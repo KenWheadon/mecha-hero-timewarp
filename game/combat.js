@@ -162,6 +162,8 @@ function cleanupSpriteSheet() {
   container.style.backgroundSize = "";
   container.style.backgroundRepeat = "";
   container.style.aspectRatio = "";  // Reset aspect ratio for static images
+  container.style.transform = "";  // Reset transform
+  container.style.transformOrigin = "";
 }
 
 // Set pose image or sprite - no fallback, log error if missing

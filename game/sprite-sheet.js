@@ -9,6 +9,9 @@ export class SpriteSheet {
     this.cols = config.cols || 6;
     this.fps = config.fps || 12;
     this.loop = config.loop !== undefined ? config.loop : true;
+    this.scale = config.scale || 1;
+    this.offsetX = config.offsetX || 0;
+    this.offsetY = config.offsetY || 0;
 
     this.totalFrames = this.rows * this.cols;
     this.currentFrame = 0;
@@ -118,6 +121,11 @@ export class SpriteSheet {
 
     // Set aspect ratio to match frame dimensions for uniform scaling without distortion
     element.style.aspectRatio = `${this.frameWidth} / ${this.frameHeight}`;
+
+    // Apply scale and position transforms to the container
+    // This scales the entire container (not the background) to make sprite appear larger
+    element.style.transform = `scale(${this.scale}) translate(${this.offsetX}px, ${this.offsetY}px)`;
+    element.style.transformOrigin = 'center center';
 
     // Calculate which row/col we're showing
     const col = this.currentFrame % this.cols;

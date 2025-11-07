@@ -28,6 +28,9 @@ function parseDimensions(filename) {
  * - cols: Number of columns in the sprite sheet (default: 6)
  * - fps: Frames per second for animation (default: 12)
  * - loop: Whether to loop the animation (default: true)
+ * - scale: Scale factor for the container (default: 1)
+ * - offsetX: Horizontal offset in pixels (default: 0)
+ * - offsetY: Vertical offset in pixels (default: 0)
  */
 export const SPRITE_CONFIGS = {
   "pose2-hit": {
@@ -44,6 +47,9 @@ export const SPRITE_CONFIGS = {
     cols: 6,
     fps: 12,
     loop: true,
+    scale: 1,
+    offsetX: 0,
+    offsetY: 0,
   },
 
   // Add more sprite configurations here as needed

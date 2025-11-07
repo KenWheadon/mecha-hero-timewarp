@@ -545,10 +545,12 @@ body.title-active::before {
 #enemy-container {
   position: relative;
   display: inline-block;
+  /* Increase container size by 40% width and 10% height */
+  width: 532px;  /* 380px * 1.4 = 532px */
 }
 
 #enemy-pose {
-  width: 380px;
+  width: 100%;
   height: auto;
   border: var(--border-thick) solid #000;
   display: flex;
@@ -1234,9 +1236,13 @@ body.title-active::before {
     max-width: 300px;
   }
 
+  #enemy-container {
+    width: 420px;  /* 300px * 1.4 = 420px */
+  }
+
   #enemy-pose {
-    width: 300px;
-    height: 300px;
+    width: 100%;
+    height: auto;
   }
 
   #instruction {
@@ -1315,9 +1321,13 @@ body.title-active::before {
     height: 35px;
   }
 
+  #enemy-container {
+    width: 364px;  /* 260px * 1.4 = 364px */
+  }
+
   #enemy-pose {
-    width: 260px;
-    height: 260px;
+    width: 100%;
+    height: auto;
   }
 
   #instruction {
