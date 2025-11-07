@@ -17,9 +17,47 @@
         height: 100vh;
         overflow: hidden;
       }
+      #title-screen {
+        text-align: center;
+        max-width: 800px;
+      }
+      #title {
+        font-size: 48px;
+        margin-bottom: 40px;
+        text-shadow: 0 0 10px #0f0;
+      }
+      .title-btn {
+        padding: 15px 30px;
+        font-size: 24px;
+        background: #333;
+        border: 2px solid #fff;
+        color: #fff;
+        cursor: pointer;
+        margin: 10px;
+        transition: background 0.2s;
+      }
+      .title-btn:hover {
+        background: #555;
+      }
       #game {
         text-align: center;
         max-width: 800px;
+        display: none; /* Hidden until start */
+      }
+      #controls {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        display: flex;
+        gap: 10px;
+      }
+      #pause {
+        padding: 10px 20px;
+        background: #f00;
+        border: none;
+        color: #fff;
+        font-size: 16px;
+        cursor: pointer;
       }
       #hearts {
         position: absolute;
@@ -34,7 +72,7 @@
       }
       #fight-info {
         position: absolute;
-        top: 20px;
+        top: 80px;
         right: 20px;
         font-size: 24px;
       }
@@ -52,6 +90,15 @@
         width: 100%;
         transition: width 0.1s;
       }
+      #timer-paused {
+        position: absolute;
+        top: -25px;
+        left: 50%;
+        transform: translateX(-50%);
+        color: #ff0;
+        font-size: 12px;
+        display: none;
+      }
       #enemy-pose {
         width: 300px;
         height: 300px;
@@ -67,6 +114,13 @@
         width: 100%;
         height: 100%;
         object-fit: contain;
+      }
+      #instruction {
+        font-size: 28px;
+        font-weight: bold;
+        margin: 20px;
+        color: #0f0;
+        min-height: 40px;
       }
       #attacks {
         display: grid;
@@ -94,17 +148,17 @@
         object-fit: contain;
         margin-right: 10px;
       }
-      .attack-btn:hover {
+      .attack-btn:hover:not(:disabled) {
         background: #555;
       }
       .attack-btn:disabled {
-        opacity: 0.5;
+        opacity: 0.3;
         cursor: not-allowed;
       }
       #message {
-        font-size: 24px;
+        font-size: 20px;
         margin: 20px;
-        min-height: 30px;
+        min-height: 25px;
       }
       #restart {
         display: none;
@@ -116,13 +170,96 @@
         cursor: pointer;
         margin-top: 20px;
       }
+      #how-to-play {
+        display: none;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: #111;
+        border: 2px solid #fff;
+        padding: 20px;
+        max-width: 500px;
+        z-index: 10;
+      }
+      #how-to-play h2 {
+        margin-top: 0;
+      }
+      #how-to-play ul {
+        text-align: left;
+      }
+      #close-htp {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: none;
+        border: none;
+        color: #fff;
+        font-size: 24px;
+        cursor: pointer;
+      }
+      #overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        z-index: 5;
+      }
     </style>
   </head>
   <body>
+    <div id="overlay"></div>
+    <div id="how-to-play">
+      <button id="close-htp">&times;</button>
+      <h2>How to Play Mecha Hero</h2>
+      <p>
+        Enter the recursive arena and counter the enemy's mecha poses before
+        time runs out!
+      </p>
+      <ul>
+        <li>
+          <strong>Poses:</strong> Watch the enemy shift from neutral to attack
+          stances. Fight 1: 2 poses/attacks. Fights 2-3: 4 poses/attacks (faster
+          in 3).
+        </li>
+        <li>
+          <strong>Respond:</strong> Click the correct counter (Shield Bash for
+          high arms, Rocket Fist for low sweeps, etc.) within the timer.
+        </li>
+        <li>
+          <strong>Timer:</strong> Green bar drains—timeout loses a heart.
+          Correct hits advance; wrong retries after cooldown.
+        </li>
+        <li><strong>Hearts:</strong> 3 lives total. Lose all? Game over.</li>
+        <li>
+          <strong>Fights:</strong> Beat all poses to win a fight. Clear all 3
+          fights to shatter the time crystal!
+        </li>
+        <li><strong>Pause:</strong> Hit pause to freeze the action anytime.</li>
+      </ul>
+      <p>Recursion rules: Patterns echo and accelerate—adapt or overload!</p>
+    </div>
+
+    <div id="title-screen">
+      <h1 id="title">MECHA HERO</h1>
+      <p>Recursion Jam Edition</p>
+      <button class="title-btn" id="start-btn">Start Game</button>
+      <button class="title-btn" id="htp-btn">How to Play</button>
+    </div>
+
     <div id="game">
+      <div id="controls">
+        <button id="pause">Pause</button>
+      </div>
       <div id="hearts"></div>
       <div id="fight-info">Fight: 1/3</div>
-      <div id="timer"><div id="timer-fill"></div></div>
+      <div id="timer">
+        <div id="timer-paused">PAUSED</div>
+        <div id="timer-fill"></div>
+      </div>
       <div id="enemy-pose">
         <img
           id="pose-img"
@@ -131,7 +268,8 @@
           onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjMTExIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJtb25vc3BhY2UiIGZvbnQtc2l6ZT0iMTgiIGZpbGw9IiNmZmYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj5OZXV0cmFsIFN0YW5jZTwvdGV4dD48L3N2Zz4='"
         />
       </div>
-      <div id="message">Click to start!</div>
+      <div id="instruction">Prepare for battle...</div>
+      <div id="message"></div>
       <div id="attacks">
         <button class="attack-btn" data-action="shield">
           <img
@@ -209,17 +347,30 @@
         maxFights: 3,
         hearts: 3,
         currentPoseIndex: 0,
-        currentPoses: [], // Shuffled attacks only (4)
+        currentPoses: [], // Shuffled attacks only
+        numPoses: 0,
+        availableAttacks: [],
         timer: null,
         timerInterval: null,
         baseTimerDuration: 5000, // ms, adjusted per fight
+        isPaused: false,
       };
 
       const elements = {
+        titleScreen: document.getElementById("title-screen"),
+        game: document.getElementById("game"),
+        overlay: document.getElementById("overlay"),
+        htp: document.getElementById("how-to-play"),
+        closeHtp: document.getElementById("close-htp"),
+        startBtn: document.getElementById("start-btn"),
+        htpBtn: document.getElementById("htp-btn"),
+        pause: document.getElementById("pause"),
         hearts: document.getElementById("hearts"),
         fightInfo: document.getElementById("fight-info"),
         timerFill: document.getElementById("timer-fill"),
+        timerPaused: document.getElementById("timer-paused"),
         poseImg: document.getElementById("pose-img"),
+        instruction: document.getElementById("instruction"),
         message: document.getElementById("message"),
         attacks: document.querySelectorAll(".attack-btn"),
         restart: document.getElementById("restart"),
@@ -252,11 +403,23 @@
         }
       }
 
-      // Shuffle attack poses
-      function shufflePoses() {
-        gameState.currentPoses = [...attackPoses].sort(
-          () => Math.random() - 0.5
-        );
+      // Set poses based on fight
+      function setPoses() {
+        if (gameState.currentFight === 1) {
+          // Level 1: First 2 poses/attacks
+          gameState.availableAttacks = ["shield", "rocket"];
+          gameState.currentPoses = attackPoses
+            .slice(0, 2)
+            .sort(() => Math.random() - 0.5);
+          gameState.numPoses = 2;
+        } else {
+          // Levels 2-3: All 4
+          gameState.availableAttacks = ["shield", "rocket", "sword", "plasma"];
+          gameState.currentPoses = [...attackPoses].sort(
+            () => Math.random() - 0.5
+          );
+          gameState.numPoses = 4;
+        }
       }
 
       // Reset to neutral with cooldown delay before next action
@@ -265,18 +428,20 @@
         disableButtons();
         clearInterval(gameState.timerInterval);
         elements.timerFill.style.width = "100%"; // Reset timer visually
+        elements.instruction.textContent = "Cooldown...";
         setTimeout(callback, delay);
       }
 
       // Start a new fight
       function startFight() {
         if (gameState.currentFight > gameState.maxFights) {
-          elements.message.textContent = "Victory! Crystal Shattered.";
+          elements.instruction.textContent = "VICTORY!";
+          elements.message.textContent = "Crystal Shattered. Recursion Broken.";
           setPose(neutralPose); // Back to neutral on win
           elements.restart.style.display = "block";
           return;
         }
-        shufflePoses();
+        setPoses();
         gameState.currentPoseIndex = 0;
         gameState.baseTimerDuration =
           gameState.currentFight === 1
@@ -285,7 +450,8 @@
             ? 3000
             : 1500;
         elements.fightInfo.textContent = `Fight: ${gameState.currentFight}/3`;
-        elements.message.textContent = "Begin!";
+        elements.instruction.textContent = "Begin!";
+        elements.message.textContent = "";
         elements.restart.style.display = "none";
         // Start with neutral, brief pause, then first pose
         setPose(neutralPose);
@@ -296,9 +462,10 @@
 
       // Show next pose
       function nextPose() {
-        if (gameState.currentPoseIndex >= 4) {
+        if (gameState.currentPoseIndex >= gameState.numPoses) {
           // Fight won - show defeated
           setPose(defeatedPose);
+          elements.instruction.textContent = "FIGHT WON!";
           elements.message.textContent = `Fight ${gameState.currentFight} Complete! Rewind...`;
           setTimeout(() => {
             gameState.currentFight++;
@@ -312,20 +479,23 @@
         }
         const pose = gameState.currentPoses[gameState.currentPoseIndex];
         setPose(pose);
-        elements.message.textContent = `Pose ${
+        elements.instruction.textContent = `RESPOND NOW! (${
           gameState.currentPoseIndex + 1
-        }/4: ${pose.desc}`;
+        }/${gameState.numPoses})`;
+        elements.message.textContent = pose.desc;
         startTimer();
         enableButtons();
       }
 
       // Start timer
       function startTimer() {
+        if (gameState.isPaused) return;
         clearInterval(gameState.timerInterval);
         const duration = gameState.baseTimerDuration;
         let timeLeft = duration;
         elements.timerFill.style.width = "100%";
         gameState.timerInterval = setInterval(() => {
+          if (gameState.isPaused) return;
           timeLeft -= 50;
           const percent = (timeLeft / duration) * 100;
           elements.timerFill.style.width = `${percent}%`;
@@ -339,20 +509,24 @@
 
       // Handle attack click
       function handleAttack(action) {
+        if (gameState.isPaused || !gameState.availableAttacks.includes(action))
+          return;
         clearInterval(gameState.timerInterval);
         const pose = gameState.currentPoses[gameState.currentPoseIndex];
         if (action === pose.correct) {
-          elements.message.textContent = "Counter! Perfect.";
+          elements.instruction.textContent = "PERFECT COUNTER!";
+          elements.message.textContent = "Damage dealt!";
           gameState.currentPoseIndex++;
           cooldownToNeutral(500, () => {
-            if (gameState.currentPoseIndex >= 4) {
+            if (gameState.currentPoseIndex >= gameState.numPoses) {
               nextPose(); // This will show defeated
             } else {
               nextPose();
             }
           });
         } else {
-          elements.message.textContent = "Wrong! Hit taken.";
+          elements.instruction.textContent = "MISSED!";
+          elements.message.textContent = "Counter failed!";
           loseHeart();
           cooldownToNeutral(1000, nextPose); // Retry after cooldown
         }
@@ -360,7 +534,8 @@
       }
 
       // Lose a heart
-      function loseHeart() {
+      function loseHeart(reason) {
+        elements.message.textContent += ` ${reason || "Hit taken."}`;
         gameState.hearts--;
         updateHearts();
         if (gameState.hearts <= 0) {
@@ -390,57 +565,93 @@
 
       // Game over
       function gameOver() {
-        elements.message.textContent = "Game Over! Crystal Overload.";
+        elements.instruction.textContent = "GAME OVER!";
+        elements.message.textContent = "Crystal Overload. Restart?";
         setPose(neutralPose); // Reset to neutral
         elements.restart.style.display = "block";
         disableButtons();
       }
 
-      // Enable/disable buttons
+      // Enable/disable buttons based on available attacks
       function enableButtons() {
-        elements.attacks.forEach((btn) => (btn.disabled = false));
+        elements.attacks.forEach((btn) => {
+          if (gameState.availableAttacks.includes(btn.dataset.action)) {
+            btn.disabled = false;
+          } else {
+            btn.disabled = true;
+          }
+        });
       }
       function disableButtons() {
         elements.attacks.forEach((btn) => (btn.disabled = true));
       }
 
+      // Pause toggle
+      function togglePause() {
+        gameState.isPaused = !gameState.isPaused;
+        elements.pause.textContent = gameState.isPaused ? "Resume" : "Pause";
+        elements.timerPaused.style.display = gameState.isPaused
+          ? "block"
+          : "none";
+        if (gameState.isPaused) {
+          clearInterval(gameState.timerInterval);
+          disableButtons();
+          elements.instruction.textContent += " (PAUSED)";
+        } else {
+          elements.instruction.textContent =
+            elements.instruction.textContent.replace(" (PAUSED)", "");
+          if (gameState.currentPoseIndex < gameState.numPoses) {
+            enableButtons();
+            startTimer(); // Resume timer if in pose
+          }
+        }
+      }
+
       // Event listeners
+      elements.startBtn.addEventListener("click", () => {
+        elements.titleScreen.style.display = "none";
+        elements.game.style.display = "block";
+        initHearts();
+        startFight();
+      });
+
+      elements.htpBtn.addEventListener("click", () => {
+        elements.overlay.style.display = "block";
+        elements.htp.style.display = "block";
+      });
+
+      elements.closeHtp.addEventListener("click", () => {
+        elements.overlay.style.display = "none";
+        elements.htp.style.display = "none";
+      });
+
+      elements.overlay.addEventListener("click", () => {
+        elements.overlay.style.display = "none";
+        elements.htp.style.display = "none";
+      });
+
       elements.attacks.forEach((btn) => {
         btn.addEventListener("click", () => handleAttack(btn.dataset.action));
       });
+
+      elements.pause.addEventListener("click", togglePause);
+
       elements.restart.addEventListener("click", () => {
         gameState = {
           ...gameState,
           currentFight: 1,
           hearts: 3,
           currentPoseIndex: 0,
+          isPaused: false,
         };
+        elements.pause.textContent = "Pause";
+        elements.timerPaused.style.display = "none";
         initHearts();
         startFight();
       });
 
-      // Init game - Defaults to neutral pose
-      initHearts();
+      // Init - Show title
       setPose(neutralPose);
-      elements.message.textContent = "Click a response to start Fight 1!";
-      enableButtons();
-      // Auto-start on first attack click for demo
-      elements.attacks.forEach((btn) => {
-        btn.addEventListener(
-          "click",
-          function firstClick(e) {
-            if (
-              gameState.currentFight === 1 &&
-              gameState.currentPoseIndex === 0 &&
-              !gameState.currentPoses.length
-            ) {
-              this.removeEventListener("click", firstClick);
-              startFight();
-            }
-          },
-          { once: true }
-        );
-      });
     </script>
   </body>
 </html>
