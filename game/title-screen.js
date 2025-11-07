@@ -77,9 +77,22 @@ function startTitleGlitch() {
     setTimeout(() => {
       // Replace the title text with an image
       elements.title.innerHTML =
-        '<img src="images/logo-thin.png" alt="MECHA HERO" style="max-width: 30%; height: auto;" />';
+        '<img id="logo-img" src="images/logo-thin.png" alt="MECHA HERO" style="max-width: 30%; height: auto; cursor: pointer;" />';
       elements.title.style.animation = "none";
       elements.title.style.marginBottom = "10px";
+
+      // Add click event to logo
+      const logoImg = document.getElementById("logo-img");
+      logoImg.addEventListener("click", onLogoClick);
     }, 300);
   }, 3000);
+}
+
+// Handle logo click - switch to thick version and start pulsing
+function onLogoClick() {
+  const logoImg = document.getElementById("logo-img");
+  if (logoImg && !logoImg.classList.contains("logo-pulsing")) {
+    logoImg.src = "images/logo-thick.png";
+    logoImg.classList.add("logo-pulsing");
+  }
 }

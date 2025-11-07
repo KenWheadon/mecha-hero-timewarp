@@ -149,6 +149,24 @@ body.title-active::before {
   }
 }
 
+/* Logo pulsing animation */
+.logo-pulsing {
+  animation: logoPulse 2s ease-in-out infinite !important;
+}
+
+@keyframes logoPulse {
+  0%,
+  100% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 10px rgba(255, 0, 51, 0.5));
+  }
+  50% {
+    transform: scale(1.1);
+    filter: drop-shadow(0 0 15px rgba(255, 0, 51, 0.8))
+      drop-shadow(0 0 20px rgba(0, 255, 255, 0.6));
+  }
+}
+
 /* Button container for better spacing */
 #title-screen .button-container {
   display: flex;
