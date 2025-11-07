@@ -1,59 +1,74 @@
 Mecha Hero Design Document
-Game Overview
-
-Title: Mecha Hero
-Jam: Mini Jam 197: Recursion
-Genre: Rhythm-action quick-time event (QTE) fighter
-Platform: Web (HTML/JS single-page)
-Core Loop: Respond to enemy mecha poses by selecting the correct counter-attack from 4 options within a time limit. Complete sequences to progress through fights.
-Win Condition: Successfully counter all 4 poses in each of 3 escalating fights.
-Lose Condition: Deplete 3 player hearts via incorrect selections or timeouts.
-Replayability: Procedural shuffle of pose order per fight.
-
+Overview
+Mecha Hero is a single-player rhythm-action game where the player counters enemy mecha poses by selecting the correct response within a time limit. The game progresses through 4 fights (levels), each with escalating difficulty via reduced timers, more poses, and procedural elements. The player has 3 hearts (lives); losing all ends the game. Success depletes the enemy's HP bar by countering all required poses. Visual feedback includes pose images, bars, and text prompts. The theme emphasizes recursion through time warps and accelerating patterns.
 Core Mechanics
 
-Enemy Poses: 4 distinct mecha poses, each requiring a specific player counter.
-Player Actions: 4 attack buttons (Shield Bash, Rocket Fist, Sword Slash, Plasma Dodge).
-Response Rules:
+Poses and Responses: The enemy starts in a neutral stance (Pose 1). It shifts to an attack pose, revealing 2-4 player response buttons (Shield Bash, Rocket Fist, Sword Slash, Plasma Dodge). Each pose maps to one correct response.
 
-Correct selection: Advances to next pose.
-Wrong selection: Loses 1 heart; retries current pose.
-Timeout: Loses 1 heart; retries current pose.
+Correct selection: Deals 1 damage to enemy HP, triggers "PERFECT COUNTER!" message, 500ms cooldown to neutral pose, advances to next pose.
+Incorrect selection or timeout: Triggers "MISSED!" or "Timeout!" message, loses 1 heart, 1000ms cooldown, retries the same pose.
 
-Hearts System: Player starts with 3 hearts. No regeneration. 0 hearts = game over.
-Timer: Per-pose countdown bar. Duration decreases per fight.
-Sequence Requirement: Must complete all 4 poses correctly in shuffled order to win a fight. No enemy health bar; success is sequence completion.
+Timer: Green bar drains from full (10s/6s/4s/2s per level). Pauses on pause toggle.
+Hearts: 3 icons (full/empty images). Deplete on miss/timeout; 0 hearts triggers game over.
+Enemy HP: Red bar starts full (2/4/4/8 per level). Depletes by 1 per correct counter. Displays current/max HP in instruction text.
+Crystal Energy: Cyan bar (2 charges max), visible from Level 2. Drains by 1 on time warp after Levels 2-3.
+Pause: Toggles timer/buttons freeze; appends "(PAUSED)" to instruction; changes button to "Resume".
+End States:
 
-Pose-Response Mapping
+Game Over: "GAME OVER! Crystal Overload. Restart?" message, shows neutral pose.
+Victory (Level 4): "TOTAL VICTORY! Robot Destroyed. Recursion Ended." message, shows destroyed pose (Pose 9).
 
-Pose #Enemy Pose DescriptionCorrect Player AttackCounter Flavor Text1Arm Cocked High (glowing elbow joint, overhead wind-up)Shield BashBlocks the downward smash, stunning the arm for a riposte crack.2Leg Sweep Low (knee vents hissing, ground tremor effect)Rocket FistLaunches you airborne, dodging the trip and counter-stomping the vents.3Torso Twist (shoulder pauldrons rotating, feint sparks)Sword SlashSlices through the spin, exploiting the exposed core mid-rotation.4Chest Burst (reactor core pulsing red, exhaust flare)Plasma DodgeSidesteps the beam, circling back for a charged overload shot.
-Progression
+Level Progression
+Levels are sequential fights; completing one advances via animations.
 
-Fights: 3 total, against the same enemy mecha.
-Time Crystal Mechanic: After each fight win, enemy uses time crystal to rewind (visual/audio cue) and accelerate to next fight.
-Fight Timers:
+Level 1 (2 HP, 10s timer):
 
-Fight 1: 5 seconds per pose.
-Fight 2: 3 seconds per pose.
-Fight 3: 1.5 seconds per pose.
+2 unique poses (Arm Cocked High → Shield Bash; Leg Sweep Low → Rocket Fist), shown in random order.
+No crystal bar.
+On completion: Damaged pose (2s), time warp pose (5s), advance to Level 2.
 
-Between Fights: Brief "rewind" message and delay before next fight starts with shuffled poses.
-Overall Flow:
+Level 2 (4 HP, 6s timer):
 
-Start Fight 1.
-Complete 4-pose sequence → Rewind cue → Fight 2.
-Repeat for Fight 3.
-Complete Fight 3 → Victory ("Crystal Shattered").
+4 unique poses (all attacks), random order.
+Crystal starts at 2 charges; drains 1 on warp.
+On completion: Damaged (2s), time warp (5s), advance.
 
-Failure Handling: Heart loss retries current pose. Game over restarts full game.
+Level 3 (4 HP, 4s timer):
 
-UI/UX Elements
+4 unique poses, random order.
+Crystal drains 1 on warp (now 0).
+On completion: Damaged (2s), time warp (5s), advance.
 
-Hearts Display: 3 icons (full/empty states) in top-left.
-Fight Counter: "Fight: X/3" in top-right.
-Timer Bar: Crystal-shaped progress bar draining per pose.
-Enemy Pose Area: Central display for pose image/description.
-Attack Buttons: 2x2 grid with icons and labels.
-Message Area: Displays current pose info, feedback (e.g., "Counter! Perfect.", "Wrong! Hit taken.", "Timeout!"), fight complete cues, victory/game over text.
-Restart Button: Appears on game over or victory for full reset.
-Input: Mouse clicks on buttons. Buttons disabled during transitions/timeouts.
+Level 4 (8 HP, 2s timer):
+
+8 random poses (repeats allowed from all 4 attacks).
+No crystal.
+On completion: Shows destroyed pose, victory screen.
+
+UI and Flow
+
+Title Screen: "MECHA HERO" title, "Recursion Jam Edition" subtitle, "Start Game" and "How to Play" buttons.
+How to Play Modal: Overlay with rules list, close button (× or overlay click).
+Game Screen Layout:
+
+Top-left: 3 heart icons.
+Top-right: Pause button; below: "Fight: X/4".
+Center-top: Timer bar (with "PAUSED" label).
+Center: Enemy container (crystal bar above HP bar above pose image).
+Below: Instruction text (bold green, e.g., "RESPOND NOW! HP: X/Y"), message text (e.g., pose desc or feedback).
+Below: Attacks grid (2x2, fades in/out; disabled buttons at 30% opacity).
+Bottom: Restart button (hidden until end).
+
+Visual Feedback:
+
+Pose transitions: Image swap with fallback SVG text.
+Attacks: Fade in on pose show; only relevant buttons enabled.
+Bars: Smooth width transitions; HP red, crystal cyan, timer green.
+
+Restart: Resets to Level 1, full hearts/crystal.
+
+Assets
+
+Images folder: pose1.png (neutral), pose2-5.png (attacks), pose7.png (damaged), pose8.png (warp), pose9.png (destroyed), shield/rocket/sword/plasma.png (buttons), heart_full/empty.png.
+
+I've also added a 'pose2-hit' 'pose2-dmg' for each of the attack poses (2-5) with the hit showing if the player picks the incorrect defense, and dmg showing if they picked the correct one. These should be shown for 1 second to provide additional feedback on the players action.

@@ -99,6 +99,43 @@
         font-size: 12px;
         display: none;
       }
+      #enemy-container {
+        position: relative;
+        display: inline-block;
+      }
+      #enemy-hp {
+        position: absolute;
+        top: -30px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 200px;
+        height: 10px;
+        background: #333;
+        border: 1px solid #fff;
+      }
+      #enemy-hp-fill {
+        height: 100%;
+        background: #f00;
+        width: 100%;
+        transition: width 0.3s;
+      }
+      #crystal-energy {
+        display: none;
+        position: absolute;
+        top: -50px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 200px;
+        height: 10px;
+        background: #333;
+        border: 1px solid #0ff;
+      }
+      #crystal-fill {
+        height: 100%;
+        background: #0ff;
+        width: 100%;
+        transition: width 0.3s;
+      }
       #enemy-pose {
         width: 300px;
         height: 300px;
@@ -128,6 +165,11 @@
         gap: 20px;
         max-width: 400px;
         margin: 20px auto;
+        opacity: 0;
+        transition: opacity 0.3s;
+      }
+      #attacks.show {
+        opacity: 1;
       }
       .attack-btn {
         padding: 20px;
@@ -221,26 +263,29 @@
       </p>
       <ul>
         <li>
-          <strong>Poses:</strong> Watch the enemy shift from neutral to attack
-          stances. Fight 1: 2 poses/attacks. Fights 2-3: 4 poses/attacks (faster
-          in 3).
+          <strong>Poses:</strong> Robot starts neutral, shifts to attack. Fight
+          1: 2 unique poses. Fights 2-3: 4 unique. Fight 4: 8 random (repeats
+          ok).
         </li>
         <li>
-          <strong>Respond:</strong> Click the correct counter (Shield Bash for
-          high arms, Rocket Fist for low sweeps, etc.) within the timer.
+          <strong>Respond:</strong> When attack shows, click correct counter
+          within timer. Correct: Enemy HP -1.
         </li>
         <li>
-          <strong>Timer:</strong> Green bar drains—timeout loses a heart.
-          Correct hits advance; wrong retries after cooldown.
+          <strong>Timer:</strong> Drains per level (10s/6s/4s/2s)—timeout loses
+          heart, retry pose.
         </li>
-        <li><strong>Hearts:</strong> 3 lives total. Lose all? Game over.</li>
+        <li><strong>Hearts/HP:</strong> 3 player hearts. Enemy: 2/4/4/8 HP.</li>
         <li>
-          <strong>Fights:</strong> Beat all poses to win a fight. Clear all 3
-          fights to shatter the time crystal!
+          <strong>Levels:</strong> Deplete HP to win fight. Damaged (2s) + Warp
+          (5s, L1-3) before next. L4: Final destroy.
         </li>
-        <li><strong>Pause:</strong> Hit pause to freeze the action anytime.</li>
+        <li>
+          <strong>Crystal:</strong> Energy (2 charges) drains on warps (L2-3).
+        </li>
+        <li><strong>Pause:</strong> Freeze anytime.</li>
       </ul>
-      <p>Recursion rules: Patterns echo and accelerate—adapt or overload!</p>
+      <p>Recursion rules: Echo and accelerate—adapt or overload!</p>
     </div>
 
     <div id="title-screen">
@@ -255,18 +300,22 @@
         <button id="pause">Pause</button>
       </div>
       <div id="hearts"></div>
-      <div id="fight-info">Fight: 1/3</div>
+      <div id="fight-info">Fight: 1/4</div>
       <div id="timer">
         <div id="timer-paused">PAUSED</div>
         <div id="timer-fill"></div>
       </div>
-      <div id="enemy-pose">
-        <img
-          id="pose-img"
-          src="images/pose1.png"
-          alt="Enemy Pose"
-          onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjMTExIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJtb25vc3BhY2UiIGZvbnQtc2l6ZT0iMTgiIGZpbGw9IiNmZmYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj5OZXV0cmFsIFN0YW5jZTwvdGV4dD48L3N2Zz4='"
-        />
+      <div id="enemy-container">
+        <div id="crystal-energy"><div id="crystal-fill"></div></div>
+        <div id="enemy-hp"><div id="enemy-hp-fill"></div></div>
+        <div id="enemy-pose">
+          <img
+            id="pose-img"
+            src="images/pose1.png"
+            alt="Enemy Pose"
+            onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjMTExIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJtb25vc3BhY2UiIGZvbnQtc2l6ZT0iMTgiIGZpbGw9IiNmZmYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj5OZXV0cmFsIFN0YW5jZTwvdGV4dD48L3N2Zz4='"
+          />
+        </div>
       </div>
       <div id="instruction">Prepare for battle...</div>
       <div id="message"></div>
@@ -308,7 +357,7 @@
     </div>
 
     <script>
-      // Game data - Neutral (1) as default/reset, Attacks (2-5) shuffled, Defeated (6) for win
+      // Game data
       const neutralPose = {
         id: 1,
         desc: "Neutral Stance",
@@ -340,20 +389,32 @@
           correct: "plasma",
         },
       ];
-      const defeatedPose = { id: 6, desc: "Defeated", img: "images/pose6.png" };
+      const damagedPose = { id: 7, desc: "Damaged", img: "images/pose7.png" };
+      const timeWarpPose = {
+        id: 8,
+        desc: "Time Warp",
+        img: "images/pose8.png",
+      };
+      const finalDestroyPose = {
+        id: 9,
+        desc: "Destroyed",
+        img: "images/pose9.png",
+      };
 
       let gameState = {
         currentFight: 1,
-        maxFights: 3,
+        maxFights: 4,
         hearts: 3,
-        currentPoseIndex: 0,
-        currentPoses: [], // Shuffled attacks only
-        numPoses: 0,
+        enemyHP: 0,
+        maxEnemyHP: 0,
+        pendingPose: null,
         availableAttacks: [],
         timer: null,
         timerInterval: null,
-        baseTimerDuration: 5000, // ms, adjusted per fight
+        baseTimerDuration: 10000, // Default, adjusted per fight
         isPaused: false,
+        crystalCharges: 2,
+        counteredPoses: new Set(), // Track successfully countered in level for no repeats L1-3
       };
 
       const elements = {
@@ -369,10 +430,15 @@
         fightInfo: document.getElementById("fight-info"),
         timerFill: document.getElementById("timer-fill"),
         timerPaused: document.getElementById("timer-paused"),
+        crystalEnergy: document.getElementById("crystal-energy"),
+        crystalFill: document.getElementById("crystal-fill"),
+        enemyHp: document.getElementById("enemy-hp"),
+        enemyHpFill: document.getElementById("enemy-hp-fill"),
         poseImg: document.getElementById("pose-img"),
         instruction: document.getElementById("instruction"),
         message: document.getElementById("message"),
         attacks: document.querySelectorAll(".attack-btn"),
+        attacksDiv: document.getElementById("attacks"),
         restart: document.getElementById("restart"),
       };
 
@@ -386,6 +452,36 @@
             encodeURIComponent(fallbackText) +
             "</text></svg>";
         };
+      }
+
+      // Show feedback pose for duration
+      function showFeedback(isCorrect, duration, callback) {
+        const pose = gameState.pendingPose;
+        const suffix = isCorrect ? "dmg" : "hit";
+        const fbPose = {
+          id: pose.id,
+          desc: `${pose.desc} ${isCorrect ? "Dmg" : "Hit"}`,
+          img: `images/pose${pose.id}-${suffix}.png`,
+        };
+        setPose(fbPose);
+        setTimeout(() => {
+          if (isCorrect) {
+            gameState.pendingPose = null;
+          }
+          callback();
+        }, duration);
+      }
+
+      // Update enemy HP bar
+      function updateEnemyHP() {
+        const percent = (gameState.enemyHP / gameState.maxEnemyHP) * 100;
+        elements.enemyHpFill.style.width = `${percent}%`;
+      }
+
+      // Update crystal bar
+      function updateCrystal() {
+        const percent = (gameState.crystalCharges / 2) * 100;
+        elements.crystalFill.style.width = `${percent}%`;
       }
 
       // Init hearts
@@ -403,86 +499,80 @@
         }
       }
 
-      // Set poses based on fight
-      function setPoses() {
-        if (gameState.currentFight === 1) {
-          // Level 1: First 2 poses/attacks
-          gameState.availableAttacks = ["shield", "rocket"];
-          gameState.currentPoses = attackPoses
-            .slice(0, 2)
-            .sort(() => Math.random() - 0.5);
-          gameState.numPoses = 2;
+      // Get next pose candidate (without adding to countered)
+      function getNextPoseCandidate() {
+        if (gameState.currentFight === 4) {
+          // Random, can repeat
+          return attackPoses[Math.floor(Math.random() * attackPoses.length)];
         } else {
-          // Levels 2-3: All 4
-          gameState.availableAttacks = ["shield", "rocket", "sword", "plasma"];
-          gameState.currentPoses = [...attackPoses].sort(
-            () => Math.random() - 0.5
+          // Unique, no repeats until success
+          const available = attackPoses.filter(
+            (p) =>
+              !gameState.counteredPoses.has(p.id) &&
+              gameState.availableAttacks.includes(p.correct)
           );
-          gameState.numPoses = 4;
+          if (available.length === 0) return null;
+          return available[Math.floor(Math.random() * available.length)];
         }
       }
 
-      // Reset to neutral with cooldown delay before next action
-      function cooldownToNeutral(delay, callback) {
-        setPose(neutralPose);
-        disableButtons();
-        clearInterval(gameState.timerInterval);
-        elements.timerFill.style.width = "100%"; // Reset timer visually
-        elements.instruction.textContent = "Cooldown...";
-        setTimeout(callback, delay);
-      }
-
-      // Start a new fight
-      function startFight() {
-        if (gameState.currentFight > gameState.maxFights) {
-          elements.instruction.textContent = "VICTORY!";
-          elements.message.textContent = "Crystal Shattered. Recursion Broken.";
-          setPose(neutralPose); // Back to neutral on win
-          elements.restart.style.display = "block";
-          return;
+      // Set up for new fight
+      function setupFight() {
+        gameState.pendingPose = null;
+        gameState.counteredPoses.clear();
+        if (gameState.currentFight === 1) {
+          gameState.maxEnemyHP = 2;
+          gameState.availableAttacks = ["shield", "rocket"];
+          gameState.baseTimerDuration = 10000;
+          gameState.crystalCharges = 2;
+          elements.crystalEnergy.style.display = "none";
+        } else if (gameState.currentFight <= 3) {
+          gameState.maxEnemyHP = 4;
+          gameState.availableAttacks = ["shield", "rocket", "sword", "plasma"];
+          gameState.baseTimerDuration =
+            gameState.currentFight === 2 ? 6000 : 4000;
+          elements.crystalEnergy.style.display = "block";
+          updateCrystal();
+        } else {
+          // L4
+          gameState.maxEnemyHP = 8;
+          gameState.availableAttacks = ["shield", "rocket", "sword", "plasma"];
+          gameState.baseTimerDuration = 2000;
+          elements.crystalEnergy.style.display = "none";
         }
-        setPoses();
-        gameState.currentPoseIndex = 0;
-        gameState.baseTimerDuration =
-          gameState.currentFight === 1
-            ? 5000
-            : gameState.currentFight === 2
-            ? 3000
-            : 1500;
-        elements.fightInfo.textContent = `Fight: ${gameState.currentFight}/3`;
+        gameState.enemyHP = gameState.maxEnemyHP;
+        updateEnemyHP();
+        elements.fightInfo.textContent = `Fight: ${gameState.currentFight}/4`;
         elements.instruction.textContent = "Begin!";
         elements.message.textContent = "";
-        elements.restart.style.display = "none";
-        // Start with neutral, brief pause, then first pose
         setPose(neutralPose);
-        setTimeout(() => {
-          nextPose();
-        }, 500);
+        elements.attacksDiv.classList.remove("show");
+        disableButtons();
+        setTimeout(() => nextAttackPose(), 500);
       }
 
-      // Show next pose
-      function nextPose() {
-        if (gameState.currentPoseIndex >= gameState.numPoses) {
-          // Fight won - show defeated
-          setPose(defeatedPose);
-          elements.instruction.textContent = "FIGHT WON!";
-          elements.message.textContent = `Fight ${gameState.currentFight} Complete! Rewind...`;
-          setTimeout(() => {
-            gameState.currentFight++;
-            if (gameState.hearts <= 0) {
-              gameOver();
-            } else {
-              startFight();
-            }
-          }, 2000);
+      // Transition to next attack pose (retry pending on miss/timeout)
+      function nextAttackPose() {
+        if (gameState.enemyHP <= 0) {
+          endFight();
           return;
         }
-        const pose = gameState.currentPoses[gameState.currentPoseIndex];
+        let pose;
+        if (gameState.pendingPose) {
+          pose = gameState.pendingPose;
+        } else {
+          const candidate = getNextPoseCandidate();
+          if (!candidate) {
+            endFight();
+            return;
+          }
+          gameState.pendingPose = candidate;
+          pose = candidate;
+        }
         setPose(pose);
-        elements.instruction.textContent = `RESPOND NOW! (${
-          gameState.currentPoseIndex + 1
-        }/${gameState.numPoses})`;
+        elements.instruction.textContent = `RESPOND NOW! HP: ${gameState.enemyHP}/${gameState.maxEnemyHP}`;
         elements.message.textContent = pose.desc;
+        elements.attacksDiv.classList.add("show");
         startTimer();
         enableButtons();
       }
@@ -501,41 +591,70 @@
           elements.timerFill.style.width = `${percent}%`;
           if (timeLeft <= 0) {
             clearInterval(gameState.timerInterval);
-            loseHeart("Timeout!");
-            cooldownToNeutral(1000, nextPose); // Retry after cooldown
+            elements.instruction.textContent = "Timeout!";
+            elements.message.textContent = "Too slow!";
+            loseHeart();
+            showFeedback(false, 1000, nextAttackPose);
           }
         }, 50);
       }
 
-      // Handle attack click
+      // Handle attack
       function handleAttack(action) {
         if (gameState.isPaused || !gameState.availableAttacks.includes(action))
           return;
         clearInterval(gameState.timerInterval);
-        const pose = gameState.currentPoses[gameState.currentPoseIndex];
+        const pose = gameState.pendingPose;
+        elements.attacksDiv.classList.remove("show");
+        disableButtons();
         if (action === pose.correct) {
+          // Success
+          gameState.enemyHP--;
+          updateEnemyHP();
+          if (gameState.currentFight !== 4) {
+            gameState.counteredPoses.add(pose.id);
+          }
           elements.instruction.textContent = "PERFECT COUNTER!";
           elements.message.textContent = "Damage dealt!";
-          gameState.currentPoseIndex++;
-          cooldownToNeutral(500, () => {
-            if (gameState.currentPoseIndex >= gameState.numPoses) {
-              nextPose(); // This will show defeated
-            } else {
-              nextPose();
-            }
-          });
+          showFeedback(true, 1000, nextAttackPose);
         } else {
+          // Miss - retry same pose
           elements.instruction.textContent = "MISSED!";
           elements.message.textContent = "Counter failed!";
           loseHeart();
-          cooldownToNeutral(1000, nextPose); // Retry after cooldown
+          showFeedback(false, 1000, nextAttackPose);
         }
-        disableButtons();
       }
 
-      // Lose a heart
-      function loseHeart(reason) {
-        elements.message.textContent += ` ${reason || "Hit taken."}`;
+      // End current fight
+      function endFight() {
+        if (gameState.currentFight === 4) {
+          setPose(finalDestroyPose);
+          elements.instruction.textContent = "TOTAL VICTORY!";
+          elements.message.textContent = "Robot Destroyed. Recursion Ended.";
+          elements.restart.style.display = "block";
+          return;
+        }
+        setPose(damagedPose);
+        elements.instruction.textContent = "FIGHT WON! Damaged.";
+        elements.message.textContent = `Fight ${gameState.currentFight} Complete!`;
+        setTimeout(() => {
+          if (gameState.currentFight >= 2 && gameState.currentFight <= 3) {
+            gameState.crystalCharges--;
+            updateCrystal();
+          }
+          setPose(timeWarpPose);
+          elements.instruction.textContent = "Time Warp...";
+          elements.message.textContent = "Energizing for next recursion.";
+          setTimeout(() => {
+            gameState.currentFight++;
+            setupFight();
+          }, 5000);
+        }, 2000);
+      }
+
+      // Lose heart
+      function loseHeart() {
         gameState.hearts--;
         updateHearts();
         if (gameState.hearts <= 0) {
@@ -543,7 +662,7 @@
         }
       }
 
-      // Update hearts display
+      // Update hearts
       function updateHearts() {
         const heartEls = elements.hearts.querySelectorAll(".heart");
         heartEls.forEach((el, i) => {
@@ -567,19 +686,18 @@
       function gameOver() {
         elements.instruction.textContent = "GAME OVER!";
         elements.message.textContent = "Crystal Overload. Restart?";
-        setPose(neutralPose); // Reset to neutral
+        setPose(neutralPose);
         elements.restart.style.display = "block";
+        elements.attacksDiv.classList.remove("show");
         disableButtons();
       }
 
-      // Enable/disable buttons based on available attacks
+      // Enable/disable buttons
       function enableButtons() {
         elements.attacks.forEach((btn) => {
-          if (gameState.availableAttacks.includes(btn.dataset.action)) {
-            btn.disabled = false;
-          } else {
-            btn.disabled = true;
-          }
+          btn.disabled = !gameState.availableAttacks.includes(
+            btn.dataset.action
+          );
         });
       }
       function disableButtons() {
@@ -600,9 +718,9 @@
         } else {
           elements.instruction.textContent =
             elements.instruction.textContent.replace(" (PAUSED)", "");
-          if (gameState.currentPoseIndex < gameState.numPoses) {
+          if (elements.attacksDiv.classList.contains("show")) {
             enableButtons();
-            startTimer(); // Resume timer if in pose
+            startTimer();
           }
         }
       }
@@ -612,7 +730,7 @@
         elements.titleScreen.style.display = "none";
         elements.game.style.display = "block";
         initHearts();
-        startFight();
+        setupFight();
       });
 
       elements.htpBtn.addEventListener("click", () => {
@@ -641,16 +759,19 @@
           ...gameState,
           currentFight: 1,
           hearts: 3,
-          currentPoseIndex: 0,
+          enemyHP: 0,
+          pendingPose: null,
           isPaused: false,
+          crystalCharges: 2,
+          counteredPoses: new Set(),
         };
         elements.pause.textContent = "Pause";
         elements.timerPaused.style.display = "none";
         initHearts();
-        startFight();
+        setupFight();
       });
 
-      // Init - Show title
+      // Init
       setPose(neutralPose);
     </script>
   </body>
