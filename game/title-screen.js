@@ -1,17 +1,15 @@
-// Title Screen Module - manages the main menu and how-to-play modal
+// Title Screen Module - manages the main menu
 
 import { neutralPose } from "./config.js";
 import { initGame } from "./combat.js";
 import { audioManager } from "./audio-manager.js";
 import { getHighScore, formatTime } from "./storage-manager.js";
+import { HowToPlay } from "./how-to-play.js";
 
 // Cache DOM elements
 const elements = {
   titleScreen: document.getElementById("title-screen"),
   game: document.getElementById("game"),
-  overlay: document.getElementById("overlay"),
-  htp: document.getElementById("how-to-play"),
-  closeHtp: document.getElementById("close-htp"),
   startBtn: document.getElementById("start-btn"),
   htpBtn: document.getElementById("htp-btn"),
   poseImg: document.getElementById("pose-img"),
@@ -20,9 +18,16 @@ const elements = {
   highScoreValue: document.getElementById("high-score-value"),
 };
 
+// Initialize How to Play modal
+let howToPlayModal;
+
 // Initialize title screen
 export function initTitleScreen() {
   setPose(neutralPose);
+
+  // Initialize How to Play modal
+  howToPlayModal = new HowToPlay();
+
   setupEventListeners();
   // Activate colorful background for title screen
   document.body.classList.add("title-active");
@@ -59,18 +64,13 @@ function setupEventListeners() {
   // Add click listeners with sound effects
   elements.startBtn.addEventListener("click", onStartGame);
   elements.htpBtn.addEventListener("click", onHowToPlay);
-  elements.closeHtp.addEventListener("click", () => {
-    audioManager.playSoundEffect("btnClick");
-    closeModal();
-  });
-  elements.overlay.addEventListener("click", closeModal);
   elements.audioToggleTitle.addEventListener("click", () => {
     audioManager.playSoundEffect("btnClick");
     toggleAudio();
   });
 
   // Add hover sound effects to all clickable buttons
-  [elements.startBtn, elements.htpBtn, elements.closeHtp, elements.audioToggleTitle].forEach((btn) => {
+  [elements.startBtn, elements.htpBtn, elements.audioToggleTitle].forEach((btn) => {
     btn.addEventListener("mouseenter", () => {
       audioManager.playSoundEffect("btnHover");
     });
@@ -89,15 +89,7 @@ function onStartGame() {
 
 // Handle how to play button
 function onHowToPlay() {
-  audioManager.playSoundEffect("btnClick");
-  elements.overlay.style.display = "block";
-  elements.htp.style.display = "block";
-}
-
-// Close modal
-function closeModal() {
-  elements.overlay.style.display = "none";
-  elements.htp.style.display = "none";
+  howToPlayModal.open();
 }
 
 // Title glitch effect - replaces title with logo after 3 seconds

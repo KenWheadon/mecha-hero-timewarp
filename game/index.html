@@ -17,36 +17,86 @@
     </div>
     <div id="how-to-play">
       <button id="close-htp">&times;</button>
-      <h2>How to Play Mecha Hero</h2>
-      <p>
-        Enter the recursive arena and counter the enemy's mecha poses before
-        time runs out!
-      </p>
-      <ul>
-        <li>
-          <strong>Poses:</strong> Robot starts neutral, shifts to attack. Fight
-          1: 2 unique poses. Fights 2-3: 4 unique. Fight 4: 8 random (repeats
-          ok).
-        </li>
-        <li>
-          <strong>Respond:</strong> When attack shows, click correct counter
-          within timer. Correct: Enemy HP -1.
-        </li>
-        <li>
-          <strong>Timer:</strong> Drains per level (10s/6s/4s/2s)—timeout loses
-          heart, retry pose.
-        </li>
-        <li><strong>Hearts/HP:</strong> 3 player hearts. Enemy: 2/4/4/8 HP.</li>
-        <li>
-          <strong>Levels:</strong> Deplete HP to win fight. Damaged (2s) + Warp
-          (5s, L1-3) before next. L4: Final destroy.
-        </li>
-        <li>
-          <strong>Crystal:</strong> Energy (2 charges) drains on warps (L2-3).
-        </li>
-        <li><strong>Pause:</strong> Freeze anytime.</li>
-      </ul>
-      <p>Recursion rules: Echo and accelerate—adapt or overload!</p>
+      <h2>How to Play</h2>
+
+      <div class="htp-intro">
+        <p>Counter the enemy mecha's attacks before time runs out! Each fight gets harder with more poses and less time.</p>
+      </div>
+
+      <div class="htp-section">
+        <h3>Basic Gameplay</h3>
+        <div class="htp-card">
+          <div class="htp-icon">⚔️</div>
+          <div class="htp-content">
+            <strong>Watch & Counter</strong>
+            <p>Enemy shows an attack pose, you respond with the correct counter move</p>
+          </div>
+        </div>
+        <div class="htp-card">
+          <div class="htp-icon">⏱️</div>
+          <div class="htp-content">
+            <strong>Beat the Timer</strong>
+            <p>Each fight gives you less time per pose: 10s → 6s → 4s → 2s</p>
+          </div>
+        </div>
+        <div class="htp-card">
+          <div class="htp-icon">💔</div>
+          <div class="htp-content">
+            <strong>3 Hearts Only</strong>
+            <p>Wrong answer or timeout costs 1 heart. Lose all 3 and it's game over</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="htp-section">
+        <h3>Fight Progression</h3>
+        <div class="htp-fight-grid">
+          <div class="htp-fight-card fight-1">
+            <div class="fight-number">Fight 1</div>
+            <div class="fight-detail">2 Poses</div>
+            <div class="fight-detail">2 Enemy HP</div>
+            <div class="fight-detail">10s Timer</div>
+          </div>
+          <div class="htp-fight-card fight-2">
+            <div class="fight-number">Fight 2</div>
+            <div class="fight-detail">4 Poses</div>
+            <div class="fight-detail">4 Enemy HP</div>
+            <div class="fight-detail">6s Timer</div>
+          </div>
+          <div class="htp-fight-card fight-3">
+            <div class="fight-number">Fight 3</div>
+            <div class="fight-detail">4 Poses</div>
+            <div class="fight-detail">4 Enemy HP</div>
+            <div class="fight-detail">4s Timer</div>
+          </div>
+          <div class="htp-fight-card fight-4">
+            <div class="fight-number">Fight 4</div>
+            <div class="fight-detail">8 Poses</div>
+            <div class="fight-detail">8 Enemy HP</div>
+            <div class="fight-detail">2s Timer</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="htp-section">
+        <h3>Special Mechanics</h3>
+        <div class="htp-mechanic">
+          <strong>Crystal Energy</strong>
+          <p>Powers time warps between fights 2-3. Starts with 2 charges.</p>
+        </div>
+        <div class="htp-mechanic">
+          <strong>Time Warps</strong>
+          <p>After winning fights 1-3, watch a 5s warp animation before the next battle.</p>
+        </div>
+        <div class="htp-mechanic">
+          <strong>Pause Anytime</strong>
+          <p>Need a break? Hit pause to freeze the action.</p>
+        </div>
+      </div>
+
+      <div class="htp-footer">
+        <p>Remember: Recursion rules this arena. Patterns echo and accelerate!</p>
+      </div>
     </div>
 
     <div id="title-screen">

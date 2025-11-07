@@ -712,9 +712,9 @@ body.title-active::before {
   background: var(--color-card);
   border: var(--border-thick) solid #000;
   padding: 40px;
-  max-width: 600px;
+  max-width: 700px;
   width: 90%;
-  max-height: 80vh;
+  max-height: 85vh;
   overflow-y: auto;
   z-index: 10;
   box-shadow: 16px 16px 0px #000;
@@ -723,39 +723,210 @@ body.title-active::before {
 
 #how-to-play h2 {
   margin-top: 0;
-  font-size: 36px;
+  font-size: 42px;
   font-weight: 900;
   text-transform: uppercase;
-  letter-spacing: -1px;
+  letter-spacing: 2px;
   color: #000;
-  border-bottom: var(--border-medium) solid #000;
-  padding-bottom: 15px;
-  margin-bottom: 25px;
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-accent) 100%);
+  padding: 20px;
+  border: var(--border-medium) solid #000;
+  box-shadow: 8px 8px 0px #000;
+  margin-bottom: 30px;
+  text-align: center;
 }
 
-#how-to-play p {
-  font-size: 16px;
-  line-height: 1.6;
-  margin-bottom: 20px;
-}
-
-#how-to-play ul {
-  text-align: left;
-  line-height: 1.8;
-  font-size: 15px;
-}
-
-#how-to-play li {
-  margin-bottom: 15px;
-  padding-left: 10px;
-  border-left: 4px solid var(--color-primary);
-  padding-left: 15px;
-}
-
-#how-to-play strong {
-  color: var(--color-danger);
+#how-to-play h3 {
+  font-size: 24px;
+  font-weight: 900;
   text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #000;
+  background: var(--color-warning);
+  padding: 12px 20px;
+  border: var(--border-medium) solid #000;
+  box-shadow: 6px 6px 0px #000;
+  margin-bottom: 20px;
+  margin-top: 0;
+}
+
+/* Intro Section */
+.htp-intro {
+  background: var(--color-accent);
+  border: var(--border-medium) solid #000;
+  padding: 20px;
+  margin-bottom: 30px;
+  box-shadow: 6px 6px 0px #000;
+}
+
+.htp-intro p {
+  margin: 0;
+  font-size: 18px;
+  line-height: 1.6;
+  font-weight: 700;
+  color: #000;
+}
+
+/* Section Container */
+.htp-section {
+  margin-bottom: 30px;
+}
+
+/* Info Cards */
+.htp-card {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  background: var(--color-card);
+  border: var(--border-medium) solid #000;
+  padding: 20px;
+  margin-bottom: 15px;
+  box-shadow: 6px 6px 0px #000;
+  transition: all 0.2s ease;
+}
+
+.htp-card:hover {
+  transform: translate(3px, 3px);
+  box-shadow: 3px 3px 0px #000;
+}
+
+.htp-icon {
+  font-size: 48px;
+  line-height: 1;
+  flex-shrink: 0;
+  width: 60px;
+  text-align: center;
+}
+
+.htp-content {
+  flex: 1;
+}
+
+.htp-content strong {
+  display: block;
+  font-size: 20px;
+  font-weight: 900;
+  text-transform: uppercase;
+  color: var(--color-danger);
+  margin-bottom: 8px;
+  letter-spacing: 1px;
+}
+
+.htp-content p {
+  margin: 0;
   font-size: 16px;
+  line-height: 1.5;
+  font-weight: 700;
+  color: #000;
+}
+
+/* Fight Grid */
+.htp-fight-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+.htp-fight-card {
+  background: var(--color-card);
+  border: var(--border-medium) solid #000;
+  padding: 20px;
+  box-shadow: 6px 6px 0px #000;
+  text-align: center;
+  transition: all 0.2s ease;
+}
+
+.htp-fight-card:hover {
+  transform: translate(3px, 3px);
+  box-shadow: 3px 3px 0px #000;
+}
+
+.htp-fight-card.fight-1 {
+  background: linear-gradient(135deg, #00ff00 0%, #00cc00 100%);
+}
+
+.htp-fight-card.fight-2 {
+  background: linear-gradient(135deg, #ffff00 0%, #ffcc00 100%);
+}
+
+.htp-fight-card.fight-3 {
+  background: linear-gradient(135deg, #ff6600 0%, #ff3300 100%);
+}
+
+.htp-fight-card.fight-4 {
+  background: linear-gradient(135deg, #ff0033 0%, #cc0033 100%);
+}
+
+.fight-number {
+  font-size: 20px;
+  font-weight: 900;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+  border-bottom: 3px solid #000;
+  letter-spacing: 1px;
+}
+
+.fight-detail {
+  font-size: 14px;
+  font-weight: 900;
+  margin: 6px 0;
+  color: #000;
+}
+
+/* Special Mechanics */
+.htp-mechanic {
+  background: var(--color-card);
+  border: var(--border-medium) solid #000;
+  border-left: 8px solid var(--color-primary);
+  padding: 15px 20px;
+  margin-bottom: 12px;
+  box-shadow: 6px 6px 0px #000;
+  transition: all 0.2s ease;
+}
+
+.htp-mechanic:hover {
+  transform: translate(3px, 3px);
+  box-shadow: 3px 3px 0px #000;
+}
+
+.htp-mechanic strong {
+  display: block;
+  font-size: 18px;
+  font-weight: 900;
+  text-transform: uppercase;
+  color: var(--color-danger);
+  margin-bottom: 8px;
+  letter-spacing: 1px;
+}
+
+.htp-mechanic p {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.5;
+  font-weight: 700;
+  color: #000;
+}
+
+/* Footer */
+.htp-footer {
+  background: var(--color-primary);
+  border: var(--border-medium) solid #000;
+  padding: 20px;
+  text-align: center;
+  box-shadow: 6px 6px 0px #000;
+  margin-top: 30px;
+}
+
+.htp-footer p {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 900;
+  font-style: italic;
+  color: #000;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 #close-htp {
@@ -1054,6 +1225,36 @@ body.title-active::before {
     width: 50px;
     height: 50px;
   }
+
+  /* How to Play Modal - Tablet */
+  #how-to-play {
+    padding: 30px;
+    max-width: 90%;
+  }
+
+  #how-to-play h2 {
+    font-size: 32px;
+    padding: 15px;
+  }
+
+  #how-to-play h3 {
+    font-size: 20px;
+    padding: 10px 15px;
+  }
+
+  .htp-card {
+    flex-direction: column;
+    text-align: center;
+    gap: 15px;
+  }
+
+  .htp-icon {
+    font-size: 40px;
+  }
+
+  .htp-fight-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 @media (max-width: 480px) {
@@ -1102,5 +1303,74 @@ body.title-active::before {
   .attack-btn:disabled::after {
     width: 40px;
     height: 40px;
+  }
+
+  /* How to Play Modal - Mobile */
+  #how-to-play {
+    padding: 20px;
+  }
+
+  #how-to-play h2 {
+    font-size: 26px;
+    padding: 12px;
+  }
+
+  #how-to-play h3 {
+    font-size: 18px;
+    padding: 8px 12px;
+  }
+
+  .htp-intro p {
+    font-size: 16px;
+  }
+
+  .htp-card {
+    padding: 15px;
+    gap: 12px;
+  }
+
+  .htp-icon {
+    font-size: 36px;
+  }
+
+  .htp-content strong {
+    font-size: 18px;
+  }
+
+  .htp-content p {
+    font-size: 14px;
+  }
+
+  .htp-fight-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .htp-fight-card {
+    padding: 15px;
+  }
+
+  .fight-number {
+    font-size: 18px;
+  }
+
+  .fight-detail {
+    font-size: 13px;
+  }
+
+  .htp-mechanic {
+    padding: 12px 15px;
+  }
+
+  .htp-mechanic strong {
+    font-size: 16px;
+  }
+
+  .htp-mechanic p {
+    font-size: 14px;
+  }
+
+  .htp-footer p {
+    font-size: 16px;
   }
 }
