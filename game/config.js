@@ -27,6 +27,7 @@ export const attackPoses = [
     desc: "Launcher Warm Up",
     img: "images/pose3.png",
     hitImg: "images/pose3-hit.png",
+    hitSprite: "pose3-hit", // Use sprite sheet for hit animation
     dmgImg: "images/pose3-dmg.png",
     correct: "rocket",
     scale: 1.0,
@@ -38,6 +39,7 @@ export const attackPoses = [
     desc: "Short Blade Ready",
     img: "images/pose4.png",
     hitImg: "images/pose4-hit.png",
+    hitSprite: "pose4-hit", // Use sprite sheet for hit animation
     dmgImg: "images/pose4-dmg.png",
     correct: "sword",
     scale: 1.0,
@@ -49,6 +51,7 @@ export const attackPoses = [
     desc: "Heavy Blade Ready",
     img: "images/pose5.png",
     hitImg: "images/pose5-hit.png",
+    hitSprite: "pose5-hit", // Use sprite sheet for hit animation
     dmgImg: "images/pose5-dmg.png",
     correct: "plasma",
     scale: 1.0,

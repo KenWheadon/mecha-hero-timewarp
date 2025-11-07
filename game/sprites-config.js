@@ -19,6 +19,39 @@ function parseDimensions(filename) {
 }
 
 /**
+ * Factory function to create a standard sprite configuration.
+ * This reduces boilerplate for sprites that share common properties.
+ * @param {string} imagePath - Path to the sprite sheet.
+ * @param {object} overrides - Optional properties to override defaults.
+ * @returns {object} A full sprite configuration object.
+ */
+function createHitSpriteConfig(imagePath, overrides = {}) {
+  const defaults = {
+    rows: 6,
+    cols: 6,
+    fps: 12,
+    loop: true,
+    scale: 1.5,
+    offsetX: 0,
+    offsetY: 0,
+  };
+
+  const config = { ...defaults, imagePath, ...overrides };
+
+  return {
+    ...config,
+    get frameWidth() {
+      const dims = parseDimensions(this.imagePath);
+      return dims.width / this.cols;
+    },
+    get frameHeight() {
+      const dims = parseDimensions(this.imagePath);
+      return dims.height / this.rows;
+    },
+  };
+}
+
+/**
  * Sprite sheet configurations
  * Each sprite config includes:
  * - imagePath: Path to the sprite sheet image
@@ -33,42 +66,18 @@ function parseDimensions(filename) {
  * - offsetY: Vertical offset in pixels (default: 0)
  */
 export const SPRITE_CONFIGS = {
-  "pose2-hit": {
-    imagePath: "images/pose2-hit-spritesheet-2112-1548.png",
-    get frameWidth() {
-      const dims = parseDimensions(this.imagePath);
-      return dims.width / (this.cols || 6);
-    },
-    get frameHeight() {
-      const dims = parseDimensions(this.imagePath);
-      return dims.height / (this.rows || 6);
-    },
-    rows: 6,
-    cols: 6,
-    fps: 12,
-    loop: true,
-    scale: 1.5,
-    offsetX: 0,
-    offsetY: 0,
-  },
-
-  // Add more sprite configurations here as needed
-  // Example:
-  // "pose3-hit": {
-  //   imagePath: "images/pose3-hit-spritesheet-1920-1080.png",
-  //   get frameWidth() {
-  //     const dims = parseDimensions(this.imagePath);
-  //     return dims.width / (this.cols || 6);
-  //   },
-  //   get frameHeight() {
-  //     const dims = parseDimensions(this.imagePath);
-  //     return dims.height / (this.rows || 6);
-  //   },
-  //   rows: 6,
-  //   cols: 6,
-  //   fps: 12,
-  //   loop: false,
-  // },
+  "pose2-hit": createHitSpriteConfig(
+    "images/pose2-hit-spritesheet-2112-1548.png"
+  ),
+  "pose3-hit": createHitSpriteConfig(
+    "images/pose3-hit-spritesheet-2406-1962.png"
+  ),
+  "pose4-hit": createHitSpriteConfig(
+    "images/pose4-hit-spritesheet-1902-1818.png"
+  ),
+  "pose5-hit": createHitSpriteConfig(
+    "images/pose5-hit-spritesheet-2316-2454.png"
+  ),
 };
 
 /**

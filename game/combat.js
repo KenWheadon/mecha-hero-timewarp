@@ -21,6 +21,9 @@ let gameState = createInitialGameState();
 // Active sprite sheet instance
 let activeSpriteSheet = null;
 
+// Interval for checking if a sprite is loaded
+let spriteLoadCheckInterval = null;
+
 // Cache DOM elements
 const elements = {
   pause: document.getElementById("pause"),
@@ -155,6 +158,11 @@ function updateCrystalEnergy() {
 // Clean up active sprite sheet
 function cleanupSpriteSheet() {
   if (activeSpriteSheet) {
+    // Also clear any pending load-check interval to prevent race conditions
+    if (spriteLoadCheckInterval) {
+      clearInterval(spriteLoadCheckInterval);
+      spriteLoadCheckInterval = null;
+    }
     activeSpriteSheet.stop();
     activeSpriteSheet.destroy();
     activeSpriteSheet = null;
@@ -206,9 +214,10 @@ function setPose(pose, useSprite = null) {
     clipper.appendChild(spriteImg);
 
     // Wait for sprite to load, then start animation
-    const checkLoaded = setInterval(() => {
-      if (activeSpriteSheet.isLoaded) {
-        clearInterval(checkLoaded);
+    spriteLoadCheckInterval = setInterval(() => {
+      if (activeSpriteSheet && activeSpriteSheet.isLoaded) {
+        clearInterval(spriteLoadCheckInterval);
+        spriteLoadCheckInterval = null;
         // Pass the CLIPPER to the play method, which contains the img
         activeSpriteSheet.play(clipper);
       }
