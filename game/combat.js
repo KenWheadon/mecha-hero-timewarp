@@ -215,8 +215,15 @@ function stopTimer() {
 function handleTimeout() {
   stopTimer();
   elements.attacksDiv.classList.remove("show");
+
+  // Flash red and shake for timeout
+  flashScreen(false);
+  shakeScreen();
+
   elements.message.textContent = "Too slow!";
   elements.message.style.color = "#f00";
+  elements.message.style.fontSize = "32px";
+  elements.message.style.textShadow = "0 0 10px #f00, 3px 3px 0px #000";
 
   // Lose a heart
   gameState.hearts--;
@@ -226,14 +233,77 @@ function handleTimeout() {
     gameOver();
   } else {
     setTimeout(() => {
+      // Reset message styles
+      elements.message.style.fontSize = "";
+      elements.message.style.textShadow = "3px 3px 0px #000";
       startNewPose();
     }, GAME_CONFIG.FEEDBACK_DURATION);
   }
 }
 
+// Add visual feedback to button press
+function addButtonFeedback(action) {
+  const button = document.querySelector(`.attack-btn[data-action="${action}"]`);
+  if (!button) return;
+
+  // Add pressed class for visual feedback
+  button.classList.add("btn-pressed");
+
+  // Remove the class after animation
+  setTimeout(() => {
+    button.classList.remove("btn-pressed");
+  }, 200);
+}
+
+// Add screen flash effect for feedback
+function flashScreen(isCorrect) {
+  const flash = document.createElement("div");
+  flash.style.position = "fixed";
+  flash.style.top = "0";
+  flash.style.left = "0";
+  flash.style.width = "100%";
+  flash.style.height = "100%";
+  flash.style.pointerEvents = "none";
+  flash.style.zIndex = "1000";
+  flash.style.opacity = "0";
+  flash.style.transition = "opacity 0.2s ease";
+
+  if (isCorrect) {
+    flash.style.background = "rgba(0, 255, 0, 0.3)";
+  } else {
+    flash.style.background = "rgba(255, 0, 0, 0.3)";
+  }
+
+  document.body.appendChild(flash);
+
+  // Trigger animation
+  setTimeout(() => {
+    flash.style.opacity = "1";
+  }, 10);
+
+  setTimeout(() => {
+    flash.style.opacity = "0";
+  }, 150);
+
+  setTimeout(() => {
+    document.body.removeChild(flash);
+  }, 350);
+}
+
+// Shake animation for incorrect answers
+function shakeScreen() {
+  document.body.style.animation = "shake 0.5s ease";
+  setTimeout(() => {
+    document.body.style.animation = "";
+  }, 500);
+}
+
 // Handle attack
 function handleAttack(action) {
   if (!gameState.pendingPose) return;
+
+  // Add button press feedback immediately
+  addButtonFeedback(action);
 
   stopTimer();
   elements.attacksDiv.classList.remove("show");
@@ -241,12 +311,17 @@ function handleAttack(action) {
   const correct = action === gameState.pendingPose.correct;
 
   if (correct) {
+    // Flash green for correct answer
+    flashScreen(true);
+
     // Show damage feedback pose (player successfully damaged enemy)
     setPose({ img: gameState.pendingPose.dmgImg, desc: "Hit!" });
 
     setTimeout(() => {
       elements.message.textContent = "Perfect counter!";
       elements.message.style.color = "#0f0";
+      elements.message.style.fontSize = "32px";
+      elements.message.style.textShadow = "0 0 10px #0f0, 3px 3px 0px #000";
 
       // Deal damage
       gameState.enemyHP--;
@@ -256,17 +331,26 @@ function handleAttack(action) {
         handleFightWon();
       } else {
         setTimeout(() => {
+          // Reset message styles
+          elements.message.style.fontSize = "";
+          elements.message.style.textShadow = "3px 3px 0px #000";
           startNewPose();
         }, GAME_CONFIG.FEEDBACK_DURATION);
       }
     }, GAME_CONFIG.FEEDBACK_POSE_DURATION);
   } else {
+    // Flash red and shake for incorrect answer
+    flashScreen(false);
+    shakeScreen();
+
     // Show hit feedback pose (enemy hit the player)
     setPose({ img: gameState.pendingPose.hitImg, desc: "Blocked!" });
 
     setTimeout(() => {
       elements.message.textContent = "Wrong move!";
       elements.message.style.color = "#f00";
+      elements.message.style.fontSize = "32px";
+      elements.message.style.textShadow = "0 0 10px #f00, 3px 3px 0px #000";
 
       // Lose a heart
       gameState.hearts--;
@@ -276,6 +360,9 @@ function handleAttack(action) {
         gameOver();
       } else {
         setTimeout(() => {
+          // Reset message styles
+          elements.message.style.fontSize = "";
+          elements.message.style.textShadow = "3px 3px 0px #000";
           startNewPose();
         }, GAME_CONFIG.FEEDBACK_DURATION);
       }
