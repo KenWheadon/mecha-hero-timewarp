@@ -546,8 +546,8 @@ body.title-active::before {
   position: relative;
   display: inline-block;
   /* Increase container width by 50%, keep original height */
-  width: 798px;  /* 532px * 1.5 = 798px */
-  height: 380px;  /* Original height maintained */
+  width: 798px; /* 532px * 1.5 = 798px */
+  height: 380px; /* Original height maintained */
 }
 
 #enemy-pose {
@@ -562,11 +562,23 @@ body.title-active::before {
   background: var(--color-card);
   box-shadow: var(--shadow-brutal);
   overflow: hidden;
-  background-size: contain;
-  background-position: center;
-  background-repeat: no-repeat;
   /* Force container to maintain fixed dimensions, ignore aspect ratio from sprites */
   aspect-ratio: unset !important;
+}
+
+/* New Sprite Structure */
+
+/* 1. The clipping container. Sized to one frame, clips overflow. */
+.sprite-clipper {
+  overflow: hidden;
+  position: relative; /* Establishes a positioning context */
+}
+
+/* 2. The image itself. Positioned absolutely within the clipper. */
+.sprite-clipper img {
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 
 #pose-img {
@@ -575,7 +587,6 @@ body.title-active::before {
   object-fit: contain;
 }
 
-/* INSTRUCTION */
 #instruction {
   font-size: 28px;
   font-weight: 900;
@@ -1240,8 +1251,8 @@ body.title-active::before {
   }
 
   #enemy-container {
-    width: 630px;  /* 420px * 1.5 = 630px */
-    height: 300px;  /* Original height maintained */
+    width: 630px; /* 420px * 1.5 = 630px */
+    height: 300px; /* Original height maintained */
   }
 
   #enemy-pose {
@@ -1326,8 +1337,8 @@ body.title-active::before {
   }
 
   #enemy-container {
-    width: 546px;  /* 364px * 1.5 = 546px */
-    height: 260px;  /* Original height maintained */
+    width: 546px; /* 364px * 1.5 = 546px */
+    height: 260px; /* Original height maintained */
   }
 
   #enemy-pose {

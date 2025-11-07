@@ -47,7 +47,7 @@ export const SPRITE_CONFIGS = {
     cols: 6,
     fps: 12,
     loop: true,
-    scale: 1,
+    scale: 1.5,
     offsetX: 0,
     offsetY: 0,
   },

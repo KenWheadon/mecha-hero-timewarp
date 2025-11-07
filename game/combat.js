@@ -63,7 +63,12 @@ export function initGame() {
   });
 
   // Add hover sound effects to all buttons
-  [elements.pause, elements.restart, elements.audioToggleCombat, ...elements.attacks].forEach((btn) => {
+  [
+    elements.pause,
+    elements.restart,
+    elements.audioToggleCombat,
+    ...elements.attacks,
+  ].forEach((btn) => {
     btn.addEventListener("mouseenter", () => {
       audioManager.playSoundEffect("btnHover");
     });
@@ -154,16 +159,16 @@ function cleanupSpriteSheet() {
     activeSpriteSheet.destroy();
     activeSpriteSheet = null;
   }
-  // Reset to using img element
+  // Reset to using img element and clear sprite container
   elements.poseImg.style.display = "block";
   const container = elements.poseImg.parentElement;
-  container.style.backgroundImage = "none";
-  container.style.backgroundPosition = "";
-  container.style.backgroundSize = "";
-  container.style.backgroundRepeat = "";
-  container.style.aspectRatio = "";  // Reset aspect ratio for static images
-  container.style.transform = "";  // Reset transform
-  container.style.transformOrigin = "";
+
+  // Remove any existing sprite viewport
+  const existingClipper = container.querySelector(".sprite-clipper");
+  if (existingClipper) {
+    container.removeChild(existingClipper);
+  }
+  elements.poseImg.style.transform = ""; // Reset transform on static image element
 }
 
 // Set pose image or sprite - no fallback, log error if missing
@@ -179,31 +184,42 @@ function setPose(pose, useSprite = null) {
     const spriteConfig = getSpriteConfig(spriteKey);
     activeSpriteSheet = new SpriteSheet(spriteConfig);
 
-    // Hide the img element and use background on parent
+    // Hide the img element and use a nested structure for the sprite
     elements.poseImg.style.display = "none";
     const container = elements.poseImg.parentElement;
+
+    // 1. Create the Clipping Container
+    const clipper = document.createElement("div");
+    clipper.className = "sprite-clipper";
+    clipper.style.width = `${activeSpriteSheet.frameWidth}px`;
+    clipper.style.height = `${activeSpriteSheet.frameHeight}px`;
+    container.appendChild(clipper);
+
+    // 2. Apply scaling and offset to the clipper itself.
+    // This makes the entire visible sprite area larger.
+    clipper.style.transform = `scale(${activeSpriteSheet.scale}) translate(${activeSpriteSheet.offsetX}px, ${activeSpriteSheet.offsetY}px)`;
+    clipper.style.transformOrigin = "center center";
+
+    // 3. Create the Image Element (inside the clipper)
+    const spriteImg = document.createElement("img");
+    spriteImg.src = activeSpriteSheet.imagePath;
+    clipper.appendChild(spriteImg);
 
     // Wait for sprite to load, then start animation
     const checkLoaded = setInterval(() => {
       if (activeSpriteSheet.isLoaded) {
         clearInterval(checkLoaded);
-        activeSpriteSheet.play();
-
-        // Update sprite display every frame
-        const updateSprite = setInterval(() => {
-          if (activeSpriteSheet && activeSpriteSheet.isPlaying) {
-            activeSpriteSheet.applyToElement(container);
-          } else {
-            clearInterval(updateSprite);
-          }
-        }, 1000 / (activeSpriteSheet.fps || 12));
+        // Pass the CLIPPER to the play method, which contains the img
+        activeSpriteSheet.play(clipper);
       }
     }, 50);
   } else {
     // Use static image
     elements.poseImg.src = pose.img;
     elements.poseImg.onerror = () => {
-      console.error(`Missing image: ${pose.img}${pose.desc ? ` (${pose.desc})` : ''}`);
+      console.error(
+        `Missing image: ${pose.img}${pose.desc ? ` (${pose.desc})` : ""}`
+      );
     };
 
     // Apply scale and position from config
@@ -258,13 +274,16 @@ function selectRandomPose() {
   // Fight 1: 2 unique poses
   if (gameState.currentFight === 1) {
     const availablePoses = attackPoses.filter(
-      (p) => gameState.availableAttacks.includes(p.correct) && !gameState.counteredPoses.has(p.id)
+      (p) =>
+        gameState.availableAttacks.includes(p.correct) &&
+        !gameState.counteredPoses.has(p.id)
     );
     if (availablePoses.length === 0) {
       gameState.counteredPoses.clear();
       return selectRandomPose();
     }
-    const pose = availablePoses[Math.floor(Math.random() * availablePoses.length)];
+    const pose =
+      availablePoses[Math.floor(Math.random() * availablePoses.length)];
     gameState.counteredPoses.add(pose.id);
     return pose;
   }
@@ -278,7 +297,8 @@ function selectRandomPose() {
       gameState.counteredPoses.clear();
       return selectRandomPose();
     }
-    const pose = availablePoses[Math.floor(Math.random() * availablePoses.length)];
+    const pose =
+      availablePoses[Math.floor(Math.random() * availablePoses.length)];
     gameState.counteredPoses.add(pose.id);
     return pose;
   }
@@ -476,7 +496,11 @@ function handleAttack(action) {
     // Show hit feedback pose (enemy hit the player)
     // Use sprite sheet if available, otherwise use static image
     if (gameState.pendingPose.hitSprite) {
-      setPose({ img: gameState.pendingPose.hitImg, desc: "Blocked!", sprite: gameState.pendingPose.hitSprite });
+      setPose({
+        img: gameState.pendingPose.hitImg,
+        desc: "Blocked!",
+        sprite: gameState.pendingPose.hitSprite,
+      });
     } else {
       setPose({ img: gameState.pendingPose.hitImg, desc: "Blocked!" });
     }
@@ -558,7 +582,9 @@ function formatTimeForDisplay(seconds) {
   const minutes = Math.floor(seconds / 60);
   const secs = Math.floor(seconds % 60);
   const ms = Math.floor((seconds % 1) * 100);
-  return `${minutes}:${secs.toString().padStart(2, '0')}.${ms.toString().padStart(2, '0')}`;
+  return `${minutes}:${secs.toString().padStart(2, "0")}.${ms
+    .toString()
+    .padStart(2, "0")}`;
 }
 
 // Show time warp transition

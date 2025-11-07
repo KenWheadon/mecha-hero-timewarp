@@ -36,15 +36,19 @@ export class SpriteSheet {
   /**
    * Play the animation
    */
-  play() {
+  play(element) {
     if (this.isPlaying) return;
 
     this.isPlaying = true;
     this.currentFrame = 0;
 
+    // Initial application of the first frame
+    if (element) this.applyToElement(element);
+
     this.animationInterval = setInterval(() => {
       this.currentFrame++;
 
+      // Apply style updates for the new frame
       if (this.currentFrame >= this.totalFrames) {
         if (this.loop) {
           this.currentFrame = 0;
@@ -52,6 +56,8 @@ export class SpriteSheet {
           this.stop();
         }
       }
+
+      if (element && this.isPlaying) this.applyToElement(element);
     }, this.frameDelay);
   }
 
@@ -107,8 +113,14 @@ export class SpriteSheet {
 
     ctx.drawImage(
       this.image,
-      frame.x, frame.y, frame.width, frame.height,
-      x, y, drawWidth, drawHeight
+      frame.x,
+      frame.y,
+      frame.width,
+      frame.height,
+      x,
+      y,
+      drawWidth,
+      drawHeight
     );
   }
 
@@ -119,40 +131,31 @@ export class SpriteSheet {
   applyToElement(element) {
     if (!this.isLoaded) return;
 
-    // Set aspect ratio to match frame dimensions for uniform scaling without distortion
-    element.style.aspectRatio = `${this.frameWidth} / ${this.frameHeight}`;
+    // Find the actual <img> tag inside the provided clipper element.
+    const imgElement = element.querySelector("img");
+    if (!imgElement) {
+      // This might run once before the img is appended, which is fine.
+      return;
+    }
 
-    // Apply scale and position transforms to the container
-    // This scales the entire container (not the background) to make sprite appear larger
-    element.style.transform = `scale(${this.scale}) translate(${this.offsetX}px, ${this.offsetY}px)`;
-    element.style.transformOrigin = 'center center';
-
-    // Calculate which row/col we're showing
     const col = this.currentFrame % this.cols;
     const row = Math.floor(this.currentFrame / this.cols);
 
-    // Use percentage-based sizing so the spritesheet scales with container
-    // The entire sheet is cols*100% wide and rows*100% tall
-    const bgSizeWidth = this.cols * 100;
-    const bgSizeHeight = this.rows * 100;
+    // This is the most robust method for sprite animation in the DOM.
+    // It avoids background-position/size bugs by using a clipping div
+    // and transforming an actual <img> element inside it.
 
-    // Position formula: move to show the correct frame
-    // Use percentage positioning: (col/(cols-1))*100 for proper alignment
-    let bgPosX = 0;
-    let bgPosY = 0;
+    // 1. Set the size of the <img> tag to the full sprite sheet dimensions.
+    imgElement.style.width = `${this.cols * this.frameWidth}px`;
+    imgElement.style.height = `${this.rows * this.frameHeight}px`;
 
-    if (this.cols > 1) {
-      bgPosX = (col / (this.cols - 1)) * 100;
-    }
+    // 2. Calculate the negative offset to show the correct frame.
+    const imgX = -col * this.frameWidth;
+    const imgY = -row * this.frameHeight;
 
-    if (this.rows > 1) {
-      bgPosY = (row / (this.rows - 1)) * 100;
-    }
-
-    element.style.backgroundImage = `url('${this.imagePath}')`;
-    element.style.backgroundSize = `${bgSizeWidth}% ${bgSizeHeight}%`;
-    element.style.backgroundPosition = `${bgPosX}% ${bgPosY}%`;
-    element.style.backgroundRepeat = 'no-repeat';
+    // 3. Apply transform to the <img>.
+    imgElement.style.transform = `translate(${imgX}px, ${imgY}px)`;
+    imgElement.style.transformOrigin = "top left";
   }
 
   /**

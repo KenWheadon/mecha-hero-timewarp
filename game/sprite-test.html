@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sprite Sheet Test</title>
+    <style>
+      body {
+        font-family: sans-serif;
+        background-color: #333;
+        color: #fff;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+      }
+      .test-container {
+        border: 2px dashed #ff00ff;
+        padding: 10px;
+      }
+      h2 {
+        margin: 0 0 10px 0;
+      }
+      /* The outer container for centering */
+      .sprite-host {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: #555;
+        border: 1px solid #fff;
+      }
+      .sprite-clipper {
+        overflow: hidden;
+        position: relative;
+      }
+      .sprite-scaler {
+        width: 100%;
+        height: 100%;
+      }
+      .sprite-scaler img {
+        position: absolute;
+        top: 0;
+        left: 0;
+      }
+      /* The actual sprite sheet image */
+      .sprite-viewport img {
+        position: absolute;
+        top: 0;
+        left: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Sprite Sheet Animation Test</h1>
+    <p>
+      Testing the `pose2-hit` sprite at different scales using the `<img />`
+      transform method.
+    </p>
+
+    <div class="test-container">
+      <h2>Scale: 1.0 (Original Size)</h2>
+      <div id="sprite-container-1" class="sprite-host"></div>
+    </div>
+
+    <div class="test-container">
+      <h2>Scale: 1.5</h2>
+      <div id="sprite-container-2" class="sprite-host"></div>
+    </div>
+
+    <div class="test-container">
+      <h2>Scale: 0.75</h2>
+      <div id="sprite-container-3" class="sprite-host"></div>
+    </div>
+
+    <div class="test-container">
+      <h2>Scale: 1.0 (Wider Container)</h2>
+      <div
+        id="sprite-container-4"
+        class="sprite-host"
+        style="width: 500px; height: 258px"
+      ></div>
+    </div>
+
+    <script type="module">
+      // We need to import the classes to test them.
+      import { SpriteSheet } from "./sprite-sheet.js";
+      import { getSpriteConfig } from "./sprites-config.js";
+
+      function setupSprite(containerId, scale) {
+        const hostContainer = document.getElementById(containerId);
+        const spriteConfigData = getSpriteConfig("pose2-hit");
+
+        const spriteSheet = new SpriteSheet(spriteConfigData);
+
+        // Create the structure
+        const clipper = document.createElement("div");
+        clipper.className = "sprite-clipper";
+        clipper.style.width = `${spriteSheet.frameWidth}px`;
+        clipper.style.height = `${spriteSheet.frameHeight}px`;
+        hostContainer.appendChild(clipper);
+
+        const scaler = document.createElement("div");
+        scaler.className = "sprite-scaler";
+        scaler.style.transform = `scale(${scale})`;
+        scaler.style.transformOrigin = "center center";
+        clipper.appendChild(scaler);
+
+        const spriteImg = document.createElement("img");
+        spriteImg.src = spriteSheet.imagePath;
+        scaler.appendChild(spriteImg);
+
+        // Wait for the image to load, then start the animation
+        spriteImg.onload = () => {
+          // Pass the scaler to the play method
+          spriteSheet.play(scaler);
+        };
+      }
+
+      // Initialize all test sprites
+      setupSprite("sprite-container-1", 1.0);
+      setupSprite("sprite-container-2", 1.5);
+      setupSprite("sprite-container-3", 0.75);
+      setupSprite("sprite-container-4", 1.0);
+    </script>
+  </body>
+</html>
