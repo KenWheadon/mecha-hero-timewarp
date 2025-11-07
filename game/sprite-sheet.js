@@ -116,21 +116,35 @@ export class SpriteSheet {
   applyToElement(element) {
     if (!this.isLoaded) return;
 
-    const frame = this.getCurrentFrameRect();
+    // Set aspect ratio to match frame dimensions for uniform scaling without distortion
+    element.style.aspectRatio = `${this.frameWidth} / ${this.frameHeight}`;
 
-    // Get the container's dimensions
-    const containerWidth = element.offsetWidth;
-    const containerHeight = element.offsetHeight;
+    // Calculate which row/col we're showing
+    const col = this.currentFrame % this.cols;
+    const row = Math.floor(this.currentFrame / this.cols);
 
-    // Calculate centering offset
-    const centerX = (containerWidth - this.frameWidth) / 2;
-    const centerY = (containerHeight - this.frameHeight) / 2;
+    // Use percentage-based sizing so the spritesheet scales with container
+    // The entire sheet is cols*100% wide and rows*100% tall
+    const bgSizeWidth = this.cols * 100;
+    const bgSizeHeight = this.rows * 100;
+
+    // Position formula: move to show the correct frame
+    // Use percentage positioning: (col/(cols-1))*100 for proper alignment
+    let bgPosX = 0;
+    let bgPosY = 0;
+
+    if (this.cols > 1) {
+      bgPosX = (col / (this.cols - 1)) * 100;
+    }
+
+    if (this.rows > 1) {
+      bgPosY = (row / (this.rows - 1)) * 100;
+    }
 
     element.style.backgroundImage = `url('${this.imagePath}')`;
-    element.style.backgroundPosition = `${centerX - frame.x}px ${centerY - frame.y}px`;
-    element.style.backgroundSize = `${this.frameWidth * this.cols}px ${this.frameHeight * this.rows}px`;
+    element.style.backgroundSize = `${bgSizeWidth}% ${bgSizeHeight}%`;
+    element.style.backgroundPosition = `${bgPosX}% ${bgPosY}%`;
     element.style.backgroundRepeat = 'no-repeat';
-    // Don't override width/height - let CSS control the container size
   }
 
   /**
