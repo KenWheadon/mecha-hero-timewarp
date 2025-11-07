@@ -35,7 +35,7 @@ export function initTitleScreen() {
   // Load and display high score
   loadHighScore();
 
-  // Start playing intro audio
+  // Queue the intro audio (will play on first user interaction)
   audioManager.play("titleIntro");
 
   startTitleGlitch();
@@ -47,15 +47,11 @@ function loadHighScore() {
   elements.highScoreValue.textContent = formatTime(highScore);
 }
 
-// Set pose image with fallback
+// Set pose image - no fallback, log error if missing
 function setPose(pose) {
   elements.poseImg.src = pose.img;
   elements.poseImg.onerror = () => {
-    const fallbackText = pose.desc || "Unknown Pose";
-    elements.poseImg.src =
-      "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjMTExIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJtb25vc3BhY2UiIGZvbnQtc2l6ZT0iMTgiIGZpbGw9IiNmZmYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj4=" +
-      encodeURIComponent(fallbackText) +
-      "</text></svg>";
+    console.error(`Missing image: ${pose.img}${pose.desc ? ` (${pose.desc})` : ''}`);
   };
 }
 
@@ -66,6 +62,7 @@ function setupEventListeners() {
   elements.htpBtn.addEventListener("click", onHowToPlay);
   elements.audioToggleTitle.addEventListener("click", () => {
     audioManager.playSoundEffect("btnClick");
+    ensureAudioUnlocked();
     toggleAudio();
   });
 
@@ -77,9 +74,15 @@ function setupEventListeners() {
   });
 }
 
+// Ensure audio is unlocked on first user interaction
+function ensureAudioUnlocked() {
+  audioManager.unlock();
+}
+
 // Handle start game button
 function onStartGame() {
   audioManager.playSoundEffect("btnClick");
+  ensureAudioUnlocked();
   elements.titleScreen.style.display = "none";
   elements.game.style.display = "block";
   // Remove colorful background when entering game
@@ -89,6 +92,8 @@ function onStartGame() {
 
 // Handle how to play button
 function onHowToPlay() {
+  audioManager.playSoundEffect("btnHover");
+  ensureAudioUnlocked();
   howToPlayModal.open();
 }
 

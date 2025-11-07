@@ -76,8 +76,7 @@ function initHearts() {
     heart.className = "heart";
     heart.src = "images/heart.png";
     heart.onerror = () => {
-      heart.src =
-        "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHBvbHlnb24gcG9pbnRzPSIyMCw4IDI1LDIgMzUsMiAzNSwxMiAyMCwyOCA1LDEyIDUsMiAxNSwyIiBmaWxsPSIjZjAwIi8+PC9zdmc+";
+      console.error("Missing image: images/heart.png");
     };
     elements.hearts.appendChild(heart);
   }
@@ -143,15 +142,11 @@ function updateCrystalEnergy() {
   elements.crystalFill.style.width = `${percentage}%`;
 }
 
-// Set pose image with fallback
+// Set pose image - no fallback, log error if missing
 function setPose(pose) {
   elements.poseImg.src = pose.img;
   elements.poseImg.onerror = () => {
-    const fallbackText = pose.desc || "Unknown Pose";
-    elements.poseImg.src =
-      "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjMTExIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJtb25vc3BhY2UiIGZvbnQtc2l6ZT0iMTgiIGZpbGw9IiNmZmYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj4=" +
-      encodeURIComponent(fallbackText) +
-      "</text></svg>";
+    console.error(`Missing image: ${pose.img}${pose.desc ? ` (${pose.desc})` : ''}`);
   };
 }
 

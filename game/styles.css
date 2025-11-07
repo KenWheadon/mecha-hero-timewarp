@@ -86,6 +86,16 @@ body.title-active::before {
   z-index: 1;
 }
 
+/* Bottom row with best time and audio button */
+.bottom-row {
+  display: flex;
+  gap: 30px;
+  justify-content: center;
+  align-items: center;
+  margin-top: 40px;
+  flex-wrap: wrap;
+}
+
 /* HIGH SCORE */
 #high-score {
   font-size: 28px;
@@ -96,7 +106,6 @@ body.title-active::before {
   padding: 15px 40px;
   border: 5px solid #000;
   box-shadow: 8px 8px 0px #000;
-  margin-bottom: 40px;
   text-transform: uppercase;
   letter-spacing: 2px;
 }
@@ -281,16 +290,15 @@ body.title-active::before {
   }
 }
 
-/* AUDIO TOGGLE BUTTON - Compact version */
+/* AUDIO TOGGLE BUTTON - Square version */
 .audio-toggle-btn {
-  padding: 5px 10px !important;
-  font-size: 5.6px !important;
-  min-width: 32px;
-  min-height: 32px;
+  padding: 25px !important;
+  font-size: 0 !important;
+  width: 80px;
+  height: 80px;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 4px;
   background: linear-gradient(135deg, #00ff00 0%, #00cc00 100%) !important;
 }
 
@@ -299,8 +307,8 @@ body.title-active::before {
 }
 
 .audio-icon {
-  width: 12px;
-  height: 12px;
+  width: 40px;
+  height: 40px;
   object-fit: contain;
 }
 
@@ -358,6 +366,45 @@ body.title-active::before {
   display: flex;
   gap: 15px;
   flex: 0 0 auto;
+  align-items: center;
+}
+
+#controls .audio-toggle-btn {
+  /* Inherit all styles from .audio-toggle-btn and .title-btn */
+  border: 6px solid #000;
+  box-shadow: 10px 10px 0px #000;
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  cursor: pointer;
+  font-family: inherit;
+  position: relative;
+  overflow: hidden;
+}
+
+#controls .audio-toggle-btn::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    45deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.5) 50%,
+    transparent 70%
+  );
+  transform: rotate(45deg);
+  animation: shine 3s infinite;
+}
+
+#controls .audio-toggle-btn:hover {
+  transform: translate(5px, 5px) scale(1.1);
+  box-shadow: 5px 5px 0px #000;
+}
+
+#controls .audio-toggle-btn:active {
+  transform: translate(10px, 10px) scale(1.05);
+  box-shadow: none;
 }
 
 #pause {
