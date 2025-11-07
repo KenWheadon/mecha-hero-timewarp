@@ -8,6 +8,13 @@
   </head>
   <body>
     <div id="overlay"></div>
+    <div id="onboarding-popup">
+      <div id="onboarding-content">
+        <h3 id="onboarding-title"></h3>
+        <p id="onboarding-text"></p>
+        <button id="onboarding-close">Got it!</button>
+      </div>
+    </div>
     <div id="how-to-play">
       <button id="close-htp">&times;</button>
       <h2>How to Play Mecha Hero</h2>
@@ -45,9 +52,14 @@
     <div id="title-screen">
       <h1 id="title">MECHA HERO</h1>
       <p>Mini Jam 179: Recursion</p>
+      <div id="high-score">High Score: Fight <span id="high-score-value">0</span>/4</div>
       <div class="button-container">
         <button class="title-btn" id="start-btn">Start Game</button>
         <button class="title-btn" id="htp-btn">How to Play</button>
+        <button class="title-btn audio-toggle-btn" id="audio-toggle-title">
+          <img src="images/icon-musicnote.png" alt="Audio" class="audio-icon" />
+          Audio
+        </button>
       </div>
     </div>
 
@@ -57,6 +69,9 @@
         <div id="hearts"></div>
         <div id="fight-info">Fight: 1/4</div>
         <div id="controls">
+          <button id="audio-toggle-combat" class="audio-toggle-btn">
+            <img src="images/icon-musicnote.png" alt="Audio" class="audio-icon" />
+          </button>
           <button id="pause">Pause</button>
         </div>
       </div>

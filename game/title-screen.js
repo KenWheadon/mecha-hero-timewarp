@@ -2,6 +2,8 @@
 
 import { neutralPose } from "./config.js";
 import { initGame } from "./combat.js";
+import { audioManager } from "./audio-manager.js";
+import { getHighScore } from "./storage-manager.js";
 
 // Cache DOM elements
 const elements = {
@@ -14,6 +16,8 @@ const elements = {
   htpBtn: document.getElementById("htp-btn"),
   poseImg: document.getElementById("pose-img"),
   title: document.getElementById("title"),
+  audioToggleTitle: document.getElementById("audio-toggle-title"),
+  highScoreValue: document.getElementById("high-score-value"),
 };
 
 // Initialize title screen
@@ -23,7 +27,19 @@ export function initTitleScreen() {
   // Activate colorful background for title screen
   document.body.classList.add("title-active");
 
+  // Load and display high score
+  loadHighScore();
+
+  // Start playing intro audio
+  audioManager.play("titleIntro");
+
   startTitleGlitch();
+}
+
+// Load and display high score
+function loadHighScore() {
+  const highScore = getHighScore();
+  elements.highScoreValue.textContent = highScore;
 }
 
 // Set pose image with fallback
@@ -44,6 +60,7 @@ function setupEventListeners() {
   elements.htpBtn.addEventListener("click", onHowToPlay);
   elements.closeHtp.addEventListener("click", closeModal);
   elements.overlay.addEventListener("click", closeModal);
+  elements.audioToggleTitle.addEventListener("click", toggleAudio);
 }
 
 // Handle start game button
@@ -94,5 +111,14 @@ function onLogoClick() {
   if (logoImg && !logoImg.classList.contains("logo-pulsing")) {
     logoImg.src = "images/logo-thick.png";
     logoImg.classList.add("logo-pulsing");
+    // Switch to main intro audio
+    audioManager.play("titleMain");
   }
+}
+
+// Toggle audio on/off
+function toggleAudio() {
+  const isMuted = audioManager.toggleMute();
+  // Update button visual state
+  elements.audioToggleTitle.style.opacity = isMuted ? "0.5" : "1";
 }

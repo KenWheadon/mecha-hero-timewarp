@@ -9,6 +9,7 @@ import {
   GAME_CONFIG,
   createInitialGameState,
 } from "./config.js";
+import { audioManager } from "./audio-manager.js";
 
 // Game state
 let gameState = createInitialGameState();
@@ -29,6 +30,7 @@ const elements = {
   attacks: document.querySelectorAll(".attack-btn"),
   attacksDiv: document.getElementById("attacks"),
   restart: document.getElementById("restart"),
+  audioToggleCombat: document.getElementById("audio-toggle-combat"),
 };
 
 // Initialize game
@@ -38,9 +40,13 @@ export function initGame() {
   setupFight();
   elements.pause.addEventListener("click", togglePause);
   elements.restart.addEventListener("click", restartGame);
+  elements.audioToggleCombat.addEventListener("click", toggleAudio);
   elements.attacks.forEach((btn) => {
     btn.addEventListener("click", () => handleAttack(btn.dataset.action));
   });
+
+  // Start combat audio
+  audioManager.play("combat");
 }
 
 // Initialize hearts display
@@ -447,4 +453,11 @@ function restartGame() {
   gameState = createInitialGameState();
   initHearts();
   setupFight();
+}
+
+// Toggle audio on/off
+function toggleAudio() {
+  const isMuted = audioManager.toggleMute();
+  // Update button visual state
+  elements.audioToggleCombat.style.opacity = isMuted ? "0.5" : "1";
 }
