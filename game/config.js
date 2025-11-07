@@ -120,5 +120,9 @@ export function createInitialGameState() {
     isPaused: false,
     crystalCharges: GAME_CONFIG.INITIAL_CRYSTAL_CHARGES,
     counteredPoses: new Set(),
+    // Total game time tracking
+    gameStartTime: null,
+    totalPausedTime: 0,
+    lastPauseTime: null,
   };
 }

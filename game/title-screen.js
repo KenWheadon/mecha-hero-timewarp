@@ -3,7 +3,7 @@
 import { neutralPose } from "./config.js";
 import { initGame } from "./combat.js";
 import { audioManager } from "./audio-manager.js";
-import { getHighScore } from "./storage-manager.js";
+import { getHighScore, formatTime } from "./storage-manager.js";
 
 // Cache DOM elements
 const elements = {
@@ -39,7 +39,7 @@ export function initTitleScreen() {
 // Load and display high score
 function loadHighScore() {
   const highScore = getHighScore();
-  elements.highScoreValue.textContent = highScore;
+  elements.highScoreValue.textContent = formatTime(highScore);
 }
 
 // Set pose image with fallback

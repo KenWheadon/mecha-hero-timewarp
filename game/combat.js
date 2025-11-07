@@ -10,6 +10,8 @@ import {
   createInitialGameState,
 } from "./config.js";
 import { audioManager } from "./audio-manager.js";
+import { saveHighScore } from "./storage-manager.js";
+import { initOnboarding, checkAndShowOnboarding } from "./onboarding.js";
 
 // Game state
 let gameState = createInitialGameState();
@@ -37,6 +39,7 @@ const elements = {
 export function initGame() {
   gameState = createInitialGameState();
   initHearts();
+  initOnboarding();
   setupFight();
   elements.pause.addEventListener("click", togglePause);
   elements.restart.addEventListener("click", restartGame);
@@ -100,8 +103,15 @@ function setupFight() {
     btn.disabled = !gameState.availableAttacks.includes(action);
   });
 
-  // Start first pose
-  startNewPose();
+  // Check for first-time onboarding popup
+  checkAndShowOnboarding(gameState.currentFight, () => {
+    // Start game timer on first fight
+    if (gameState.currentFight === 1 && gameState.gameStartTime === null) {
+      gameState.gameStartTime = Date.now();
+    }
+    // Start first pose after popup closes (or immediately if not first time)
+    startNewPose();
+  });
 }
 
 // Update enemy HP bar
@@ -385,17 +395,45 @@ function handleFightWon() {
 
   setTimeout(() => {
     if (gameState.currentFight === gameState.maxFights) {
-      // Final fight won - show destroy pose and end game
+      // Final fight won - calculate and save time-based score
+      const totalGameTime = calculateTotalGameTime();
+      const isNewHighScore = saveHighScore(totalGameTime);
+
       setPose(finalDestroyPose);
       elements.instruction.textContent = "VICTORY!";
-      elements.message.textContent = "All enemies destroyed!";
-      elements.message.style.color = "#0f0";
+
+      // Show time and high score status
+      const timeText = formatTimeForDisplay(totalGameTime);
+      if (isNewHighScore) {
+        elements.message.textContent = `New Record: ${timeText}!`;
+        elements.message.style.color = "#ffff00";
+      } else {
+        elements.message.textContent = `Time: ${timeText}`;
+        elements.message.style.color = "#0f0";
+      }
+
       elements.restart.style.display = "block";
     } else {
       // Show time warp transition
       showTimeWarp();
     }
   }, GAME_CONFIG.DAMAGED_STATE_DURATION);
+}
+
+// Calculate total game time (excluding paused time)
+function calculateTotalGameTime() {
+  const endTime = Date.now();
+  const totalElapsed = endTime - gameState.gameStartTime;
+  const activeTime = totalElapsed - gameState.totalPausedTime;
+  return activeTime / 1000; // Convert to seconds
+}
+
+// Format time for in-game display
+function formatTimeForDisplay(seconds) {
+  const minutes = Math.floor(seconds / 60);
+  const secs = Math.floor(seconds % 60);
+  const ms = Math.floor((seconds % 1) * 100);
+  return `${minutes}:${secs.toString().padStart(2, '0')}.${ms.toString().padStart(2, '0')}`;
 }
 
 // Show time warp transition
@@ -436,9 +474,16 @@ function togglePause() {
   gameState.isPaused = !gameState.isPaused;
 
   if (gameState.isPaused) {
+    // Track when pause started
+    gameState.lastPauseTime = Date.now();
     elements.pause.textContent = "Resume";
     elements.timerPaused.style.display = "block";
   } else {
+    // Add paused time to total when resuming
+    if (gameState.lastPauseTime) {
+      gameState.totalPausedTime += Date.now() - gameState.lastPauseTime;
+      gameState.lastPauseTime = null;
+    }
     elements.pause.textContent = "Pause";
     elements.timerPaused.style.display = "none";
   }
