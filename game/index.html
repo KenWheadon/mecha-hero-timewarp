@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mecha Hero - Mini Jam 197: Recursion</title>
+    <style>
+      /* NEOBRUTALISM DESIGN SYSTEM */
+      :root {
+        --color-bg: #000000;
+        --color-text: #ffffff;
+        --color-primary: #00ff00;
+        --color-danger: #ff0033;
+        --color-accent: #00ffff;
+        --color-warning: #ffff00;
+        --color-card: #ffffff;
+        --border-thick: 5px;
+        --border-medium: 4px;
+        --shadow-brutal: 8px 8px 0px #000000;
+        --shadow-brutal-hover: 12px 12px 0px #000000;
+        --shadow-brutal-active: 4px 4px 0px #000000;
+      }
+
+      body {
+        margin: 0;
+        padding: 0;
+        background: var(--color-bg);
+        color: var(--color-text);
+        font-family: 'Courier New', 'Courier', monospace;
+        font-weight: bold;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        overflow-x: hidden;
+        padding: 20px;
+        box-sizing: border-box;
+        position: relative;
+      }
+
+      /* Animated colorful background for title screen */
+      body::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background:
+          linear-gradient(45deg, #ff0033 0%, #ffff00 25%, #00ff00 50%, #00ffff 75%, #ff0033 100%);
+        background-size: 400% 400%;
+        animation: gradientShift 8s ease infinite;
+        opacity: 0;
+        transition: opacity 0.5s ease;
+        z-index: -1;
+        pointer-events: none;
+      }
+
+      body.title-active::before {
+        opacity: 1;
+      }
+
+      @keyframes gradientShift {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+      }
+
+      /* TITLE SCREEN */
+      #title-screen {
+        text-align: center;
+        max-width: 900px;
+        width: 100%;
+        position: relative;
+        z-index: 1;
+      }
+
+      #title {
+        font-size: 96px;
+        font-weight: 900;
+        margin-bottom: 30px;
+        letter-spacing: -3px;
+        text-transform: uppercase;
+        color: #000;
+        background: linear-gradient(45deg, #ff0033, #ffff00, #00ff00, #00ffff, #ff0033);
+        background-size: 300% 300%;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        animation: glitch 3s infinite, rainbowText 4s ease infinite;
+        line-height: 1;
+        filter: drop-shadow(8px 8px 0px #000) drop-shadow(-2px -2px 0px rgba(255,255,255,0.5));
+        position: relative;
+      }
+
+      @keyframes rainbowText {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+      }
+
+      #title-screen > p {
+        font-size: 24px;
+        text-transform: uppercase;
+        letter-spacing: 4px;
+        margin-bottom: 60px;
+        color: #000;
+        background: var(--color-warning);
+        display: inline-block;
+        padding: 10px 30px;
+        border: 4px solid #000;
+        box-shadow: 6px 6px 0px #000;
+        font-weight: 900;
+        animation: pulse 2s ease-in-out infinite;
+      }
+
+      @keyframes pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+      }
+
+      /* Button container for better spacing */
+      #title-screen .button-container {
+        display: flex;
+        gap: 20px;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+
+      .title-btn {
+        padding: 25px 50px;
+        font-size: 28px;
+        font-weight: 900;
+        border: 6px solid #000;
+        color: #000;
+        cursor: pointer;
+        margin: 0;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        box-shadow: 10px 10px 0px #000;
+        transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+        font-family: inherit;
+        position: relative;
+        overflow: hidden;
+      }
+
+      /* Start button - Hot Pink/Magenta */
+      #start-btn {
+        background: linear-gradient(135deg, #ff0066 0%, #ff3399 100%);
+      }
+
+      /* How to Play button - Electric Cyan */
+      #htp-btn {
+        background: linear-gradient(135deg, #00ffff 0%, #00ccff 100%);
+      }
+
+      /* Shiny overlay effect */
+      .title-btn::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: linear-gradient(
+          45deg,
+          transparent 30%,
+          rgba(255, 255, 255, 0.5) 50%,
+          transparent 70%
+        );
+        transform: rotate(45deg);
+        animation: shine 3s infinite;
+      }
+
+      @keyframes shine {
+        0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+        100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+      }
+
+      .title-btn:hover {
+        transform: translate(5px, 5px) scale(1.1);
+        box-shadow: 5px 5px 0px #000;
+        animation: none;
+      }
+
+      #start-btn:hover {
+        background: linear-gradient(135deg, #ffff00 0%, #ff6600 100%);
+      }
+
+      #htp-btn:hover {
+        background: linear-gradient(135deg, #00ff00 0%, #00ff88 100%);
+      }
+
+      .title-btn:active {
+        transform: translate(10px, 10px) scale(1.05);
+        box-shadow: none;
+      }
+
+      /* Extra sparkle effect */
+      @keyframes sparkle {
+        0%, 100% { opacity: 0; transform: scale(0) rotate(0deg); }
+        50% { opacity: 1; transform: scale(1) rotate(180deg); }
+      }
+
+      /* GAME SCREEN */
+      #game {
+        text-align: center;
+        max-width: 900px;
+        width: 100%;
+        display: none;
+        position: relative;
+      }
+
+      /* CONTROLS */
+      #controls {
+        position: absolute;
+        top: 0;
+        right: 0;
+        display: flex;
+        gap: 15px;
+        z-index: 100;
+      }
+
+      #pause {
+        padding: 15px 30px;
+        background: var(--color-danger);
+        border: var(--border-medium) solid #000;
+        color: #000;
+        font-size: 18px;
+        font-weight: 900;
+        cursor: pointer;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        box-shadow: 6px 6px 0px #000;
+        transition: all 0.15s ease;
+        font-family: inherit;
+      }
+
+      #pause:hover {
+        transform: translate(3px, 3px);
+        box-shadow: 3px 3px 0px #000;
+        background: var(--color-warning);
+      }
+
+      #pause:active {
+        transform: translate(6px, 6px);
+        box-shadow: none;
+      }
+
+      /* HEARTS */
+      #hearts {
+        position: absolute;
+        top: 0;
+        left: 0;
+        display: flex;
+        gap: 15px;
+        z-index: 100;
+      }
+
+      .heart {
+        width: 50px;
+        height: 50px;
+        border: var(--border-medium) solid #000;
+        background: var(--color-danger);
+        box-shadow: 4px 4px 0px #000;
+        transition: all 0.2s ease;
+      }
+
+      /* FIGHT INFO */
+      #fight-info {
+        position: absolute;
+        top: 70px;
+        right: 0;
+        font-size: 28px;
+        font-weight: 900;
+        text-transform: uppercase;
+        background: var(--color-card);
+        color: #000;
+        padding: 12px 20px;
+        border: var(--border-medium) solid #000;
+        box-shadow: 6px 6px 0px #000;
+        letter-spacing: 2px;
+      }
+
+      /* TIMER */
+      #timer {
+        width: 100%;
+        max-width: 600px;
+        height: 40px;
+        background: var(--color-card);
+        margin: 100px auto 40px;
+        border: var(--border-thick) solid #000;
+        position: relative;
+        box-shadow: var(--shadow-brutal);
+      }
+
+      #timer-fill {
+        height: 100%;
+        background: var(--color-primary);
+        width: 100%;
+        transition: width 0.1s linear;
+        border-right: 4px solid #000;
+      }
+
+      #timer-paused {
+        position: absolute;
+        top: -40px;
+        left: 50%;
+        transform: translateX(-50%);
+        color: #000;
+        background: var(--color-warning);
+        padding: 8px 16px;
+        font-size: 16px;
+        font-weight: 900;
+        border: var(--border-medium) solid #000;
+        box-shadow: 4px 4px 0px #000;
+        display: none;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+      }
+
+      /* ENEMY CONTAINER */
+      #enemy-container {
+        position: relative;
+        display: inline-block;
+        margin: 30px 0;
+      }
+
+      /* HP AND CRYSTAL BARS */
+      #enemy-hp,
+      #crystal-energy {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 280px;
+        height: 24px;
+        background: var(--color-card);
+        border: var(--border-medium) solid #000;
+        box-shadow: 6px 6px 0px #000;
+      }
+
+      #enemy-hp {
+        top: -50px;
+      }
+
+      #crystal-energy {
+        display: none;
+        top: -85px;
+      }
+
+      #enemy-hp-fill {
+        height: 100%;
+        background: var(--color-danger);
+        width: 100%;
+        transition: width 0.3s ease;
+        border-right: 3px solid #000;
+      }
+
+      #crystal-fill {
+        height: 100%;
+        background: var(--color-accent);
+        width: 100%;
+        transition: width 0.3s ease;
+        border-right: 3px solid #000;
+      }
+
+      /* ENEMY POSE */
+      #enemy-pose {
+        width: 350px;
+        height: 350px;
+        margin: 0 auto;
+        border: var(--border-thick) solid #000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        font-weight: 900;
+        background: var(--color-card);
+        box-shadow: var(--shadow-brutal);
+        position: relative;
+      }
+
+      #pose-img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+      }
+
+      /* INSTRUCTION */
+      #instruction {
+        font-size: 36px;
+        font-weight: 900;
+        margin: 30px 0;
+        color: #000;
+        background: var(--color-primary);
+        padding: 20px 30px;
+        border: var(--border-thick) solid #000;
+        box-shadow: var(--shadow-brutal);
+        min-height: 50px;
+        display: inline-block;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      /* ATTACKS GRID */
+      #attacks {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 25px;
+        max-width: 600px;
+        margin: 40px auto;
+        opacity: 0;
+        transition: opacity 0.2s ease;
+      }
+
+      #attacks.show {
+        opacity: 1;
+      }
+
+      .attack-btn {
+        padding: 25px 20px;
+        font-size: 18px;
+        font-weight: 900;
+        background: var(--color-card);
+        border: var(--border-thick) solid #000;
+        color: #000;
+        cursor: pointer;
+        transition: all 0.15s ease;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 140px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        box-shadow: var(--shadow-brutal);
+        font-family: inherit;
+      }
+
+      .attack-btn img {
+        width: 60px;
+        height: 60px;
+        object-fit: contain;
+        margin-bottom: 12px;
+        border: 3px solid #000;
+      }
+
+      .attack-btn:hover:not(:disabled) {
+        transform: translate(4px, 4px);
+        box-shadow: var(--shadow-brutal-active);
+        background: var(--color-accent);
+      }
+
+      .attack-btn:active:not(:disabled) {
+        transform: translate(8px, 8px);
+        box-shadow: none;
+      }
+
+      .attack-btn:disabled {
+        opacity: 0.3;
+        cursor: not-allowed;
+        filter: grayscale(100%);
+      }
+
+      /* MESSAGE */
+      #message {
+        font-size: 28px;
+        font-weight: 900;
+        margin: 30px 0;
+        min-height: 40px;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        text-shadow: 3px 3px 0px #000;
+      }
+
+      /* RESTART BUTTON */
+      #restart {
+        display: none;
+        padding: 20px 40px;
+        background: var(--color-danger);
+        border: var(--border-thick) solid #000;
+        color: #000;
+        font-size: 24px;
+        font-weight: 900;
+        cursor: pointer;
+        margin-top: 30px;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        box-shadow: var(--shadow-brutal);
+        transition: all 0.15s ease;
+        font-family: inherit;
+      }
+
+      #restart:hover {
+        transform: translate(4px, 4px);
+        box-shadow: var(--shadow-brutal-active);
+        background: var(--color-warning);
+      }
+
+      #restart:active {
+        transform: translate(8px, 8px);
+        box-shadow: none;
+      }
+
+      /* HOW TO PLAY MODAL */
+      #how-to-play {
+        display: none;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: var(--color-card);
+        border: var(--border-thick) solid #000;
+        padding: 40px;
+        max-width: 600px;
+        width: 90%;
+        max-height: 80vh;
+        overflow-y: auto;
+        z-index: 10;
+        box-shadow: 16px 16px 0px #000;
+        color: #000;
+      }
+
+      #how-to-play h2 {
+        margin-top: 0;
+        font-size: 36px;
+        font-weight: 900;
+        text-transform: uppercase;
+        letter-spacing: -1px;
+        color: #000;
+        border-bottom: var(--border-medium) solid #000;
+        padding-bottom: 15px;
+        margin-bottom: 25px;
+      }
+
+      #how-to-play p {
+        font-size: 16px;
+        line-height: 1.6;
+        margin-bottom: 20px;
+      }
+
+      #how-to-play ul {
+        text-align: left;
+        line-height: 1.8;
+        font-size: 15px;
+      }
+
+      #how-to-play li {
+        margin-bottom: 15px;
+        padding-left: 10px;
+        border-left: 4px solid var(--color-primary);
+        padding-left: 15px;
+      }
+
+      #how-to-play strong {
+        color: var(--color-danger);
+        text-transform: uppercase;
+        font-size: 16px;
+      }
+
+      #close-htp {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        background: var(--color-danger);
+        border: var(--border-medium) solid #000;
+        color: #000;
+        font-size: 28px;
+        font-weight: 900;
+        cursor: pointer;
+        width: 50px;
+        height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 4px 4px 0px #000;
+        transition: all 0.15s ease;
+        font-family: inherit;
+      }
+
+      #close-htp:hover {
+        transform: translate(2px, 2px);
+        box-shadow: 2px 2px 0px #000;
+        background: var(--color-warning);
+      }
+
+      #close-htp:active {
+        transform: translate(4px, 4px);
+        box-shadow: none;
+      }
+
+      /* OVERLAY */
+      #overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.9);
+        z-index: 5;
+      }
+
+      /* GLITCH ANIMATION */
+      @keyframes glitch {
+        0%, 90%, 100% {
+          text-shadow: 6px 6px 0px var(--color-danger), 12px 12px 0px #000;
+        }
+        92% {
+          text-shadow: -6px 6px 0px var(--color-accent), 12px -12px 0px var(--color-danger);
+        }
+        94% {
+          text-shadow: 6px -6px 0px var(--color-warning), -12px 12px 0px var(--color-primary);
+        }
+      }
+
+      /* RESPONSIVE */
+      @media (max-width: 768px) {
+        #title {
+          font-size: 48px;
+        }
+
+        #enemy-pose {
+          width: 280px;
+          height: 280px;
+        }
+
+        #attacks {
+          max-width: 100%;
+        }
+
+        .attack-btn {
+          min-height: 120px;
+          font-size: 16px;
+        }
+
+        #instruction {
+          font-size: 24px;
+        }
+
+        #hearts,
+        #controls,
+        #fight-info {
+          position: static;
+          margin: 10px auto;
+          display: inline-block;
+        }
+
+        #timer {
+          margin-top: 20px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="overlay"></div>
+    <div id="how-to-play">
+      <button id="close-htp">&times;</button>
+      <h2>How to Play Mecha Hero</h2>
+      <p>
+        Enter the recursive arena and counter the enemy's mecha poses before
+        time runs out!
+      </p>
+      <ul>
+        <li>
+          <strong>Poses:</strong> Robot starts neutral, shifts to attack. Fight
+          1: 2 unique poses. Fights 2-3: 4 unique. Fight 4: 8 random (repeats
+          ok).
+        </li>
+        <li>
+          <strong>Respond:</strong> When attack shows, click correct counter
+          within timer. Correct: Enemy HP -1.
+        </li>
+        <li>
+          <strong>Timer:</strong> Drains per level (10s/6s/4s/2s)—timeout loses
+          heart, retry pose.
+        </li>
+        <li><strong>Hearts/HP:</strong> 3 player hearts. Enemy: 2/4/4/8 HP.</li>
+        <li>
+          <strong>Levels:</strong> Deplete HP to win fight. Damaged (2s) + Warp
+          (5s, L1-3) before next. L4: Final destroy.
+        </li>
+        <li>
+          <strong>Crystal:</strong> Energy (2 charges) drains on warps (L2-3).
+        </li>
+        <li><strong>Pause:</strong> Freeze anytime.</li>
+      </ul>
+      <p>Recursion rules: Echo and accelerate—adapt or overload!</p>
+    </div>
+
+    <div id="title-screen">
+      <h1 id="title">MECHA HERO</h1>
+      <p>Recursion Jam Edition</p>
+      <div class="button-container">
+        <button class="title-btn" id="start-btn">Start Game</button>
+        <button class="title-btn" id="htp-btn">How to Play</button>
+      </div>
+    </div>
+
+    <div id="game">
+      <div id="controls">
+        <button id="pause">Pause</button>
+      </div>
+      <div id="hearts"></div>
+      <div id="fight-info">Fight: 1/4</div>
+      <div id="timer">
+        <div id="timer-paused">PAUSED</div>
+        <div id="timer-fill"></div>
+      </div>
+      <div id="enemy-container">
+        <div id="crystal-energy"><div id="crystal-fill"></div></div>
+        <div id="enemy-hp"><div id="enemy-hp-fill"></div></div>
+        <div id="enemy-pose">
+          <img
+            id="pose-img"
+            src="images/pose1.png"
+            alt="Enemy Pose"
+            onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjMTExIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJtb25vc3BhY2UiIGZvbnQtc2l6ZT0iMTgiIGZpbGw9IiNmZmYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj5OZXV0cmFsIFN0YW5jZTwvdGV4dD48L3N2Zz4='"
+          />
+        </div>
+      </div>
+      <div id="instruction">Prepare for battle...</div>
+      <div id="message"></div>
+      <div id="attacks">
+        <button class="attack-btn" data-action="shield">
+          <img
+            src="images/shield.png"
+            alt="Shield"
+            onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMzAiIGN5PSIzMCIgcj0iMzAiIGZpbGw9IiNmZmYiLz48L3N2Zz4='"
+          />
+          Shield Bash
+        </button>
+        <button class="attack-btn" data-action="rocket">
+          <img
+            src="images/rocket.png"
+            alt="Rocket"
+            onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMzAiIGN5PSIzMCIgcj0iMzAiIGZpbGw9IiNmZjAiLz48L3N2Zz4='"
+          />
+          Rocket Fist
+        </button>
+        <button class="attack-btn" data-action="sword">
+          <img
+            src="images/sword.png"
+            alt="Sword"
+            onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMzAiIGN5PSIzMCIgcj0iMzAiIGZpbGw9IiNmY2MiLz48L3N2Zz4='"
+          />
+          Sword Slash
+        </button>
+        <button class="attack-btn" data-action="plasma">
+          <img
+            src="images/plasma.png"
+            alt="Plasma"
+            onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMzAiIGN5PSIzMCIgcj0iMzAiIGZpbGw9IiMwMGZmIi8+PC9zdmc+';"
+          />
+          Plasma Dodge
+        </button>
+      </div>
+      <button id="restart">Restart Game</button>
+    </div>
+
+    <script type="module">
+      import { initTitleScreen } from "./title-screen.js";
+
+      // Initialize title screen on page load
+      initTitleScreen();
+    </script>
+  </body>
+</html>
