@@ -152,7 +152,7 @@ body.title-active::before {
 /* Button container for better spacing */
 #title-screen .button-container {
   display: flex;
-  gap: 20px;
+  gap: 30px;
   justify-content: center;
   flex-wrap: wrap;
 }
@@ -590,6 +590,23 @@ body.title-active::before {
   filter: grayscale(100%);
 }
 
+.attack-btn:disabled::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 60px;
+  height: 60px;
+  background-image: url("images/icon-lock.png");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  opacity: 1;
+  filter: none;
+  z-index: 10;
+}
+
 /* RESTART BUTTON */
 #restart {
   display: none;
@@ -735,6 +752,54 @@ body.title-active::before {
   }
 }
 
+/* INTENSE GLITCH ANIMATION FOR TITLE TRANSITION */
+@keyframes glitchIntense {
+  0% {
+    transform: translate(0);
+    opacity: 1;
+  }
+  10% {
+    transform: translate(-10px, 5px) skew(-5deg);
+    opacity: 0.8;
+  }
+  20% {
+    transform: translate(15px, -8px) skew(8deg);
+    opacity: 0.6;
+  }
+  30% {
+    transform: translate(-8px, 10px) skew(-10deg);
+    opacity: 0.9;
+  }
+  40% {
+    transform: translate(12px, -15px) skew(12deg);
+    opacity: 0.4;
+  }
+  50% {
+    transform: translate(-20px, 8px) skew(-8deg);
+    opacity: 0.7;
+  }
+  60% {
+    transform: translate(18px, -12px) skew(15deg);
+    opacity: 0.3;
+  }
+  70% {
+    transform: translate(-15px, 15px) skew(-12deg);
+    opacity: 0.5;
+  }
+  80% {
+    transform: translate(25px, -10px) skew(10deg);
+    opacity: 0.2;
+  }
+  90% {
+    transform: translate(-30px, 20px) skew(-20deg);
+    opacity: 0.1;
+  }
+  100% {
+    transform: translate(0) skew(0deg);
+    opacity: 0;
+  }
+}
+
 /* SHAKE ANIMATION FOR INCORRECT ANSWERS */
 @keyframes shake {
   0%,
@@ -839,6 +904,11 @@ body.title-active::before {
   .attack-btn:active:not(:disabled) {
     transform: translate(8px, 8px) scale(1);
   }
+
+  .attack-btn:disabled::after {
+    width: 50px;
+    height: 50px;
+  }
 }
 
 @media (max-width: 480px) {
@@ -882,5 +952,10 @@ body.title-active::before {
 
   .attack-btn:active:not(:disabled) {
     transform: translate(6px, 6px) scale(1);
+  }
+
+  .attack-btn:disabled::after {
+    width: 40px;
+    height: 40px;
   }
 }

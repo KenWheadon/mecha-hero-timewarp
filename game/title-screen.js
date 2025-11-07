@@ -13,6 +13,7 @@ const elements = {
   startBtn: document.getElementById("start-btn"),
   htpBtn: document.getElementById("htp-btn"),
   poseImg: document.getElementById("pose-img"),
+  title: document.getElementById("title"),
 };
 
 // Initialize title screen
@@ -20,7 +21,9 @@ export function initTitleScreen() {
   setPose(neutralPose);
   setupEventListeners();
   // Activate colorful background for title screen
-  document.body.classList.add('title-active');
+  document.body.classList.add("title-active");
+
+  startTitleGlitch();
 }
 
 // Set pose image with fallback
@@ -48,7 +51,7 @@ function onStartGame() {
   elements.titleScreen.style.display = "none";
   elements.game.style.display = "block";
   // Remove colorful background when entering game
-  document.body.classList.remove('title-active');
+  document.body.classList.remove("title-active");
   initGame();
 }
 
@@ -62,4 +65,21 @@ function onHowToPlay() {
 function closeModal() {
   elements.overlay.style.display = "none";
   elements.htp.style.display = "none";
+}
+
+// Title glitch effect - replaces title with logo after 3 seconds
+function startTitleGlitch() {
+  setTimeout(() => {
+    // Add intense glitch effect
+    elements.title.style.animation = "glitchIntense 0.3s linear";
+
+    // After glitch animation, replace with logo
+    setTimeout(() => {
+      // Replace the title text with an image
+      elements.title.innerHTML =
+        '<img src="images/logo-thin.png" alt="MECHA HERO" style="max-width: 30%; height: auto;" />';
+      elements.title.style.animation = "none";
+      elements.title.style.marginBottom = "10px";
+    }, 300);
+  }, 3000);
 }
