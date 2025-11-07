@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mecha Hero - Mini Jam 197: Recursion</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        background: #000;
+        color: #fff;
+        font-family: monospace;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        overflow: hidden;
+      }
+      #game {
+        text-align: center;
+        max-width: 800px;
+      }
+      #hearts {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        display: flex;
+        gap: 10px;
+      }
+      .heart {
+        width: 40px;
+        height: 40px;
+      }
+      #fight-info {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        font-size: 24px;
+      }
+      #timer {
+        width: 200px;
+        height: 20px;
+        background: #333;
+        margin: 20px auto;
+        border: 2px solid #fff;
+        position: relative;
+      }
+      #timer-fill {
+        height: 100%;
+        background: #0f0;
+        width: 100%;
+        transition: width 0.1s;
+      }
+      #enemy-pose {
+        width: 300px;
+        height: 300px;
+        margin: 20px auto;
+        border: 2px solid #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        background: #111;
+      }
+      #pose-img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+      }
+      #attacks {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+        max-width: 400px;
+        margin: 20px auto;
+      }
+      .attack-btn {
+        padding: 20px;
+        font-size: 18px;
+        background: #333;
+        border: 2px solid #fff;
+        color: #fff;
+        cursor: pointer;
+        transition: background 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 80px;
+      }
+      .attack-btn img {
+        width: 60px;
+        height: 60px;
+        object-fit: contain;
+        margin-right: 10px;
+      }
+      .attack-btn:hover {
+        background: #555;
+      }
+      .attack-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+      #message {
+        font-size: 24px;
+        margin: 20px;
+        min-height: 30px;
+      }
+      #restart {
+        display: none;
+        padding: 10px 20px;
+        background: #f00;
+        border: none;
+        color: #fff;
+        font-size: 18px;
+        cursor: pointer;
+        margin-top: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="game">
+      <div id="hearts"></div>
+      <div id="fight-info">Fight: 1/3</div>
+      <div id="timer"><div id="timer-fill"></div></div>
+      <div id="enemy-pose">
+        <img
+          id="pose-img"
+          src="images/pose1.png"
+          alt="Enemy Pose"
+          onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjMTExIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJtb25vc3BhY2UiIGZvbnQtc2l6ZT0iMTgiIGZpbGw9IiNmZmYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj5OZXV0cmFsIFN0YW5jZTwvdGV4dD48L3N2Zz4='"
+        />
+      </div>
+      <div id="message">Click to start!</div>
+      <div id="attacks">
+        <button class="attack-btn" data-action="shield">
+          <img
+            src="images/shield.png"
+            alt="Shield"
+            onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMzAiIGN5PSIzMCIgcj0iMzAiIGZpbGw9IiNmZmYiLz48L3N2Zz4='"
+          />
+          Shield Bash
+        </button>
+        <button class="attack-btn" data-action="rocket">
+          <img
+            src="images/rocket.png"
+            alt="Rocket"
+            onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMzAiIGN5PSIzMCIgcj0iMzAiIGZpbGw9IiNmZjAiLz48L3N2Zz4='"
+          />
+          Rocket Fist
+        </button>
+        <button class="attack-btn" data-action="sword">
+          <img
+            src="images/sword.png"
+            alt="Sword"
+            onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMzAiIGN5PSIzMCIgcj0iMzAiIGZpbGw9IiNmY2MiLz48L3N2Zz4='"
+          />
+          Sword Slash
+        </button>
+        <button class="attack-btn" data-action="plasma">
+          <img
+            src="images/plasma.png"
+            alt="Plasma"
+            onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMzAiIGN5PSIzMCIgcj0iMzAiIGZpbGw9IiMwMGZmIi8+PC9zdmc+';"
+          />
+          Plasma Dodge
+        </button>
+      </div>
+      <button id="restart">Restart Game</button>
+    </div>
+
+    <script>
+      // Game data - Neutral (1) as default/reset, Attacks (2-5) shuffled, Defeated (6) for win
+      const neutralPose = {
+        id: 1,
+        desc: "Neutral Stance",
+        img: "images/pose1.png",
+      };
+      const attackPoses = [
+        {
+          id: 2,
+          desc: "Arm Cocked High",
+          img: "images/pose2.png",
+          correct: "shield",
+        },
+        {
+          id: 3,
+          desc: "Leg Sweep Low",
+          img: "images/pose3.png",
+          correct: "rocket",
+        },
+        {
+          id: 4,
+          desc: "Torso Twist",
+          img: "images/pose4.png",
+          correct: "sword",
+        },
+        {
+          id: 5,
+          desc: "Chest Burst",
+          img: "images/pose5.png",
+          correct: "plasma",
+        },
+      ];
+      const defeatedPose = { id: 6, desc: "Defeated", img: "images/pose6.png" };
+
+      let gameState = {
+        currentFight: 1,
+        maxFights: 3,
+        hearts: 3,
+        currentPoseIndex: 0,
+        currentPoses: [], // Shuffled attacks only (4)
+        timer: null,
+        timerInterval: null,
+        baseTimerDuration: 5000, // ms, adjusted per fight
+      };
+
+      const elements = {
+        hearts: document.getElementById("hearts"),
+        fightInfo: document.getElementById("fight-info"),
+        timerFill: document.getElementById("timer-fill"),
+        poseImg: document.getElementById("pose-img"),
+        message: document.getElementById("message"),
+        attacks: document.querySelectorAll(".attack-btn"),
+        restart: document.getElementById("restart"),
+      };
+
+      // Set pose image
+      function setPose(pose) {
+        elements.poseImg.src = pose.img;
+        elements.poseImg.onerror = () => {
+          const fallbackText = pose.desc || "Unknown Pose";
+          elements.poseImg.src =
+            "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjMTExIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJtb25vc3BhY2UiIGZvbnQtc2l6ZT0iMTgiIGZpbGw9IiNmZmYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj4=" +
+            encodeURIComponent(fallbackText) +
+            "</text></svg>";
+        };
+      }
+
+      // Init hearts
+      function initHearts() {
+        elements.hearts.innerHTML = "";
+        for (let i = 0; i < 3; i++) {
+          const heart = document.createElement("img");
+          heart.src = "images/heart_full.png";
+          heart.className = "heart";
+          heart.onerror = () => {
+            heart.src =
+              "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHBhdGggZD0iTTIwIDRjLTUuNSA0LTEwIDEwLTUuNSAxNGwxMCAxMDEwIDExYy41LTQtNS41LTEwLTUuNS0xNHoiIGZpbGw9IiNmMDBmZiIvPjwvc3ZnPg==";
+          };
+          elements.hearts.appendChild(heart);
+        }
+      }
+
+      // Shuffle attack poses
+      function shufflePoses() {
+        gameState.currentPoses = [...attackPoses].sort(
+          () => Math.random() - 0.5
+        );
+      }
+
+      // Reset to neutral with cooldown delay before next action
+      function cooldownToNeutral(delay, callback) {
+        setPose(neutralPose);
+        disableButtons();
+        clearInterval(gameState.timerInterval);
+        elements.timerFill.style.width = "100%"; // Reset timer visually
+        setTimeout(callback, delay);
+      }
+
+      // Start a new fight
+      function startFight() {
+        if (gameState.currentFight > gameState.maxFights) {
+          elements.message.textContent = "Victory! Crystal Shattered.";
+          setPose(neutralPose); // Back to neutral on win
+          elements.restart.style.display = "block";
+          return;
+        }
+        shufflePoses();
+        gameState.currentPoseIndex = 0;
+        gameState.baseTimerDuration =
+          gameState.currentFight === 1
+            ? 5000
+            : gameState.currentFight === 2
+            ? 3000
+            : 1500;
+        elements.fightInfo.textContent = `Fight: ${gameState.currentFight}/3`;
+        elements.message.textContent = "Begin!";
+        elements.restart.style.display = "none";
+        // Start with neutral, brief pause, then first pose
+        setPose(neutralPose);
+        setTimeout(() => {
+          nextPose();
+        }, 500);
+      }
+
+      // Show next pose
+      function nextPose() {
+        if (gameState.currentPoseIndex >= 4) {
+          // Fight won - show defeated
+          setPose(defeatedPose);
+          elements.message.textContent = `Fight ${gameState.currentFight} Complete! Rewind...`;
+          setTimeout(() => {
+            gameState.currentFight++;
+            if (gameState.hearts <= 0) {
+              gameOver();
+            } else {
+              startFight();
+            }
+          }, 2000);
+          return;
+        }
+        const pose = gameState.currentPoses[gameState.currentPoseIndex];
+        setPose(pose);
+        elements.message.textContent = `Pose ${
+          gameState.currentPoseIndex + 1
+        }/4: ${pose.desc}`;
+        startTimer();
+        enableButtons();
+      }
+
+      // Start timer
+      function startTimer() {
+        clearInterval(gameState.timerInterval);
+        const duration = gameState.baseTimerDuration;
+        let timeLeft = duration;
+        elements.timerFill.style.width = "100%";
+        gameState.timerInterval = setInterval(() => {
+          timeLeft -= 50;
+          const percent = (timeLeft / duration) * 100;
+          elements.timerFill.style.width = `${percent}%`;
+          if (timeLeft <= 0) {
+            clearInterval(gameState.timerInterval);
+            loseHeart("Timeout!");
+            cooldownToNeutral(1000, nextPose); // Retry after cooldown
+          }
+        }, 50);
+      }
+
+      // Handle attack click
+      function handleAttack(action) {
+        clearInterval(gameState.timerInterval);
+        const pose = gameState.currentPoses[gameState.currentPoseIndex];
+        if (action === pose.correct) {
+          elements.message.textContent = "Counter! Perfect.";
+          gameState.currentPoseIndex++;
+          cooldownToNeutral(500, () => {
+            if (gameState.currentPoseIndex >= 4) {
+              nextPose(); // This will show defeated
+            } else {
+              nextPose();
+            }
+          });
+        } else {
+          elements.message.textContent = "Wrong! Hit taken.";
+          loseHeart();
+          cooldownToNeutral(1000, nextPose); // Retry after cooldown
+        }
+        disableButtons();
+      }
+
+      // Lose a heart
+      function loseHeart() {
+        gameState.hearts--;
+        updateHearts();
+        if (gameState.hearts <= 0) {
+          setTimeout(gameOver, 1000);
+        }
+      }
+
+      // Update hearts display
+      function updateHearts() {
+        const heartEls = elements.hearts.querySelectorAll(".heart");
+        heartEls.forEach((el, i) => {
+          if (i < gameState.hearts) {
+            el.src = "images/heart_full.png";
+            el.onerror = () => {
+              el.src =
+                "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHBhdGggZD0iTTIwIDRjLTUuNSA0LTEwIDEwLTUuNSAxNGwxMCAxMDEwIDExYy41LTQtNS41LTEwLTUuNS0xNHoiIGZpbGw9IiNmMDBmZiIvPjwvc3ZnPg==";
+            };
+          } else {
+            el.src = "images/heart_empty.png";
+            el.onerror = () => {
+              el.src =
+                "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMjAiIGZpbGw9IiNmMDAiLz48L3N2Zz4=";
+            };
+          }
+        });
+      }
+
+      // Game over
+      function gameOver() {
+        elements.message.textContent = "Game Over! Crystal Overload.";
+        setPose(neutralPose); // Reset to neutral
+        elements.restart.style.display = "block";
+        disableButtons();
+      }
+
+      // Enable/disable buttons
+      function enableButtons() {
+        elements.attacks.forEach((btn) => (btn.disabled = false));
+      }
+      function disableButtons() {
+        elements.attacks.forEach((btn) => (btn.disabled = true));
+      }
+
+      // Event listeners
+      elements.attacks.forEach((btn) => {
+        btn.addEventListener("click", () => handleAttack(btn.dataset.action));
+      });
+      elements.restart.addEventListener("click", () => {
+        gameState = {
+          ...gameState,
+          currentFight: 1,
+          hearts: 3,
+          currentPoseIndex: 0,
+        };
+        initHearts();
+        startFight();
+      });
+
+      // Init game - Defaults to neutral pose
+      initHearts();
+      setPose(neutralPose);
+      elements.message.textContent = "Click a response to start Fight 1!";
+      enableButtons();
+      // Auto-start on first attack click for demo
+      elements.attacks.forEach((btn) => {
+        btn.addEventListener(
+          "click",
+          function firstClick(e) {
+            if (
+              gameState.currentFight === 1 &&
+              gameState.currentPoseIndex === 0 &&
+              !gameState.currentPoses.length
+            ) {
+              this.removeEventListener("click", firstClick);
+              startFight();
+            }
+          },
+          { once: true }
+        );
+      });
+    </script>
+  </body>
+</html>
