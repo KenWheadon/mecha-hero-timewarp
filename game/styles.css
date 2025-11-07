@@ -590,6 +590,11 @@ body.title-active::before {
   filter: grayscale(100%);
 }
 
+.attack-btn:disabled img {
+  opacity: 0;
+  visibility: hidden;
+}
+
 .attack-btn:disabled::after {
   content: "";
   position: absolute;
