@@ -341,9 +341,6 @@ body.title-active::before {
 .heart {
   width: 50px;
   height: 50px;
-  border: var(--border-medium) solid #000;
-  background: var(--color-danger);
-  box-shadow: 4px 4px 0px #000;
   transition: all 0.2s ease;
 }
 
@@ -775,7 +772,11 @@ body.title-active::before {
   text-transform: uppercase;
   letter-spacing: 2px;
   color: #000;
-  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-accent) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--color-primary) 0%,
+    var(--color-accent) 100%
+  );
   padding: 20px;
   border: var(--border-medium) solid #000;
   box-shadow: 8px 8px 0px #000;

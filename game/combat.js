@@ -12,9 +12,14 @@ import {
 import { audioManager } from "./audio-manager.js";
 import { saveHighScore } from "./storage-manager.js";
 import { initOnboarding, checkAndShowOnboarding } from "./onboarding.js";
+import { SpriteSheet } from "./sprite-sheet.js";
+import { getSpriteConfig, hasSprite } from "./sprites-config.js";
 
 // Game state
 let gameState = createInitialGameState();
+
+// Active sprite sheet instance
+let activeSpriteSheet = null;
 
 // Cache DOM elements
 const elements = {
@@ -142,12 +147,62 @@ function updateCrystalEnergy() {
   elements.crystalFill.style.width = `${percentage}%`;
 }
 
-// Set pose image - no fallback, log error if missing
-function setPose(pose) {
-  elements.poseImg.src = pose.img;
-  elements.poseImg.onerror = () => {
-    console.error(`Missing image: ${pose.img}${pose.desc ? ` (${pose.desc})` : ''}`);
-  };
+// Clean up active sprite sheet
+function cleanupSpriteSheet() {
+  if (activeSpriteSheet) {
+    activeSpriteSheet.stop();
+    activeSpriteSheet.destroy();
+    activeSpriteSheet = null;
+  }
+  // Reset to using img element
+  elements.poseImg.style.display = "block";
+  const container = elements.poseImg.parentElement;
+  container.style.backgroundImage = "none";
+  container.style.backgroundPosition = "";
+  container.style.backgroundSize = "";
+  container.style.backgroundRepeat = "";
+}
+
+// Set pose image or sprite - no fallback, log error if missing
+function setPose(pose, useSprite = null) {
+  // Clean up any existing sprite
+  cleanupSpriteSheet();
+
+  // Check if we should use a sprite sheet
+  const spriteKey = useSprite || pose.sprite;
+
+  if (spriteKey && hasSprite(spriteKey)) {
+    // Use sprite sheet animation
+    const spriteConfig = getSpriteConfig(spriteKey);
+    activeSpriteSheet = new SpriteSheet(spriteConfig);
+
+    // Hide the img element and use background on parent
+    elements.poseImg.style.display = "none";
+    const container = elements.poseImg.parentElement;
+
+    // Wait for sprite to load, then start animation
+    const checkLoaded = setInterval(() => {
+      if (activeSpriteSheet.isLoaded) {
+        clearInterval(checkLoaded);
+        activeSpriteSheet.play();
+
+        // Update sprite display every frame
+        const updateSprite = setInterval(() => {
+          if (activeSpriteSheet && activeSpriteSheet.isPlaying) {
+            activeSpriteSheet.applyToElement(container);
+          } else {
+            clearInterval(updateSprite);
+          }
+        }, 1000 / (activeSpriteSheet.fps || 12));
+      }
+    }, 50);
+  } else {
+    // Use static image
+    elements.poseImg.src = pose.img;
+    elements.poseImg.onerror = () => {
+      console.error(`Missing image: ${pose.img}${pose.desc ? ` (${pose.desc})` : ''}`);
+    };
+  }
 }
 
 // Start new pose sequence
@@ -410,7 +465,12 @@ function handleAttack(action) {
     }
 
     // Show hit feedback pose (enemy hit the player)
-    setPose({ img: gameState.pendingPose.hitImg, desc: "Blocked!" });
+    // Use sprite sheet if available, otherwise use static image
+    if (gameState.pendingPose.hitSprite) {
+      setPose({ img: gameState.pendingPose.hitImg, desc: "Blocked!", sprite: gameState.pendingPose.hitSprite });
+    } else {
+      setPose({ img: gameState.pendingPose.hitImg, desc: "Blocked!" });
+    }
 
     setTimeout(() => {
       elements.message.textContent = "Wrong move!";
@@ -551,6 +611,7 @@ function togglePause() {
 // Restart game
 function restartGame() {
   stopTimer();
+  cleanupSpriteSheet();
   elements.restart.style.display = "none";
   elements.pause.textContent = "Pause";
   elements.timerPaused.style.display = "none";

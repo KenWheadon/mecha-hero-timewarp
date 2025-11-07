@@ -12,6 +12,7 @@ export const attackPoses = [
     desc: "Laser Beam Charge",
     img: "images/pose2.png",
     hitImg: "images/pose2-hit.png",
+    hitSprite: "pose2-hit", // Use sprite sheet for hit animation
     dmgImg: "images/pose2-dmg.png",
     correct: "shield",
   },
