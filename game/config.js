@@ -9,7 +9,7 @@ export const neutralPose = {
 export const attackPoses = [
   {
     id: 2,
-    desc: "Arm Cocked High",
+    desc: "Laser Beam Charge",
     img: "images/pose2.png",
     hitImg: "images/pose2-hit.png",
     dmgImg: "images/pose2-dmg.png",
@@ -17,7 +17,7 @@ export const attackPoses = [
   },
   {
     id: 3,
-    desc: "Leg Sweep Low",
+    desc: "Launcher Warm Up",
     img: "images/pose3.png",
     hitImg: "images/pose3-hit.png",
     dmgImg: "images/pose3-dmg.png",
@@ -25,7 +25,7 @@ export const attackPoses = [
   },
   {
     id: 4,
-    desc: "Torso Twist",
+    desc: "Short Blade Ready",
     img: "images/pose4.png",
     hitImg: "images/pose4-hit.png",
     dmgImg: "images/pose4-dmg.png",
@@ -33,7 +33,7 @@ export const attackPoses = [
   },
   {
     id: 5,
-    desc: "Chest Burst",
+    desc: "Heavy Blade Ready",
     img: "images/pose5.png",
     hitImg: "images/pose5-hit.png",
     dmgImg: "images/pose5-dmg.png",
