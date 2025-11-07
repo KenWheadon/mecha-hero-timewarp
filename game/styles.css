@@ -545,13 +545,14 @@ body.title-active::before {
 #enemy-container {
   position: relative;
   display: inline-block;
-  /* Increase container size by 40% width and 10% height */
-  width: 532px;  /* 380px * 1.4 = 532px */
+  /* Increase container width by 50%, keep original height */
+  width: 798px;  /* 532px * 1.5 = 798px */
+  height: 380px;  /* Original height maintained */
 }
 
 #enemy-pose {
   width: 100%;
-  height: auto;
+  height: 100%;
   border: var(--border-thick) solid #000;
   display: flex;
   align-items: center;
@@ -564,6 +565,8 @@ body.title-active::before {
   background-size: contain;
   background-position: center;
   background-repeat: no-repeat;
+  /* Force container to maintain fixed dimensions, ignore aspect ratio from sprites */
+  aspect-ratio: unset !important;
 }
 
 #pose-img {
@@ -1237,12 +1240,13 @@ body.title-active::before {
   }
 
   #enemy-container {
-    width: 420px;  /* 300px * 1.4 = 420px */
+    width: 630px;  /* 420px * 1.5 = 630px */
+    height: 300px;  /* Original height maintained */
   }
 
   #enemy-pose {
     width: 100%;
-    height: auto;
+    height: 100%;
   }
 
   #instruction {
@@ -1322,12 +1326,13 @@ body.title-active::before {
   }
 
   #enemy-container {
-    width: 364px;  /* 260px * 1.4 = 364px */
+    width: 546px;  /* 364px * 1.5 = 546px */
+    height: 260px;  /* Original height maintained */
   }
 
   #enemy-pose {
     width: 100%;
-    height: auto;
+    height: 100%;
   }
 
   #instruction {

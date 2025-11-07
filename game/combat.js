@@ -205,6 +205,12 @@ function setPose(pose, useSprite = null) {
     elements.poseImg.onerror = () => {
       console.error(`Missing image: ${pose.img}${pose.desc ? ` (${pose.desc})` : ''}`);
     };
+
+    // Apply scale and position from config
+    const scale = pose.scale || 1.0;
+    const x = pose.x || 0;
+    const y = pose.y || 0;
+    elements.poseImg.style.transform = `translate(${x}px, ${y}px) scale(${scale})`;
   }
 }
 
