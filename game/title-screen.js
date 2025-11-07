@@ -56,15 +56,30 @@ function setPose(pose) {
 
 // Setup event listeners
 function setupEventListeners() {
+  // Add click listeners with sound effects
   elements.startBtn.addEventListener("click", onStartGame);
   elements.htpBtn.addEventListener("click", onHowToPlay);
-  elements.closeHtp.addEventListener("click", closeModal);
+  elements.closeHtp.addEventListener("click", () => {
+    audioManager.playSoundEffect("btnClick");
+    closeModal();
+  });
   elements.overlay.addEventListener("click", closeModal);
-  elements.audioToggleTitle.addEventListener("click", toggleAudio);
+  elements.audioToggleTitle.addEventListener("click", () => {
+    audioManager.playSoundEffect("btnClick");
+    toggleAudio();
+  });
+
+  // Add hover sound effects to all clickable buttons
+  [elements.startBtn, elements.htpBtn, elements.closeHtp, elements.audioToggleTitle].forEach((btn) => {
+    btn.addEventListener("mouseenter", () => {
+      audioManager.playSoundEffect("btnHover");
+    });
+  });
 }
 
 // Handle start game button
 function onStartGame() {
+  audioManager.playSoundEffect("btnClick");
   elements.titleScreen.style.display = "none";
   elements.game.style.display = "block";
   // Remove colorful background when entering game
@@ -74,6 +89,7 @@ function onStartGame() {
 
 // Handle how to play button
 function onHowToPlay() {
+  audioManager.playSoundEffect("btnClick");
   elements.overlay.style.display = "block";
   elements.htp.style.display = "block";
 }

@@ -281,6 +281,29 @@ body.title-active::before {
   }
 }
 
+/* AUDIO TOGGLE BUTTON - Compact version */
+.audio-toggle-btn {
+  padding: 5px 10px !important;
+  font-size: 5.6px !important;
+  min-width: 32px;
+  min-height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  background: linear-gradient(135deg, #00ff00 0%, #00cc00 100%) !important;
+}
+
+.audio-toggle-btn:hover {
+  background: linear-gradient(135deg, #ffff00 0%, #00ff88 100%) !important;
+}
+
+.audio-icon {
+  width: 12px;
+  height: 12px;
+  object-fit: contain;
+}
+
 /* GAME SCREEN */
 #game {
   text-align: center;

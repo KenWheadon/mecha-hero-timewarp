@@ -41,11 +41,27 @@ export function initGame() {
   initHearts();
   initOnboarding();
   setupFight();
-  elements.pause.addEventListener("click", togglePause);
-  elements.restart.addEventListener("click", restartGame);
-  elements.audioToggleCombat.addEventListener("click", toggleAudio);
+  elements.pause.addEventListener("click", () => {
+    audioManager.playSoundEffect("btnClick");
+    togglePause();
+  });
+  elements.restart.addEventListener("click", () => {
+    audioManager.playSoundEffect("btnClick");
+    restartGame();
+  });
+  elements.audioToggleCombat.addEventListener("click", () => {
+    audioManager.playSoundEffect("btnClick");
+    toggleAudio();
+  });
   elements.attacks.forEach((btn) => {
     btn.addEventListener("click", () => handleAttack(btn.dataset.action));
+  });
+
+  // Add hover sound effects to all buttons
+  [elements.pause, elements.restart, elements.audioToggleCombat, ...elements.attacks].forEach((btn) => {
+    btn.addEventListener("mouseenter", () => {
+      audioManager.playSoundEffect("btnHover");
+    });
   });
 
   // Start combat audio
@@ -162,6 +178,18 @@ function showAttackPose() {
   setPose(pose);
   elements.instruction.textContent = `Counter the ${pose.desc}!`;
   elements.attacksDiv.classList.add("show");
+
+  // Play charge sound based on pose ID
+  const chargeSoundMap = {
+    2: "pose2Charge",
+    3: "pose3Charge",
+    4: "pose4Charge",
+    5: "pose5Charge",
+  };
+  const chargeSound = chargeSoundMap[pose.id];
+  if (chargeSound) {
+    audioManager.playSoundEffect(chargeSound);
+  }
 
   startTimer();
 }
@@ -325,10 +353,31 @@ function handleAttack(action) {
   elements.attacksDiv.classList.remove("show");
 
   const correct = action === gameState.pendingPose.correct;
+  const poseId = gameState.pendingPose.id;
+
+  // Sound effect map for each pose
+  const hitSoundMap = {
+    2: "pose2Hit",
+    3: "pose3Hit",
+    4: "pose4Hit",
+    5: "pose5Hit",
+  };
+  const missSoundMap = {
+    2: "pose2Miss",
+    3: "pose3Miss",
+    4: "pose4Miss",
+    5: "pose5Miss",
+  };
 
   if (correct) {
     // Flash green for correct answer
     flashScreen(true);
+
+    // Play miss sound (player successfully dodged/countered)
+    const missSound = missSoundMap[poseId];
+    if (missSound) {
+      audioManager.playSoundEffect(missSound);
+    }
 
     // Show damage feedback pose (player successfully damaged enemy)
     setPose({ img: gameState.pendingPose.dmgImg, desc: "Hit!" });
@@ -358,6 +407,12 @@ function handleAttack(action) {
     // Flash red and shake for incorrect answer
     flashScreen(false);
     shakeScreen();
+
+    // Play hit sound (enemy hit the player)
+    const hitSound = hitSoundMap[poseId];
+    if (hitSound) {
+      audioManager.playSoundEffect(hitSound);
+    }
 
     // Show hit feedback pose (enemy hit the player)
     setPose({ img: gameState.pendingPose.hitImg, desc: "Blocked!" });
@@ -393,6 +448,9 @@ function handleFightWon() {
   // Show damaged pose
   setPose(damagedPose);
 
+  // Play robot death sound
+  audioManager.playSoundEffect("roboDeath");
+
   setTimeout(() => {
     if (gameState.currentFight === gameState.maxFights) {
       // Final fight won - calculate and save time-based score
@@ -401,6 +459,9 @@ function handleFightWon() {
 
       setPose(finalDestroyPose);
       elements.instruction.textContent = "VICTORY!";
+
+      // Play final death sound for level 4 victory
+      audioManager.playSoundEffect("roboFinalDeath");
 
       // Show time and high score status
       const timeText = formatTimeForDisplay(totalGameTime);
@@ -442,6 +503,9 @@ function showTimeWarp() {
   elements.instruction.textContent = "Time Warp Activated!";
   elements.message.textContent = "Traveling to next fight...";
   elements.message.style.color = "#0ff";
+
+  // Play timewarp sound effect
+  audioManager.playSoundEffect("timewarp");
 
   // Consume crystal charge if applicable
   const currentConfig = GAME_CONFIG.FIGHT_CONFIGS[gameState.currentFight];
