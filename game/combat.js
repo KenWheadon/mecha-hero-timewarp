@@ -14,6 +14,7 @@ import { saveHighScore } from "./storage-manager.js";
 import { initOnboarding, checkAndShowOnboarding } from "./onboarding.js";
 import { SpriteSheet } from "./sprite-sheet.js";
 import { getSpriteConfig, hasSprite } from "./sprites-config.js";
+import { GameOverScreen } from "./game-over-screen.js";
 
 // Game state
 let gameState = createInitialGameState();
@@ -23,6 +24,9 @@ let activeSpriteSheet = null;
 
 // Interval for checking if a sprite is loaded
 let spriteLoadCheckInterval = null;
+
+// Game over screen manager
+let gameOverScreen = null;
 
 // Cache DOM elements
 const elements = {
@@ -49,6 +53,13 @@ export function initGame() {
   gameState = createInitialGameState();
   initHearts();
   initOnboarding();
+
+  // Initialize game over screen
+  if (!gameOverScreen) {
+    gameOverScreen = new GameOverScreen();
+    gameOverScreen.onRestart(restartGame);
+  }
+
   setupFight();
   elements.pause.addEventListener("click", () => {
     audioManager.playSoundEffect("btnClick");
@@ -580,17 +591,11 @@ function handleFightWon() {
       // Play final death sound for level 4 victory
       audioManager.playSoundEffect("roboFinalDeath");
 
-      // Show time and high score status
+      // Show victory screen after a brief delay
       const timeText = formatTimeForDisplay(totalGameTime);
-      if (isNewHighScore) {
-        elements.message.textContent = `New Record: ${timeText}!`;
-        elements.message.style.color = "#ffff00";
-      } else {
-        elements.message.textContent = `Time: ${timeText}`;
-        elements.message.style.color = "#0f0";
-      }
-
-      elements.restart.style.display = "block";
+      setTimeout(() => {
+        gameOverScreen.showVictory(timeText, isNewHighScore, totalGameTime);
+      }, 1000);
     } else {
       // Show time warp transition
       showTimeWarp();
@@ -649,7 +654,11 @@ function gameOver() {
   elements.instruction.textContent = "GAME OVER";
   elements.message.textContent = `You reached Fight ${gameState.currentFight}`;
   elements.message.style.color = "#f00";
-  elements.restart.style.display = "block";
+
+  // Show defeat screen after a brief delay
+  setTimeout(() => {
+    gameOverScreen.showDefeat(gameState.currentFight);
+  }, 1000);
 }
 
 // Toggle pause
@@ -679,6 +688,15 @@ function restartGame() {
   elements.restart.style.display = "none";
   elements.pause.textContent = "Pause";
   elements.timerPaused.style.display = "none";
+
+  // Hide game over screens
+  if (gameOverScreen) {
+    gameOverScreen.hide();
+  }
+
+  // Restart combat music
+  audioManager.play("combat");
+
   gameState = createInitialGameState();
   initHearts();
   setupFight();

@@ -86,7 +86,88 @@ body.title-active::before {
   z-index: 1;
 }
 
-/* Bottom row with best time and audio button */
+/* Start button wrapper for positioning high score */
+.start-btn-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+/* HIGH SCORE - Hidden by default, shows on start button hover */
+#high-score {
+  position: absolute;
+  right: -20px;
+  top: 50%;
+  transform: translate(100%, -50%);
+  font-size: 16px;
+  font-weight: 900;
+  color: #000;
+  background: var(--color-accent);
+  padding: 15px 20px;
+  border: 5px solid #000;
+  box-shadow: 8px 8px 0px #000;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+}
+
+.start-btn-wrapper:hover #high-score {
+  opacity: 1;
+  transform: translate(100%, -50%) scale(1.05);
+}
+
+.high-score-time {
+  font-size: 16px;
+  text-align: center;
+}
+
+#high-score-value {
+  color: var(--color-danger);
+  font-size: 20px;
+}
+
+.high-score-stars {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  align-items: center;
+}
+
+.star-small {
+  width: 30px;
+  height: 30px;
+  background-image: url("images/icon-star.png");
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  filter: grayscale(100%) brightness(0.5);
+}
+
+.star-small.unlocked {
+  filter: grayscale(0%) brightness(1);
+}
+
+.star-progress {
+  font-size: 12px;
+  font-weight: 700;
+  color: #000;
+  text-align: center;
+  padding: 8px 12px;
+  background: var(--color-warning);
+  border: 3px solid #000;
+  box-shadow: 3px 3px 0px #000;
+  margin-top: 5px;
+  line-height: 1.3;
+}
+
+/* Bottom row with audio button and help */
 .bottom-row {
   display: flex;
   gap: 30px;
@@ -94,25 +175,6 @@ body.title-active::before {
   align-items: center;
   margin-top: 40px;
   flex-wrap: wrap;
-}
-
-/* HIGH SCORE */
-#high-score {
-  font-size: 28px;
-  font-weight: 900;
-  color: #000;
-  background: var(--color-accent);
-  display: inline-block;
-  padding: 15px 40px;
-  border: 5px solid #000;
-  box-shadow: 8px 8px 0px #000;
-  text-transform: uppercase;
-  letter-spacing: 2px;
-}
-
-#high-score-value {
-  color: var(--color-danger);
-  font-size: 32px;
 }
 
 #title {
@@ -1485,5 +1547,362 @@ body.title-active::before {
 
   .htp-footer p {
     font-size: 16px;
+  }
+}
+
+/* GAME OVER SCREENS */
+#victory-screen,
+#defeat-screen {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.95);
+  z-index: 20;
+  justify-content: center;
+  align-items: center;
+  animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.game-over-container {
+  background: var(--color-card);
+  border: var(--border-thick) solid #000;
+  padding: 50px 60px;
+  max-width: 600px;
+  width: 90%;
+  box-shadow: 20px 20px 0px #000;
+  text-align: center;
+  animation: slideIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(-100px) scale(0.8);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+.game-over-title {
+  margin: 0 0 15px 0;
+  font-size: 72px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 4px;
+  text-shadow: 8px 8px 0px #000;
+  animation: glitchPulse 2s ease-in-out infinite;
+}
+
+@keyframes glitchPulse {
+  0%,
+  100% {
+    text-shadow: 8px 8px 0px #000;
+  }
+  50% {
+    text-shadow: 8px 8px 0px #000, -4px -4px 0px var(--color-accent);
+  }
+}
+
+.victory-title {
+  color: var(--color-primary);
+}
+
+.defeat-title {
+  color: var(--color-danger);
+}
+
+.game-over-subtitle {
+  font-size: 22px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: #000;
+  margin-bottom: 40px;
+  padding-bottom: 20px;
+  border-bottom: 4px solid #000;
+}
+
+/* Victory Specific Styles */
+.victory-content {
+  margin: 30px 0;
+}
+
+.high-score-badge {
+  background: var(--color-warning);
+  border: var(--border-medium) solid #000;
+  padding: 12px 30px;
+  font-size: 24px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: #000;
+  box-shadow: 8px 8px 0px #000;
+  margin: 0 auto 30px;
+  display: inline-block;
+  animation: bounce 1s ease-in-out infinite;
+}
+
+@keyframes bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.time-display {
+  background: var(--color-accent);
+  border: var(--border-medium) solid #000;
+  padding: 25px;
+  margin: 20px 0 30px;
+  box-shadow: 8px 8px 0px #000;
+}
+
+.time-label {
+  font-size: 18px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #000;
+  margin-bottom: 10px;
+}
+
+.time-value {
+  font-size: 56px;
+  font-weight: 900;
+  color: #000;
+  letter-spacing: 2px;
+  text-shadow: 4px 4px 0px rgba(255, 255, 255, 0.5);
+}
+
+.star-rating {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  align-items: center;
+  margin: 25px 0;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.1);
+  border: var(--border-medium) solid #000;
+  box-shadow: 6px 6px 0px #000;
+}
+
+.star {
+  width: 60px;
+  height: 60px;
+  background-color: #888;
+  background-image: url("images/icon-star.png");
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  border: 4px solid #000;
+  box-shadow: 4px 4px 0px #000;
+  filter: grayscale(100%) brightness(0.5);
+  transition: all 0.3s ease;
+}
+
+.star.unlocked {
+  background-color: var(--color-warning);
+  filter: grayscale(0%) brightness(1);
+  animation: starPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes starPop {
+  0% {
+    transform: scale(0) rotate(0deg);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.2) rotate(180deg);
+  }
+  100% {
+    transform: scale(1) rotate(360deg);
+    opacity: 1;
+  }
+}
+
+.victory-message {
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.6;
+  color: #000;
+  margin-top: 25px;
+}
+
+/* Defeat Specific Styles */
+.defeat-content {
+  margin: 30px 0;
+}
+
+.fight-reached {
+  background: var(--color-danger);
+  border: var(--border-medium) solid #000;
+  padding: 25px;
+  margin: 20px 0 30px;
+  box-shadow: 8px 8px 0px #000;
+}
+
+.fight-label {
+  font-size: 18px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #000;
+  margin-bottom: 10px;
+}
+
+.fight-value {
+  font-size: 96px;
+  font-weight: 900;
+  color: #000;
+  text-shadow: 6px 6px 0px rgba(255, 255, 255, 0.3);
+  line-height: 1;
+}
+
+.defeat-message {
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.6;
+  color: #000;
+  margin-top: 25px;
+}
+
+/* Restart Button */
+.game-over-restart {
+  background: var(--color-primary);
+  border: var(--border-thick) solid #000;
+  color: #000;
+  font-size: 28px;
+  font-weight: 900;
+  padding: 20px 50px;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  box-shadow: var(--shadow-brutal);
+  transition: all 0.15s ease;
+  font-family: inherit;
+  margin-top: 20px;
+}
+
+.game-over-restart:hover {
+  transform: translate(4px, 4px);
+  box-shadow: var(--shadow-brutal-hover);
+  background: var(--color-accent);
+}
+
+.game-over-restart:active {
+  transform: translate(8px, 8px);
+  box-shadow: var(--shadow-brutal-active);
+}
+
+/* Responsive - Tablet */
+@media (max-width: 768px) {
+  .game-over-container {
+    padding: 40px 40px;
+  }
+
+  .game-over-title {
+    font-size: 56px;
+  }
+
+  .game-over-subtitle {
+    font-size: 18px;
+  }
+
+  .time-value {
+    font-size: 44px;
+  }
+
+  .fight-value {
+    font-size: 72px;
+  }
+
+  .star {
+    width: 50px;
+    height: 50px;
+  }
+
+  .game-over-restart {
+    font-size: 24px;
+    padding: 18px 40px;
+  }
+}
+
+/* Responsive - Mobile */
+@media (max-width: 480px) {
+  .game-over-container {
+    padding: 30px 25px;
+  }
+
+  .game-over-title {
+    font-size: 42px;
+    letter-spacing: 2px;
+  }
+
+  .game-over-subtitle {
+    font-size: 16px;
+    margin-bottom: 30px;
+  }
+
+  .high-score-badge {
+    font-size: 18px;
+    padding: 10px 20px;
+  }
+
+  .time-display,
+  .fight-reached {
+    padding: 20px;
+  }
+
+  .time-label,
+  .fight-label {
+    font-size: 16px;
+  }
+
+  .time-value {
+    font-size: 36px;
+  }
+
+  .fight-value {
+    font-size: 64px;
+  }
+
+  .victory-message,
+  .defeat-message {
+    font-size: 16px;
+  }
+
+  .star-rating {
+    gap: 10px;
+    padding: 15px;
+  }
+
+  .star {
+    width: 40px;
+    height: 40px;
+    border: 3px solid #000;
+    box-shadow: 3px 3px 0px #000;
+  }
+
+  .game-over-restart {
+    font-size: 20px;
+    padding: 15px 35px;
+    letter-spacing: 2px;
   }
 }

@@ -55,6 +55,20 @@ function getFirstTimeFlags() {
   return flags ? JSON.parse(flags) : {};
 }
 
+// Get star rating based on completion time
+// Under 1 minute: 3 stars
+// Under 2 minutes: 2 stars
+// Anything else: 1 star
+export function getStarRating(timeInSeconds) {
+  if (timeInSeconds < 60) {
+    return 3;
+  } else if (timeInSeconds < 120) {
+    return 2;
+  } else {
+    return 1;
+  }
+}
+
 // Reset all progress (for testing or user request)
 export function resetAllProgress() {
   localStorage.removeItem(STORAGE_KEYS.HIGH_SCORE);

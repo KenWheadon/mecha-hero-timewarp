@@ -5,7 +5,7 @@ import { initGame } from "./combat.js";
 import { audioManager } from "./audio-manager.js";
 import { SpriteSheet } from "./sprite-sheet.js";
 import { getSpriteConfig } from "./sprites-config.js";
-import { getHighScore, formatTime } from "./storage-manager.js";
+import { getHighScore, formatTime, getStarRating } from "./storage-manager.js";
 import { HowToPlay } from "./how-to-play.js";
 
 // Cache DOM elements
@@ -51,6 +51,42 @@ export function initTitleScreen() {
 function loadHighScore() {
   const highScore = getHighScore();
   elements.highScoreValue.textContent = formatTime(highScore);
+
+  // Update stars and progress message
+  updateHighScoreStars(highScore);
+}
+
+// Update high score stars and progress message
+function updateHighScoreStars(timeInSeconds) {
+  const stars = document.querySelectorAll('.star-small');
+  const progressMessage = document.getElementById('star-progress-message');
+
+  if (timeInSeconds === null) {
+    // No high score yet - all stars locked
+    stars.forEach(star => star.classList.remove('unlocked'));
+    progressMessage.textContent = 'Complete the game!';
+    return;
+  }
+
+  const rating = getStarRating(timeInSeconds);
+
+  // Update star visuals
+  stars.forEach((star, index) => {
+    if (index < rating) {
+      star.classList.add('unlocked');
+    } else {
+      star.classList.remove('unlocked');
+    }
+  });
+
+  // Set progress message based on current rating
+  if (rating === 3) {
+    progressMessage.textContent = 'Perfect! 3 stars!';
+  } else if (rating === 2) {
+    progressMessage.textContent = 'Under 1 minute for 3 stars';
+  } else {
+    progressMessage.textContent = 'Under 2 minutes for 2 stars';
+  }
 }
 
 // Set pose image - no fallback, log error if missing

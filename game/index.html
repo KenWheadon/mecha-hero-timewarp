@@ -117,12 +117,22 @@
       <h1 id="title">MECHA HERO</h1>
       <p>Mini Jam 179: Recursion</p>
       <div class="button-container">
-        <button class="title-btn" id="start-btn">Start Game</button>
+        <div class="start-btn-wrapper">
+          <button class="title-btn" id="start-btn">Start Game</button>
+          <div id="high-score">
+            <div class="high-score-time">
+              Best Time: <span id="high-score-value">N/A</span>
+            </div>
+            <div class="high-score-stars">
+              <div class="star-small" data-star="1"></div>
+              <div class="star-small" data-star="2"></div>
+              <div class="star-small" data-star="3"></div>
+            </div>
+            <div id="star-progress-message" class="star-progress"></div>
+          </div>
+        </div>
       </div>
       <div class="bottom-row">
-        <div id="high-score">
-          Best Time: <span id="high-score-value">N/A</span>
-        </div>
         <button class="title-btn audio-toggle-btn" id="audio-toggle-title">
           <img src="images/icon-musicnote.png" alt="Audio" class="audio-icon" />
         </button>
@@ -216,6 +226,54 @@
 
       <!-- Restart Button -->
       <button id="restart">Restart Game</button>
+    </div>
+
+    <!-- Victory Screen -->
+    <div id="victory-screen">
+      <div class="game-over-container">
+        <h1 class="game-over-title victory-title">VICTORY!</h1>
+        <div class="game-over-subtitle">All Enemies Defeated</div>
+
+        <div class="victory-content">
+          <div id="victory-badge" class="high-score-badge">NEW RECORD!</div>
+          <div class="time-display">
+            <div class="time-label">Your Time</div>
+            <div id="victory-time" class="time-value">0:00.00</div>
+          </div>
+          <div class="star-rating">
+            <div class="star" data-star="1"></div>
+            <div class="star" data-star="2"></div>
+            <div class="star" data-star="3"></div>
+          </div>
+          <div class="victory-message">
+            The mecha threat has been neutralized.<br>
+            Time flows freely once more!
+          </div>
+        </div>
+
+        <button class="game-over-restart">Play Again</button>
+      </div>
+    </div>
+
+    <!-- Defeat Screen -->
+    <div id="defeat-screen">
+      <div class="game-over-container">
+        <h1 class="game-over-title defeat-title">DEFEATED</h1>
+        <div class="game-over-subtitle">Systems Overloaded</div>
+
+        <div class="defeat-content">
+          <div class="fight-reached">
+            <div class="fight-label">Fight Reached</div>
+            <div id="defeat-fight" class="fight-value">1</div>
+          </div>
+          <div class="defeat-message">
+            Your mecha has fallen.<br>
+            The time loop continues...
+          </div>
+        </div>
+
+        <button class="game-over-restart">Try Again</button>
+      </div>
     </div>
 
     <script type="module">
