@@ -14,6 +14,127 @@
   --shadow-brutal-active: 4px 4px 0px #000000;
 }
 
+/* LOADING SCREEN */
+#loading-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--color-bg);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10000;
+}
+
+#loading-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 40px;
+  max-width: 500px;
+  width: 90%;
+}
+
+#loading-logo {
+  width: 200px;
+  height: auto;
+  animation: logoFloat 2s ease-in-out infinite;
+}
+
+@keyframes logoFloat {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+#loading-progress-bar {
+  width: 100%;
+  height: 40px;
+  background: var(--color-card);
+  border: var(--border-thick) solid #000000;
+  box-shadow: var(--shadow-brutal);
+  position: relative;
+  overflow: hidden;
+}
+
+#loading-progress-fill {
+  height: 100%;
+  width: 0%;
+  background: var(--color-primary);
+  transition: width 0.3s ease;
+  position: relative;
+}
+
+#loading-progress-fill::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.3) 50%,
+    transparent 100%
+  );
+  animation: progressShimmer 1.5s infinite;
+}
+
+@keyframes progressShimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+#loading-progress-text {
+  font-size: 24px;
+  color: var(--color-text);
+  text-align: center;
+  text-shadow: 3px 3px 0px #000000;
+  letter-spacing: 2px;
+}
+
+#loading-start-btn {
+  display: none;
+  width: 100%;
+  padding: 20px 40px;
+  font-size: 28px;
+  font-weight: bold;
+  font-family: "Courier New", "Courier", monospace;
+  background: var(--color-primary);
+  color: #000000;
+  border: var(--border-thick) solid #000000;
+  box-shadow: var(--shadow-brutal);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+}
+
+#loading-start-btn:hover {
+  box-shadow: var(--shadow-brutal-hover);
+  transform: translate(-2px, -2px);
+}
+
+#loading-start-btn:active {
+  box-shadow: var(--shadow-brutal-active);
+  transform: translate(2px, 2px);
+}
+
+#loading-start-btn:focus {
+  outline: none;
+}
+
 body {
   margin: 0;
   padding: 0;
@@ -1728,6 +1849,22 @@ body.title-active::before {
     opacity: 0;
     transform: translateY(-300px) scale(0.5) rotate(360deg);
   }
+}
+
+/* EYEBALL PARTICLE FOR LOGO EASTER EGG */
+.eyeball-particle {
+  position: fixed;
+  width: 40px;
+  height: 40px;
+  background-image: url("images/icon-eyeball.png");
+  background-size: contain;
+  background-repeat: no-repeat;
+  pointer-events: none;
+  z-index: 1001;
+  transform: scale(1);
+  opacity: 1;
+  will-change: transform, opacity;
+  transition: transform 1s ease-out, opacity 1s ease-out;
 }
 
 /* RESPONSIVE */

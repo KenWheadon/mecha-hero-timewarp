@@ -227,9 +227,27 @@ class AudioManager {
     if (this.volumes[effectName] !== undefined) {
       soundClone.volume = this.volumes[effectName];
     }
+
+    // Clean up the cloned audio after it finishes playing
+    soundClone.addEventListener('ended', () => {
+      soundClone.src = '';
+      soundClone.remove();
+    });
+
+    // Also clean up if there's an error
+    soundClone.addEventListener('error', () => {
+      soundClone.src = '';
+      soundClone.remove();
+    });
+
     soundClone
       .play()
-      .catch((err) => console.error("Error playing sound effect:", err));
+      .catch((err) => {
+        console.error("Error playing sound effect:", err);
+        // Clean up on playback error
+        soundClone.src = '';
+        soundClone.remove();
+      });
   }
 }
 

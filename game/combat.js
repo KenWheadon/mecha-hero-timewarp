@@ -249,16 +249,18 @@ function updateCrystalEnergy() {
 
 // Clean up active sprite sheet
 function cleanupSpriteSheet() {
+  // Clear any pending load-check interval first to prevent race conditions
+  if (spriteLoadCheckInterval) {
+    clearInterval(spriteLoadCheckInterval);
+    spriteLoadCheckInterval = null;
+  }
+
   if (activeSpriteSheet) {
-    // Also clear any pending load-check interval to prevent race conditions
-    if (spriteLoadCheckInterval) {
-      clearInterval(spriteLoadCheckInterval);
-      spriteLoadCheckInterval = null;
-    }
     activeSpriteSheet.stop();
     activeSpriteSheet.destroy();
     activeSpriteSheet = null;
   }
+
   // Reset to using img element and clear sprite container
   elements.poseImg.style.display = "block";
   const container = elements.poseImg.parentElement;
@@ -537,17 +539,21 @@ function createParticleShower(button) {
     particle.style.setProperty('--target-y', `${targetY - centerY}px`);
 
     // Apply transform for spreading effect
-    setTimeout(() => {
+    const animateTimeout = setTimeout(() => {
       particle.style.transform = `translate(${targetX - centerX}px, ${targetY - centerY - 200}px) scale(0.5) rotate(${Math.random() * 360}deg)`;
       particle.style.opacity = '0';
     }, 10);
 
-    // Remove particle after animation
-    setTimeout(() => {
+    // Remove particle after animation with proper cleanup
+    const cleanupTimeout = setTimeout(() => {
       if (particle.parentNode) {
         document.body.removeChild(particle);
       }
     }, duration + 100);
+
+    // Store timeout IDs for potential cleanup
+    particle.dataset.animateTimeout = animateTimeout;
+    particle.dataset.cleanupTimeout = cleanupTimeout;
   }
 }
 

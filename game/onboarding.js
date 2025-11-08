@@ -34,10 +34,18 @@ const FIGHT_INSTRUCTIONS = {
 // Current callback for when popup closes
 let onCloseCallback = null;
 
+// Track if event listeners have been initialized
+let eventListenersInitialized = false;
+
 // Initialize onboarding system
 export function initOnboarding() {
+  // Only add event listeners once to prevent duplicates
+  if (eventListenersInitialized) return;
+
   elements.closeBtn.addEventListener("click", closePopup);
   elements.overlay.addEventListener("click", closePopup);
+
+  eventListenersInitialized = true;
 }
 
 // Check if we should show onboarding for this fight

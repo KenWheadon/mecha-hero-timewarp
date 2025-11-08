@@ -56,31 +56,38 @@ export class StoryPanel {
   setupEventListeners() {
     // Next button
     this.elements.nextBtn.addEventListener("click", () => {
-      audioManager.playSound("select");
+      audioManager.playSoundEffect("btnClick");
       this.next();
     });
 
     // Back button
     this.elements.backBtn.addEventListener("click", () => {
-      audioManager.playSound("select");
+      audioManager.playSoundEffect("btnClick");
       this.back();
     });
 
     // Skip button
     this.elements.skipBtn.addEventListener("click", () => {
-      audioManager.playSound("select");
+      audioManager.playSoundEffect("btnClick");
       this.close();
     });
 
     // Click overlay to close
     this.elements.overlay.addEventListener("click", () => {
-      audioManager.playSound("select");
+      audioManager.playSoundEffect("btnClick");
       this.close();
     });
 
     // Prevent clicks on panel from closing overlay
     this.elements.panel.addEventListener("click", (e) => {
       e.stopPropagation();
+    });
+
+    // Add hover sound effects
+    [this.elements.nextBtn, this.elements.backBtn, this.elements.skipBtn].forEach((btn) => {
+      btn.addEventListener("mouseenter", () => {
+        audioManager.playSoundEffect("btnHover");
+      });
     });
   }
 
@@ -92,7 +99,7 @@ export class StoryPanel {
     this.elements.overlay.style.display = "block";
     this.elements.panel.style.display = "block";
 
-    audioManager.playSound("select");
+    audioManager.playSoundEffect("btnClick");
   }
 
   close() {

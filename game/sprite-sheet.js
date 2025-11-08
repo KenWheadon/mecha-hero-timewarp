@@ -65,6 +65,12 @@ export class SpriteSheet {
     this.isPlaying = true;
 
     this.animationInterval = setInterval(() => {
+      // Safety check: if element no longer exists, stop animation
+      if (element && !element.isConnected) {
+        this.stop();
+        return;
+      }
+
       this.currentFrame++;
 
       // Apply style updates for the new frame
@@ -73,6 +79,7 @@ export class SpriteSheet {
           this.currentFrame = 0;
         } else {
           this.stop();
+          return;
         }
       }
 

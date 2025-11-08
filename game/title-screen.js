@@ -295,8 +295,11 @@ function startTitleGlitch() {
 // Handle logo click - switch to thick version and start pulsing
 function onLogoClick() {
   const logoImg = document.getElementById("logo-img");
-  // If the logo is already thick, do nothing.
-  if (logoImg) return;
+  // If the logo is already thick, shoot eyeballs!
+  if (logoImg) {
+    createEyeballShower(logoImg);
+    return;
+  }
 
   // Clear the animation interval and sprite
   if (logoAnimationInterval) {
@@ -308,6 +311,53 @@ function onLogoClick() {
     '<img id="logo-img" src="images/logo-thick.png" alt="MECHA HERO" class="logo-pulsing" style="max-width: 30%; height: auto;" />';
 
   audioManager.play("titleMain");
+}
+
+// Create eyeball particle shower effect for logo click easter egg
+function createEyeballShower(element) {
+  const rect = element.getBoundingClientRect();
+  const centerX = rect.left + rect.width / 2;
+  const centerY = rect.top + rect.height / 2;
+  const particleCount = 50; // More eyeballs!
+
+  audioManager.playSoundEffect("timewarp"); // A fun sound for the effect
+
+  for (let i = 0; i < particleCount; i++) {
+    const particle = document.createElement("div");
+    particle.className = "eyeball-particle";
+
+    // Position at element center
+    particle.style.left = `${centerX}px`;
+    particle.style.top = `${centerY}px`;
+
+    document.body.appendChild(particle);
+
+    // Random spread angle and distance
+    const angle = Math.random() * Math.PI * 2;
+    const distance = 200 + Math.random() * 300; // Fly further
+
+    const targetX = centerX + Math.cos(angle) * distance;
+    const targetY = centerY + Math.sin(angle) * distance;
+
+    // Animate particle
+    const duration = 1000 + Math.random() * 500;
+
+    // Apply transform for spreading effect
+    setTimeout(() => {
+      particle.style.transform = `translate(${targetX - centerX}px, ${
+        targetY - centerY
+      }px) scale(0) rotate(${Math.random() * 720 - 360}deg)`;
+      particle.style.opacity = "0";
+      particle.style.transition = `transform ${duration}ms ease-out, opacity ${duration}ms ease-out`;
+    }, 10);
+
+    // Remove particle after animation
+    setTimeout(() => {
+      if (particle.parentNode) {
+        document.body.removeChild(particle);
+      }
+    }, duration + 100);
+  }
 }
 
 // Toggle audio on/off
