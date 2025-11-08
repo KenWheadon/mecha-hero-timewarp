@@ -123,12 +123,12 @@
 
 #loading-start-btn:hover {
   box-shadow: var(--shadow-brutal-hover);
-  transform: translate(-2px, -2px);
+  transform: translate(3px, 3px);
 }
 
 #loading-start-btn:active {
-  box-shadow: var(--shadow-brutal-active);
-  transform: translate(2px, 2px);
+  box-shadow: none;
+  transform: translate(8px, 8px);
 }
 
 #loading-start-btn:focus {
@@ -517,8 +517,8 @@ body.title-active::before {
 }
 
 .title-btn:hover {
-  transform: translate(5px, 5px) scale(1.1);
-  box-shadow: 5px 5px 0px #000;
+  transform: translate(3px, 3px);
+  box-shadow: 7px 7px 0px #000;
   animation: none;
 }
 
@@ -531,7 +531,7 @@ body.title-active::before {
 }
 
 .title-btn:active {
-  transform: translate(10px, 10px) scale(1.05);
+  transform: translate(10px, 10px);
   box-shadow: none;
 }
 
@@ -586,6 +586,11 @@ body.title-active::before {
   background: linear-gradient(135deg, #ff6600 0%, #ff3399 100%) !important;
 }
 
+.trophy-icon-btn:active {
+  transform: translate(10px, 10px);
+  box-shadow: none;
+}
+
 .trophy-icon {
   width: 40px;
   height: 40px;
@@ -607,6 +612,11 @@ body.title-active::before {
 
 .htp-icon-btn:hover {
   background: linear-gradient(135deg, #00ff00 0%, #00ff88 100%) !important;
+}
+
+.htp-icon-btn:active {
+  transform: translate(10px, 10px);
+  box-shadow: none;
 }
 
 /* GAME SCREEN */
@@ -692,12 +702,12 @@ body.title-active::before {
 }
 
 #controls .audio-toggle-btn:hover {
-  transform: translate(5px, 5px) scale(1.1);
-  box-shadow: 5px 5px 0px #000;
+  transform: translate(3px, 3px);
+  box-shadow: 7px 7px 0px #000;
 }
 
 #controls .audio-toggle-btn:active {
-  transform: translate(10px, 10px) scale(1.05);
+  transform: translate(10px, 10px);
   box-shadow: none;
 }
 
@@ -1105,8 +1115,8 @@ body.title-active::before {
 }
 
 .attack-btn:hover:not(:disabled) {
-  transform: translate(5px, 5px) scale(1.05);
-  box-shadow: 5px 5px 0px #000;
+  transform: translate(3px, 3px);
+  box-shadow: 7px 7px 0px #000;
 }
 
 .attack-btn[data-action="shield"]:hover:not(:disabled) {
@@ -1126,7 +1136,7 @@ body.title-active::before {
 }
 
 .attack-btn:active:not(:disabled) {
-  transform: translate(10px, 10px) scale(1);
+  transform: translate(10px, 10px);
   box-shadow: none;
 }
 
@@ -1584,6 +1594,11 @@ body.title-active::before {
 
 .trophy-item.unlocked:hover {
   background: linear-gradient(135deg, #00ff00 0%, #00ffff 100%);
+}
+
+.trophy-item:active {
+  transform: translate(6px, 6px);
+  box-shadow: none;
 }
 
 .trophy-item img {
@@ -2105,7 +2120,7 @@ body.title-active::before {
 
 /* BUTTON PRESSED FEEDBACK */
 .attack-btn.btn-pressed {
-  transform: translate(10px, 10px) scale(0.95) !important;
+  transform: translate(10px, 10px) !important;
   box-shadow: none !important;
   filter: brightness(1.3);
 }
@@ -2113,7 +2128,7 @@ body.title-active::before {
 /* BUTTON CORRECT FEEDBACK - Green flash */
 .attack-btn.btn-correct {
   animation: correctFlash 0.5s ease !important;
-  transform: translate(10px, 10px) scale(0.95) !important;
+  transform: translate(10px, 10px) !important;
   box-shadow: none !important;
 }
 
@@ -2135,7 +2150,7 @@ body.title-active::before {
 /* BUTTON INCORRECT FEEDBACK - Red flash */
 .attack-btn.btn-incorrect {
   animation: incorrectFlash 0.5s ease !important;
-  transform: translate(10px, 10px) scale(0.95) !important;
+  transform: translate(10px, 10px) !important;
   box-shadow: none !important;
 }
 
@@ -2302,12 +2317,12 @@ body.title-active::before {
   }
 
   .attack-btn:hover:not(:disabled) {
-    transform: translate(4px, 4px) scale(1.05);
-    box-shadow: 4px 4px 0px #000;
+    transform: translate(2px, 2px);
+    box-shadow: 6px 6px 0px #000;
   }
 
   .attack-btn:active:not(:disabled) {
-    transform: translate(8px, 8px) scale(1);
+    transform: translate(8px, 8px);
   }
 
   .attack-btn:disabled::after {
@@ -2386,12 +2401,12 @@ body.title-active::before {
   }
 
   .attack-btn:hover:not(:disabled) {
-    transform: translate(3px, 3px) scale(1.03);
-    box-shadow: 3px 3px 0px #000;
+    transform: translate(2px, 2px);
+    box-shadow: 4px 4px 0px #000;
   }
 
   .attack-btn:active:not(:disabled) {
-    transform: translate(6px, 6px) scale(1);
+    transform: translate(6px, 6px);
   }
 
   .attack-btn:disabled::after {
@@ -2727,14 +2742,14 @@ body.title-active::before {
 }
 
 .game-over-restart:hover {
-  transform: translate(4px, 4px);
-  box-shadow: var(--shadow-brutal-hover);
+  transform: translate(3px, 3px);
+  box-shadow: 5px 5px 0px #000;
   background: var(--color-accent);
 }
 
 .game-over-restart:active {
   transform: translate(8px, 8px);
-  box-shadow: var(--shadow-brutal-active);
+  box-shadow: none;
 }
 
 .game-over-main-menu {
@@ -2754,9 +2769,14 @@ body.title-active::before {
 }
 
 .game-over-main-menu:hover {
-  transform: translate(4px, 4px);
-  box-shadow: var(--shadow-brutal-hover);
+  transform: translate(3px, 3px);
+  box-shadow: 5px 5px 0px #000;
   background: #a9a9a9;
+}
+
+.game-over-main-menu:active {
+  transform: translate(8px, 8px);
+  box-shadow: none;
 }
 
 /* Responsive - Tablet */
