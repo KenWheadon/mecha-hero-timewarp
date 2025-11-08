@@ -5,7 +5,7 @@ import { initGame } from "./combat.js";
 import { audioManager } from "./audio-manager.js";
 import { SpriteSheet } from "./sprite-sheet.js";
 import { getSpriteConfig } from "./sprites-config.js";
-import { getHighScore, formatTime, getStarRating } from "./storage-manager.js";
+import { getHighScore, formatTime, getStarRating, getInfiniteHighScore, getInfiniteStarRating } from "./storage-manager.js";
 import { HowToPlay } from "./how-to-play.js";
 
 // Cache DOM elements
@@ -13,11 +13,13 @@ const elements = {
   titleScreen: document.getElementById("title-screen"),
   game: document.getElementById("game"),
   startBtn: document.getElementById("start-btn"),
+  infiniteBtn: document.getElementById("infinite-btn"),
   htpBtn: document.getElementById("htp-btn"),
   poseImg: document.getElementById("pose-img"),
   title: document.getElementById("title"),
   audioToggleTitle: document.getElementById("audio-toggle-title"),
   highScoreValue: document.getElementById("high-score-value"),
+  infiniteScoreValue: document.getElementById("infinite-score-value"),
 };
 
 // Initialize How to Play modal
@@ -41,6 +43,9 @@ export function initTitleScreen() {
   // Load and display high score
   loadHighScore();
 
+  // Load and display infinite mode high score
+  loadInfiniteHighScore();
+
   // Queue the intro audio (will play on first user interaction)
   audioManager.play("titleIntro");
 
@@ -58,7 +63,7 @@ function loadHighScore() {
 
 // Update high score stars and progress message
 function updateHighScoreStars(timeInSeconds) {
-  const stars = document.querySelectorAll('.star-small');
+  const stars = document.querySelectorAll('#high-score .star-small');
   const progressMessage = document.getElementById('star-progress-message');
 
   if (timeInSeconds === null) {
@@ -89,6 +94,50 @@ function updateHighScoreStars(timeInSeconds) {
   }
 }
 
+// Load and display infinite mode high score
+function loadInfiniteHighScore() {
+  const highScore = getInfiniteHighScore();
+  elements.infiniteScoreValue.textContent = highScore === null ? "N/A" : highScore;
+
+  // Update stars and progress message
+  updateInfiniteHighScoreStars(highScore);
+}
+
+// Update infinite mode high score stars and progress message
+function updateInfiniteHighScoreStars(level) {
+  const stars = document.querySelectorAll('#infinite-high-score .star-small');
+  const progressMessage = document.getElementById('infinite-progress-message');
+
+  if (level === null) {
+    // No high score yet - all stars locked, show requirement for first star
+    stars.forEach(star => star.classList.remove('unlocked'));
+    progressMessage.textContent = 'Reach level 5 for 1 star';
+    return;
+  }
+
+  const rating = getInfiniteStarRating(level);
+
+  // Update star visuals
+  stars.forEach((star, index) => {
+    if (index < rating) {
+      star.classList.add('unlocked');
+    } else {
+      star.classList.remove('unlocked');
+    }
+  });
+
+  // Set progress message based on current rating
+  if (rating === 3) {
+    progressMessage.textContent = 'Amazing! 3 stars!';
+  } else if (rating === 2) {
+    progressMessage.textContent = 'Reach level 15 for 3 stars';
+  } else if (rating === 1) {
+    progressMessage.textContent = 'Reach level 10 for 2 stars';
+  } else {
+    progressMessage.textContent = 'Reach level 5 for 1 star';
+  }
+}
+
 // Set pose image - no fallback, log error if missing
 function setPose(pose) {
   elements.poseImg.src = pose.img;
@@ -103,6 +152,7 @@ function setPose(pose) {
 function setupEventListeners() {
   // Add click listeners with sound effects
   elements.startBtn.addEventListener("click", onStartGame);
+  elements.infiniteBtn.addEventListener("click", onStartInfiniteMode);
   elements.htpBtn.addEventListener("click", onHowToPlay);
   elements.audioToggleTitle.addEventListener("click", () => {
     audioManager.playSoundEffect("btnClick");
@@ -111,7 +161,7 @@ function setupEventListeners() {
   });
 
   // Add hover sound effects to all clickable buttons
-  [elements.startBtn, elements.htpBtn, elements.audioToggleTitle].forEach(
+  [elements.startBtn, elements.infiniteBtn, elements.htpBtn, elements.audioToggleTitle].forEach(
     (btn) => {
       btn.addEventListener("mouseenter", () => {
         audioManager.playSoundEffect("btnHover");
@@ -133,7 +183,23 @@ function onStartGame() {
   elements.game.style.display = "block";
   // Remove colorful background when entering game
   document.body.classList.remove("title-active");
-  initGame();
+  initGame(false);
+  // Clean up logo animation if it's running
+  if (logoAnimationInterval) {
+    clearInterval(logoAnimationInterval);
+    logoAnimationInterval = null;
+  }
+}
+
+// Handle infinite mode button
+function onStartInfiniteMode() {
+  audioManager.playSoundEffect("btnClick");
+  ensureAudioUnlocked();
+  elements.titleScreen.style.display = "none";
+  elements.game.style.display = "block";
+  // Remove colorful background when entering game
+  document.body.classList.remove("title-active");
+  initGame(true); // Pass true for infinite mode
   // Clean up logo animation if it's running
   if (logoAnimationInterval) {
     clearInterval(logoAnimationInterval);

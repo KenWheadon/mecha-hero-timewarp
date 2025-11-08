@@ -10,7 +10,7 @@ import {
   createInitialGameState,
 } from "./config.js";
 import { audioManager } from "./audio-manager.js";
-import { saveHighScore } from "./storage-manager.js";
+import { saveHighScore, saveInfiniteHighScore } from "./storage-manager.js";
 import { initOnboarding, checkAndShowOnboarding } from "./onboarding.js";
 import { SpriteSheet } from "./sprite-sheet.js";
 import { getSpriteConfig, hasSprite } from "./sprites-config.js";
@@ -49,8 +49,10 @@ const elements = {
 };
 
 // Initialize game
-export function initGame() {
+export function initGame(isInfiniteMode = false) {
   gameState = createInitialGameState();
+  gameState.isInfiniteMode = isInfiniteMode;
+  gameState.infiniteLevel = isInfiniteMode ? 1 : 0;
   initHearts();
   initOnboarding();
 
@@ -115,9 +117,45 @@ function updateHearts() {
   });
 }
 
+// Calculate timer duration for infinite mode based on level
+function calculateInfiniteTimerDuration(level) {
+  let baseDuration = 10000; // Start at 10 seconds
+
+  // Reduce by 0.5s per level until 2s
+  if (level <= 17) {
+    baseDuration = 10000 - ((level - 1) * 500);
+  } else if (level <= 27) {
+    // At level 17 we're at 2s, now reduce by 0.1s until 1s
+    baseDuration = 2000 - ((level - 17) * 100);
+  } else if (level <= 47) {
+    // At level 27 we're at 1s, now reduce by 0.025s until 0.5s
+    baseDuration = 1000 - ((level - 27) * 25);
+  } else {
+    // At level 47 we're at 0.5s, now reduce by 0.01s
+    baseDuration = 500 - ((level - 47) * 10);
+    // Don't go below 100ms
+    if (baseDuration < 100) baseDuration = 100;
+  }
+
+  return baseDuration;
+}
+
 // Setup fight
 function setupFight() {
-  const config = GAME_CONFIG.FIGHT_CONFIGS[gameState.currentFight];
+  let config;
+
+  if (gameState.isInfiniteMode) {
+    // Infinite mode: all attacks available, HP scales with level
+    config = {
+      maxHP: 1, // One hit per level
+      availableAttacks: ["shield", "rocket", "sword", "plasma"],
+      timerDuration: calculateInfiniteTimerDuration(gameState.infiniteLevel),
+      showCrystal: false,
+    };
+  } else {
+    // Normal mode
+    config = GAME_CONFIG.FIGHT_CONFIGS[gameState.currentFight];
+  }
 
   gameState.maxEnemyHP = config.maxHP;
   gameState.enemyHP = config.maxHP;
@@ -126,7 +164,11 @@ function setupFight() {
   gameState.counteredPoses.clear();
 
   // Update UI
-  elements.fightInfo.textContent = `Fight: ${gameState.currentFight}/${gameState.maxFights}`;
+  if (gameState.isInfiniteMode) {
+    elements.fightInfo.textContent = `Level: ${gameState.infiniteLevel}`;
+  } else {
+    elements.fightInfo.textContent = `Fight: ${gameState.currentFight}/${gameState.maxFights}`;
+  }
   updateEnemyHP();
   updateCrystalEnergy();
 
@@ -143,15 +185,23 @@ function setupFight() {
     btn.disabled = !gameState.availableAttacks.includes(action);
   });
 
-  // Check for first-time onboarding popup
-  checkAndShowOnboarding(gameState.currentFight, () => {
-    // Start game timer on first fight
-    if (gameState.currentFight === 1 && gameState.gameStartTime === null) {
+  // Check for first-time onboarding popup (skip in infinite mode)
+  if (gameState.isInfiniteMode) {
+    // Start game timer on first level
+    if (gameState.infiniteLevel === 1 && gameState.gameStartTime === null) {
       gameState.gameStartTime = Date.now();
     }
-    // Start first pose after popup closes (or immediately if not first time)
     startNewPose();
-  });
+  } else {
+    checkAndShowOnboarding(gameState.currentFight, () => {
+      // Start game timer on first fight
+      if (gameState.currentFight === 1 && gameState.gameStartTime === null) {
+        gameState.gameStartTime = Date.now();
+      }
+      // Start first pose after popup closes (or immediately if not first time)
+      startNewPose();
+    });
+  }
 }
 
 // Update enemy HP bar
@@ -580,7 +630,11 @@ function handleFightWon() {
   audioManager.playSoundEffect("roboDeath");
 
   setTimeout(() => {
-    if (gameState.currentFight === gameState.maxFights) {
+    if (gameState.isInfiniteMode) {
+      // Infinite mode: advance to next level
+      gameState.infiniteLevel++;
+      setupFight();
+    } else if (gameState.currentFight === gameState.maxFights) {
       // Final fight won - calculate and save time-based score
       const totalGameTime = calculateTotalGameTime();
       const isNewHighScore = saveHighScore(totalGameTime);
@@ -652,13 +706,27 @@ function showTimeWarp() {
 function gameOver() {
   stopTimer();
   elements.instruction.textContent = "GAME OVER";
-  elements.message.textContent = `You reached Fight ${gameState.currentFight}`;
-  elements.message.style.color = "#f00";
 
-  // Show defeat screen after a brief delay
-  setTimeout(() => {
-    gameOverScreen.showDefeat(gameState.currentFight);
-  }, 1000);
+  if (gameState.isInfiniteMode) {
+    // Save infinite mode high score
+    const levelReached = gameState.infiniteLevel;
+    const isNewHighScore = saveInfiniteHighScore(levelReached);
+    elements.message.textContent = `Level Reached: ${levelReached}`;
+    elements.message.style.color = "#f00";
+
+    // Show defeat screen after a brief delay
+    setTimeout(() => {
+      gameOverScreen.showInfiniteDefeat(levelReached, isNewHighScore);
+    }, 1000);
+  } else {
+    elements.message.textContent = `You reached Fight ${gameState.currentFight}`;
+    elements.message.style.color = "#f00";
+
+    // Show defeat screen after a brief delay
+    setTimeout(() => {
+      gameOverScreen.showDefeat(gameState.currentFight);
+    }, 1000);
+  }
 }
 
 // Toggle pause

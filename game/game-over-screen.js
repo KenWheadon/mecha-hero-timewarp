@@ -1,7 +1,7 @@
 // Game Over Screen - handles victory and defeat screens
 
 import { audioManager } from "./audio-manager.js";
-import { getStarRating } from "./storage-manager.js";
+import { getStarRating, getInfiniteStarRating } from "./storage-manager.js";
 
 export class GameOverScreen {
   constructor() {
@@ -97,11 +97,53 @@ export class GameOverScreen {
   }
 
   /**
+   * Show infinite mode defeat screen
+   * @param {number} levelReached - The level the player reached
+   * @param {boolean} isNewHighScore - Whether this is a new high score
+   */
+  showInfiniteDefeat(levelReached, isNewHighScore) {
+    // Update defeat screen with infinite mode info
+    const fightElement = document.getElementById("defeat-fight");
+    fightElement.textContent = levelReached;
+
+    // Update subtitle for infinite mode
+    const subtitle = this.defeatScreen.querySelector(".game-over-subtitle");
+    const originalSubtitle = subtitle.textContent;
+    subtitle.textContent = isNewHighScore ? "New High Score!" : "Try Again!";
+
+    // Update message for infinite mode
+    const message = this.defeatScreen.querySelector(".defeat-message");
+    const originalMessage = message.innerHTML;
+    message.innerHTML = `Level ${levelReached} reached.<br>Can you go further?`;
+
+    // Show defeat screen
+    this.defeatScreen.style.display = "flex";
+
+    // Store originals for restoration
+    this.defeatScreen.dataset.originalSubtitle = originalSubtitle;
+    this.defeatScreen.dataset.originalMessage = originalMessage;
+
+    // Continue playing combat music (no special defeat music)
+  }
+
+  /**
    * Hide both screens
    */
   hide() {
     this.victoryScreen.style.display = "none";
     this.defeatScreen.style.display = "none";
+
+    // Restore original defeat screen text if modified
+    if (this.defeatScreen.dataset.originalSubtitle) {
+      const subtitle = this.defeatScreen.querySelector(".game-over-subtitle");
+      subtitle.textContent = this.defeatScreen.dataset.originalSubtitle;
+      delete this.defeatScreen.dataset.originalSubtitle;
+    }
+    if (this.defeatScreen.dataset.originalMessage) {
+      const message = this.defeatScreen.querySelector(".defeat-message");
+      message.innerHTML = this.defeatScreen.dataset.originalMessage;
+      delete this.defeatScreen.dataset.originalMessage;
+    }
   }
 
   /**

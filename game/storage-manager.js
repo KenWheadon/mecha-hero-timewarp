@@ -3,6 +3,7 @@
 const STORAGE_KEYS = {
   HIGH_SCORE: 'mecha-hero-high-score',
   FIRST_TIME_FLAGS: 'mecha-hero-first-time',
+  INFINITE_HIGH_SCORE: 'mecha-hero-infinite-high-score',
 };
 
 // Get high score (best time in seconds, lower is better)
@@ -69,8 +70,45 @@ export function getStarRating(timeInSeconds) {
   }
 }
 
+// Get infinite mode high score (highest level reached)
+// Returns null if no score exists yet
+export function getInfiniteHighScore() {
+  const score = localStorage.getItem(STORAGE_KEYS.INFINITE_HIGH_SCORE);
+  return score ? parseInt(score) : null;
+}
+
+// Save infinite mode high score (level reached)
+// Only saves if level is higher than current high score
+export function saveInfiniteHighScore(level) {
+  const currentHighScore = getInfiniteHighScore();
+
+  // If no high score exists, or new level is higher, save it
+  if (currentHighScore === null || level > currentHighScore) {
+    localStorage.setItem(STORAGE_KEYS.INFINITE_HIGH_SCORE, level.toString());
+    return true; // New high score
+  }
+  return false; // Not a new high score
+}
+
+// Get star rating for infinite mode based on level reached
+// 5+ levels: 1 star
+// 10+ levels: 2 stars
+// 15+ levels: 3 stars
+export function getInfiniteStarRating(level) {
+  if (level >= 15) {
+    return 3;
+  } else if (level >= 10) {
+    return 2;
+  } else if (level >= 5) {
+    return 1;
+  } else {
+    return 0;
+  }
+}
+
 // Reset all progress (for testing or user request)
 export function resetAllProgress() {
   localStorage.removeItem(STORAGE_KEYS.HIGH_SCORE);
   localStorage.removeItem(STORAGE_KEYS.FIRST_TIME_FLAGS);
+  localStorage.removeItem(STORAGE_KEYS.INFINITE_HIGH_SCORE);
 }
