@@ -5,32 +5,42 @@ const STORY_PANELS = [
   {
     id: 1,
     image: "images/story-1.png",
-    text: "In the year 2147, humanity's greatest creation turned against them. The Mecha Warriors, once defenders of peace, became instruments of chaos.",
+    text: "It's the year 2147, and most of humanity has either gone cyborg or full on clanker.",
   },
   {
     id: 2,
     image: "images/story-2.png",
-    text: "As cities fell and hope faded, a mysterious temporal anomaly was discovered—a rift in time itself, pulsing with crystalline energy.",
+    text: "I'm in the lunchroom ready to eat up my tasty lunch.",
   },
   {
     id: 3,
     image: "images/story-3.png",
-    text: "Scientists raced to understand the phenomenon. The crystals held the power to manipulate time, to rewind moments, to change fate.",
+    text: "A clanker busts in and starts cutting up my sandwich, then eats BOTH halves.",
   },
   {
     id: 4,
     image: "images/story-4.png",
-    text: "You are humanity's last hope: a pilot equipped with a prototype mecha and armed with temporal crystals. Your mission is clear.",
+    text: "Then you know what? He drank my juice too!",
   },
   {
     id: 5,
     image: "images/story-5.png",
-    text: "Travel through the time loop. Study your enemies' attack patterns. Use the crystals to rewind when needed. Each loop brings you closer to victory.",
+    text: "I was getting all sad but then he pulled out this weird crystal and said 'don't worry, your food's not gone for good' and blue light came out of the crystal.",
   },
   {
     id: 6,
     image: "images/story-6.png",
-    text: "The recursive nature of time is your weapon. Master the patterns, break the cycle, and save humanity from the mecha threat!",
+    text: "Holy smokes, there was my sandwich and juice, all good as new.",
+  },
+  {
+    id: 7,
+    image: "images/story-5.png", // Reusing image
+    text: "Then he ate them again. I was so pissed.",
+  },
+  {
+    id: 8,
+    image: "images/story-6.png", // Reusing image
+    text: "Now it's time for payback!",
   },
 ];
 
@@ -84,7 +94,11 @@ export class StoryPanel {
     });
 
     // Add hover sound effects
-    [this.elements.nextBtn, this.elements.backBtn, this.elements.skipBtn].forEach((btn) => {
+    [
+      this.elements.nextBtn,
+      this.elements.backBtn,
+      this.elements.skipBtn,
+    ].forEach((btn) => {
       btn.addEventListener("mouseenter", () => {
         audioManager.playSoundEffect("btnHover");
       });
