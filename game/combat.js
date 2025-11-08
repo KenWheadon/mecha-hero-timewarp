@@ -481,17 +481,74 @@ function handleTimeout() {
 }
 
 // Add visual feedback to button press
-function addButtonFeedback(action) {
+function addButtonFeedback(action, isCorrect) {
   const button = document.querySelector(`.attack-btn[data-action="${action}"]`);
   if (!button) return;
 
-  // Add pressed class for visual feedback
-  button.classList.add("btn-pressed");
+  // Add appropriate feedback class
+  if (isCorrect) {
+    button.classList.add("btn-correct");
+    // Trigger particle shower
+    createParticleShower(button);
+  } else {
+    button.classList.add("btn-incorrect");
+  }
 
   // Remove the class after animation
   setTimeout(() => {
-    button.classList.remove("btn-pressed");
-  }, 200);
+    button.classList.remove("btn-correct", "btn-incorrect");
+  }, 500);
+}
+
+// Create particle shower effect for correct answers
+function createParticleShower(button) {
+  const rect = button.getBoundingClientRect();
+  const centerX = rect.left + rect.width / 2;
+  const centerY = rect.top + rect.height / 2;
+  const particleCount = 30;
+
+  for (let i = 0; i < particleCount; i++) {
+    const particle = document.createElement("div");
+    particle.className = "particle";
+
+    // Random colors for particles - bright neon colors
+    const colors = ["#00ff00", "#00ffff", "#ffff00", "#ff00ff"];
+    const color = colors[Math.floor(Math.random() * colors.length)];
+    particle.style.background = color;
+    particle.style.boxShadow = `0 0 10px ${color}`;
+
+    // Position at button center
+    particle.style.left = `${centerX}px`;
+    particle.style.top = `${centerY}px`;
+
+    document.body.appendChild(particle);
+
+    // Random spread angle and distance
+    const angle = (Math.PI * 2 * i) / particleCount;
+    const distance = 100 + Math.random() * 100;
+
+    const targetX = centerX + Math.cos(angle) * distance;
+    const targetY = centerY + Math.sin(angle) * distance;
+
+    // Animate particle
+    const duration = 800 + Math.random() * 400;
+    particle.style.animation = `particleRise ${duration}ms ease-out forwards`;
+    particle.style.setProperty('--target-x', `${targetX - centerX}px`);
+    particle.style.setProperty('--target-y', `${targetY - centerY}px`);
+
+    // Apply transform for spreading effect
+    setTimeout(() => {
+      particle.style.transform = `translate(${targetX - centerX}px, ${targetY - centerY - 200}px) scale(0.5) rotate(${Math.random() * 360}deg)`;
+      particle.style.opacity = '0';
+    }, 10);
+
+    // Remove particle after animation
+    setTimeout(() => {
+      if (particle.parentNode) {
+        document.body.removeChild(particle);
+      }
+    }, duration + 100);
+  }
 }
 
 // Add screen flash effect for feedback
@@ -545,14 +602,14 @@ function handleAttack(action) {
   const currentPose = gameState.pendingPose;
   gameState.pendingPose = null;
 
-  // Add button press feedback immediately
-  addButtonFeedback(action);
-
   stopTimer();
   elements.attacksDiv.classList.remove("show");
 
   const correct = action === currentPose.correct;
   const poseId = currentPose.id;
+
+  // Add button press feedback with correct/incorrect indication
+  addButtonFeedback(action, correct);
 
   // Sound effect map for each pose
   const hitSoundMap = {

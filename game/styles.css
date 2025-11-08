@@ -1661,6 +1661,75 @@ body.title-active::before {
   filter: brightness(1.3);
 }
 
+/* BUTTON CORRECT FEEDBACK - Green flash */
+.attack-btn.btn-correct {
+  animation: correctFlash 0.5s ease !important;
+  transform: translate(10px, 10px) scale(0.95) !important;
+  box-shadow: none !important;
+}
+
+@keyframes correctFlash {
+  0% {
+    background: var(--color-primary) !important;
+    filter: brightness(1);
+  }
+  50% {
+    background: var(--color-primary) !important;
+    filter: brightness(2) drop-shadow(0 0 20px var(--color-primary));
+  }
+  100% {
+    background: var(--color-primary) !important;
+    filter: brightness(1);
+  }
+}
+
+/* BUTTON INCORRECT FEEDBACK - Red flash */
+.attack-btn.btn-incorrect {
+  animation: incorrectFlash 0.5s ease !important;
+  transform: translate(10px, 10px) scale(0.95) !important;
+  box-shadow: none !important;
+}
+
+@keyframes incorrectFlash {
+  0% {
+    background: var(--color-danger) !important;
+    filter: brightness(1);
+  }
+  50% {
+    background: var(--color-danger) !important;
+    filter: brightness(2) drop-shadow(0 0 20px var(--color-danger));
+  }
+  100% {
+    background: var(--color-danger) !important;
+    filter: brightness(1);
+  }
+}
+
+/* PARTICLE EFFECTS */
+.particle {
+  position: fixed;
+  width: 10px;
+  height: 10px;
+  background: var(--color-primary);
+  border: 2px solid #000;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 1001;
+  box-shadow: 0 0 10px var(--color-primary);
+  transition: transform 0.8s ease-out, opacity 0.8s ease-out;
+}
+
+@keyframes particleRise {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(1) rotate(0deg);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-300px) scale(0.5) rotate(360deg);
+  }
+}
+
 /* RESPONSIVE */
 @media (max-width: 768px) {
   #title {
@@ -2183,6 +2252,7 @@ body.title-active::before {
   box-shadow: var(--shadow-brutal);
   transition: all 0.15s ease;
   font-family: inherit;
+  margin-top: 20px;
 }
 
 .game-over-main-menu:hover {
