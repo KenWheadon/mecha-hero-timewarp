@@ -570,6 +570,28 @@ body.title-active::before {
   object-fit: contain;
 }
 
+/* TROPHY ICON BUTTON - Square version */
+.trophy-icon-btn {
+  padding: 25px !important;
+  font-size: 0 !important;
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #ffff00 0%, #ffcc00 100%) !important;
+}
+
+.trophy-icon-btn:hover {
+  background: linear-gradient(135deg, #ff6600 0%, #ff3399 100%) !important;
+}
+
+.trophy-icon {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+}
+
 /* HTP ICON BUTTON - Square version */
 .htp-icon-btn {
   padding: 25px !important;
@@ -1454,6 +1476,312 @@ body.title-active::before {
   box-shadow: none;
 }
 
+/* TROPHY POPUP */
+#trophy-popup {
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--color-card);
+  border: var(--border-thick) solid #000;
+  padding: 40px;
+  max-width: 700px;
+  width: 90%;
+  max-height: 85vh;
+  overflow-y: auto;
+  z-index: 10;
+  box-shadow: 16px 16px 0px #000;
+  color: #000;
+}
+
+#trophy-popup h2 {
+  margin-top: 0;
+  font-size: 42px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: #000;
+  background: linear-gradient(135deg, #ffff00 0%, #ff6600 100%);
+  padding: 20px;
+  border: var(--border-medium) solid #000;
+  box-shadow: 8px 8px 0px #000;
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+#close-trophy {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: var(--color-danger);
+  border: var(--border-medium) solid #000;
+  color: #000;
+  font-size: 28px;
+  font-weight: 900;
+  cursor: pointer;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 4px 4px 0px #000;
+  transition: all 0.15s ease;
+  font-family: inherit;
+}
+
+#close-trophy:hover {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0px #000;
+  background: var(--color-warning);
+}
+
+#close-trophy:active {
+  transform: translate(4px, 4px);
+  box-shadow: none;
+}
+
+/* Trophy Grid */
+#trophy-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.trophy-item {
+  background: var(--color-card);
+  border: var(--border-medium) solid #000;
+  padding: 20px;
+  box-shadow: 6px 6px 0px #000;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 140px;
+}
+
+.trophy-item:hover {
+  transform: translate(3px, 3px);
+  box-shadow: 3px 3px 0px #000;
+  background: var(--color-accent);
+}
+
+.trophy-item.locked {
+  background: #888;
+}
+
+.trophy-item.locked:hover {
+  background: #999;
+}
+
+.trophy-item.unlocked {
+  background: linear-gradient(135deg, #ffff00 0%, #ff6600 100%);
+}
+
+.trophy-item.unlocked:hover {
+  background: linear-gradient(135deg, #00ff00 0%, #00ffff 100%);
+}
+
+.trophy-item img {
+  width: 60px;
+  height: 60px;
+  object-fit: contain;
+  margin-bottom: 10px;
+  image-rendering: pixelated;
+}
+
+.trophy-item-name {
+  font-size: 14px;
+  font-weight: 900;
+  text-transform: uppercase;
+  color: #000;
+  margin-top: 10px;
+  line-height: 1.3;
+}
+
+/* Trophy Detail Popup */
+#trophy-detail-popup {
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--color-card);
+  border: var(--border-thick) solid #000;
+  padding: 40px;
+  max-width: 500px;
+  width: 90%;
+  z-index: 15;
+  box-shadow: 20px 20px 0px #000;
+  color: #000;
+  text-align: center;
+}
+
+#close-trophy-detail {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: var(--color-danger);
+  border: var(--border-medium) solid #000;
+  color: #000;
+  font-size: 28px;
+  font-weight: 900;
+  cursor: pointer;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 4px 4px 0px #000;
+  transition: all 0.15s ease;
+  font-family: inherit;
+}
+
+#close-trophy-detail:hover {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0px #000;
+  background: var(--color-warning);
+}
+
+#close-trophy-detail:active {
+  transform: translate(4px, 4px);
+  box-shadow: none;
+}
+
+#trophy-detail-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+#trophy-detail-icon {
+  width: 100px;
+  height: 100px;
+  object-fit: contain;
+  border: var(--border-medium) solid #000;
+  padding: 15px;
+  background: var(--color-warning);
+  box-shadow: 8px 8px 0px #000;
+  image-rendering: pixelated;
+}
+
+#trophy-detail-name {
+  font-size: 32px;
+  font-weight: 900;
+  text-transform: uppercase;
+  color: #000;
+  margin: 0;
+  letter-spacing: 1px;
+}
+
+#trophy-detail-requirement {
+  font-size: 16px;
+  font-weight: 700;
+  color: #000;
+  background: var(--color-accent);
+  padding: 15px 20px;
+  border: var(--border-medium) solid #000;
+  box-shadow: 6px 6px 0px #000;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+#trophy-detail-flavor {
+  font-size: 18px;
+  font-weight: 700;
+  font-style: italic;
+  color: #000;
+  padding: 15px;
+  background: rgba(0, 0, 0, 0.05);
+  border: var(--border-medium) solid #000;
+  box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.2);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+#trophy-detail-flavor.locked {
+  display: none;
+}
+
+/* Trophy Notification */
+.trophy-notification {
+  position: fixed;
+  top: 20px;
+  right: -400px;
+  z-index: 1000;
+  width: 350px;
+  transition: right 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.trophy-notification.show {
+  right: 20px;
+}
+
+.trophy-notification-content {
+  background: var(--color-warning);
+  border: var(--border-thick) solid #000;
+  padding: 20px;
+  box-shadow: 12px 12px 0px #000;
+  animation: popupBounce 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.trophy-notification-header {
+  font-size: 20px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: #000;
+  margin-bottom: 15px;
+  text-align: center;
+  background: var(--color-danger);
+  padding: 10px;
+  border: var(--border-medium) solid #000;
+  box-shadow: 4px 4px 0px #000;
+}
+
+.trophy-notification-body {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
+.trophy-notification-icon {
+  width: 60px;
+  height: 60px;
+  object-fit: contain;
+  border: var(--border-medium) solid #000;
+  padding: 10px;
+  background: var(--color-card);
+  box-shadow: 4px 4px 0px #000;
+  image-rendering: pixelated;
+  flex-shrink: 0;
+}
+
+.trophy-notification-text {
+  flex: 1;
+}
+
+.trophy-notification-name {
+  font-size: 18px;
+  font-weight: 900;
+  text-transform: uppercase;
+  color: #000;
+  margin-bottom: 8px;
+}
+
+.trophy-notification-flavor {
+  font-size: 14px;
+  font-weight: 700;
+  font-style: italic;
+  color: #000;
+  line-height: 1.3;
+}
+
 /* OVERLAY */
 #overlay {
   display: none;
@@ -1840,6 +2168,28 @@ body.title-active::before {
   transition: transform 0.8s ease-out, opacity 0.8s ease-out;
 }
 
+/* ICON PROJECTILE - Defense icon shooting towards enemy */
+.icon-projectile {
+  position: fixed;
+  width: 80px;
+  height: 80px;
+  pointer-events: none;
+  z-index: 1002;
+  transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.6s ease-out;
+  transform-origin: center center;
+}
+
+.icon-projectile img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border: 4px solid #000;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 8px;
+  box-shadow: 0 0 20px rgba(0, 255, 0, 0.8), 0 0 40px rgba(0, 255, 0, 0.5);
+  border-radius: 10px;
+}
+
 @keyframes particleRise {
   0% {
     opacity: 1;
@@ -1863,8 +2213,19 @@ body.title-active::before {
   z-index: 1001;
   transform: scale(1);
   opacity: 1;
-  will-change: transform, opacity;
-  transition: transform 1s ease-out, opacity 1s ease-out;
+  will-change: transform, opacity, filter;
+  transition: transform 1.5s ease-out, opacity 1.5s ease-out, filter 1.5s ease-out;
+  filter: drop-shadow(0 0 10px currentColor) hue-rotate(0deg) brightness(1.5);
+  animation: eyeballGlow 0.3s ease-in-out infinite alternate;
+}
+
+@keyframes eyeballGlow {
+  0% {
+    filter: drop-shadow(0 0 10px currentColor) hue-rotate(0deg) brightness(1.3);
+  }
+  100% {
+    filter: drop-shadow(0 0 20px currentColor) hue-rotate(360deg) brightness(1.8);
+  }
 }
 
 /* RESPONSIVE */

@@ -16,6 +16,14 @@ import {
 } from "./storage-manager.js";
 import { HowToPlay } from "./how-to-play.js";
 import { storyPanel } from "./story-panel.js";
+import {
+  initTrophyManager,
+  getTrophies,
+  trackHTPOpen,
+  trackAudioToggle,
+  trackLogoClick,
+  trackEyeballShower,
+} from "./trophy-manager.js";
 
 // Cache DOM elements
 const elements = {
@@ -24,6 +32,7 @@ const elements = {
   startBtn: document.getElementById("start-btn"),
   infiniteBtn: document.getElementById("infinite-btn"),
   htpBtn: document.getElementById("htp-btn"),
+  trophyBtn: document.getElementById("trophy-btn"),
   poseImg: document.getElementById("pose-img"),
   title: document.getElementById("title"),
   audioToggleTitle: document.getElementById("audio-toggle-title"),
@@ -44,6 +53,10 @@ export function initTitleScreen() {
 
   // Initialize How to Play modal
   howToPlayModal = new HowToPlay();
+
+  // Initialize trophy system
+  initTrophyManager();
+  setupTrophyPopup();
 
   setupEventListeners();
   // Activate colorful background for title screen
@@ -173,6 +186,7 @@ function setupEventListeners() {
   elements.startBtn.addEventListener("click", onStartGame);
   elements.infiniteBtn.addEventListener("click", onStartInfiniteMode);
   elements.htpBtn.addEventListener("click", onHowToPlay);
+  elements.trophyBtn.addEventListener("click", onTrophyClick);
   elements.audioToggleTitle.addEventListener("click", () => {
     audioManager.playSoundEffect("btnClick");
     ensureAudioUnlocked();
@@ -184,6 +198,7 @@ function setupEventListeners() {
     elements.startBtn,
     elements.infiniteBtn,
     elements.htpBtn,
+    elements.trophyBtn,
     elements.audioToggleTitle,
   ].forEach((btn) => {
     btn.addEventListener("mouseenter", () => {
@@ -240,6 +255,14 @@ function onHowToPlay() {
   audioManager.playSoundEffect("btnHover");
   ensureAudioUnlocked();
   howToPlayModal.open();
+  trackHTPOpen();
+}
+
+// Handle trophy button
+function onTrophyClick() {
+  audioManager.playSoundEffect("btnClick");
+  ensureAudioUnlocked();
+  openTrophyPopup();
 }
 
 // Title glitch effect - replaces title with logo after 3 seconds
@@ -301,6 +324,9 @@ function onLogoClick() {
     return;
   }
 
+  // Track first logo click for trophy
+  trackLogoClick();
+
   // Clear the animation interval and sprite
   if (logoAnimationInterval) {
     clearInterval(logoAnimationInterval);
@@ -320,11 +346,30 @@ function createEyeballShower(element) {
   const centerY = rect.top + rect.height / 2;
   const particleCount = 50; // More eyeballs!
 
+  // Track eyeball shower trophy
+  trackEyeballShower();
+
   audioManager.playSoundEffect("timewarp"); // A fun sound for the effect
+
+  // Array of vibrant colors for the glow effect
+  const colors = [
+    "#ff0033", // Red
+    "#00ff00", // Green
+    "#00ffff", // Cyan
+    "#ffff00", // Yellow
+    "#ff00ff", // Magenta
+    "#ff6600", // Orange
+    "#00ff88", // Mint
+    "#ff3399", // Pink
+  ];
 
   for (let i = 0; i < particleCount; i++) {
     const particle = document.createElement("div");
     particle.className = "eyeball-particle";
+
+    // Random color for each eyeball
+    const randomColor = colors[Math.floor(Math.random() * colors.length)];
+    particle.style.color = randomColor;
 
     // Position at element center
     particle.style.left = `${centerX}px`;
@@ -332,23 +377,24 @@ function createEyeballShower(element) {
 
     document.body.appendChild(particle);
 
-    // Random spread angle and distance
+    // Random spread angle and distance - shoot further off screen
     const angle = Math.random() * Math.PI * 2;
-    const distance = 200 + Math.random() * 300; // Fly further
+    const distance = 400 + Math.random() * 600; // Fly much further
 
     const targetX = centerX + Math.cos(angle) * distance;
     const targetY = centerY + Math.sin(angle) * distance;
 
-    // Animate particle
-    const duration = 1000 + Math.random() * 500;
+    // Animate particle with longer duration and more rotation
+    const duration = 1500 + Math.random() * 1000;
+    const rotations = 3 + Math.random() * 5; // Multiple spins
+    const rotationDegrees = (Math.random() > 0.5 ? 1 : -1) * rotations * 360;
 
-    // Apply transform for spreading effect
+    // Apply transform for spreading effect with spinning
     setTimeout(() => {
       particle.style.transform = `translate(${targetX - centerX}px, ${
         targetY - centerY
-      }px) scale(0) rotate(${Math.random() * 720 - 360}deg)`;
+      }px) scale(0.2) rotate(${rotationDegrees}deg)`;
       particle.style.opacity = "0";
-      particle.style.transition = `transform ${duration}ms ease-out, opacity ${duration}ms ease-out`;
     }, 10);
 
     // Remove particle after animation
@@ -356,7 +402,7 @@ function createEyeballShower(element) {
       if (particle.parentNode) {
         document.body.removeChild(particle);
       }
-    }, duration + 100);
+    }, duration + 200);
   }
 }
 
@@ -365,4 +411,102 @@ function toggleAudio() {
   const isMuted = audioManager.toggleMute();
   // Update button visual state
   elements.audioToggleTitle.style.opacity = isMuted ? "0.5" : "1";
+  trackAudioToggle();
+}
+
+// Setup trophy popup
+function setupTrophyPopup() {
+  const trophyPopup = document.getElementById("trophy-popup");
+  const trophyDetailPopup = document.getElementById("trophy-detail-popup");
+  const overlay = document.getElementById("overlay");
+  const closeTrophy = document.getElementById("close-trophy");
+  const closeTrophyDetail = document.getElementById("close-trophy-detail");
+
+  // Close trophy popup
+  closeTrophy.addEventListener("click", () => {
+    audioManager.playSoundEffect("btnClick");
+    trophyPopup.style.display = "none";
+    overlay.style.display = "none";
+  });
+
+  // Close trophy detail popup
+  closeTrophyDetail.addEventListener("click", () => {
+    audioManager.playSoundEffect("btnClick");
+    trophyDetailPopup.style.display = "none";
+  });
+
+  // Close on overlay click
+  overlay.addEventListener("click", () => {
+    if (trophyPopup.style.display === "block") {
+      audioManager.playSoundEffect("btnClick");
+      trophyPopup.style.display = "none";
+      overlay.style.display = "none";
+    }
+  });
+}
+
+// Open trophy popup
+function openTrophyPopup() {
+  const trophyPopup = document.getElementById("trophy-popup");
+  const overlay = document.getElementById("overlay");
+  const trophyGrid = document.getElementById("trophy-grid");
+
+  // Clear existing trophies
+  trophyGrid.innerHTML = "";
+
+  // Get all trophies
+  const trophies = getTrophies();
+
+  // Create trophy items
+  trophies.forEach((trophy) => {
+    const trophyItem = document.createElement("div");
+    trophyItem.className = `trophy-item ${trophy.unlocked ? "unlocked" : "locked"}`;
+
+    const icon = trophy.unlocked
+      ? trophy.icon
+      : "images/icon-questionmark.png";
+
+    trophyItem.innerHTML = `
+      <img src="${icon}" alt="${trophy.unlocked ? trophy.name : "Locked"}" />
+      ${trophy.unlocked ? `<div class="trophy-item-name">${trophy.name}</div>` : ""}
+    `;
+
+    trophyItem.addEventListener("click", () => {
+      audioManager.playSoundEffect("btnClick");
+      showTrophyDetail(trophy);
+    });
+
+    trophyGrid.appendChild(trophyItem);
+  });
+
+  // Show popup
+  trophyPopup.style.display = "block";
+  overlay.style.display = "block";
+}
+
+// Show trophy detail popup
+function showTrophyDetail(trophy) {
+  const detailPopup = document.getElementById("trophy-detail-popup");
+  const detailIcon = document.getElementById("trophy-detail-icon");
+  const detailName = document.getElementById("trophy-detail-name");
+  const detailRequirement = document.getElementById("trophy-detail-requirement");
+  const detailFlavor = document.getElementById("trophy-detail-flavor");
+
+  // Set content
+  detailIcon.src = trophy.unlocked
+    ? trophy.icon
+    : "images/icon-questionmark.png";
+  detailName.textContent = trophy.unlocked ? trophy.name : "???";
+  detailRequirement.textContent = trophy.requirement;
+
+  if (trophy.unlocked) {
+    detailFlavor.textContent = trophy.flavorText;
+    detailFlavor.classList.remove("locked");
+  } else {
+    detailFlavor.textContent = "";
+    detailFlavor.classList.add("locked");
+  }
+
+  // Show detail popup
+  detailPopup.style.display = "block";
 }

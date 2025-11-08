@@ -15,6 +15,15 @@ import { initOnboarding, checkAndShowOnboarding } from "./onboarding.js";
 import { SpriteSheet } from "./sprite-sheet.js";
 import { getSpriteConfig, hasSprite } from "./sprites-config.js";
 import { GameOverScreen } from "./game-over-screen.js";
+import {
+  trackPauseDuringTimewarp,
+  trackTimeWarpComplete,
+  trackFight1Complete,
+  trackCrystalDepleted,
+  trackInfiniteLevel,
+  trackLevel1NoHits,
+  trackStoryModeComplete,
+} from "./trophy-manager.js";
 
 // Game state
 let gameState = createInitialGameState();
@@ -30,6 +39,9 @@ let gameOverScreen = null;
 
 // Track if event listeners have been initialized
 let eventListenersInitialized = false;
+
+// Track if we're currently in a time warp
+let isInTimewarp = false;
 
 // Cache DOM elements
 const elements = {
@@ -492,6 +504,8 @@ function addButtonFeedback(action, isCorrect) {
     button.classList.add("btn-correct");
     // Trigger particle shower
     createParticleShower(button);
+    // Trigger icon projectile towards enemy
+    createIconProjectile(button, action);
   } else {
     button.classList.add("btn-incorrect");
   }
@@ -535,13 +549,15 @@ function createParticleShower(button) {
     // Animate particle
     const duration = 800 + Math.random() * 400;
     particle.style.animation = `particleRise ${duration}ms ease-out forwards`;
-    particle.style.setProperty('--target-x', `${targetX - centerX}px`);
-    particle.style.setProperty('--target-y', `${targetY - centerY}px`);
+    particle.style.setProperty("--target-x", `${targetX - centerX}px`);
+    particle.style.setProperty("--target-y", `${targetY - centerY}px`);
 
     // Apply transform for spreading effect
     const animateTimeout = setTimeout(() => {
-      particle.style.transform = `translate(${targetX - centerX}px, ${targetY - centerY - 200}px) scale(0.5) rotate(${Math.random() * 360}deg)`;
-      particle.style.opacity = '0';
+      particle.style.transform = `translate(${targetX - centerX}px, ${
+        targetY - centerY - 200
+      }px) scale(0.5) rotate(${Math.random() * 360}deg)`;
+      particle.style.opacity = "0";
     }, 10);
 
     // Remove particle after animation with proper cleanup
@@ -555,6 +571,59 @@ function createParticleShower(button) {
     particle.dataset.animateTimeout = animateTimeout;
     particle.dataset.cleanupTimeout = cleanupTimeout;
   }
+}
+
+// Create icon projectile that shoots towards enemy container
+function createIconProjectile(button, action) {
+  const buttonRect = button.getBoundingClientRect();
+  const enemyContainer = document.getElementById("enemy-container");
+  if (!enemyContainer) return;
+
+  const enemyRect = enemyContainer.getBoundingClientRect();
+
+  // Get the icon image from the button
+  const buttonImg = button.querySelector("img");
+  if (!buttonImg) return;
+
+  // Create projectile element
+  const projectile = document.createElement("div");
+  projectile.className = "icon-projectile";
+
+  // Create image inside projectile
+  const projectileImg = document.createElement("img");
+  projectileImg.src = buttonImg.src;
+  projectileImg.alt = action;
+  projectile.appendChild(projectileImg);
+
+  // Position at button center
+  const startX = buttonRect.left + buttonRect.width / 2;
+  const startY = buttonRect.top + buttonRect.height / 2;
+
+  projectile.style.left = `${startX}px`;
+  projectile.style.top = `${startY}px`;
+
+  document.body.appendChild(projectile);
+
+  // Calculate target position (center of enemy container)
+  const targetX = enemyRect.left + enemyRect.width / 2;
+  const targetY = enemyRect.top + enemyRect.height / 2;
+
+  // Calculate travel distance for animation
+  const deltaX = targetX - startX;
+  const deltaY = targetY - startY;
+
+  // Trigger animation
+  requestAnimationFrame(() => {
+    projectile.style.transform = `translate(${deltaX}px, ${deltaY}px) scale(1.5) rotate(360deg)`;
+    projectile.style.opacity = "0";
+  });
+
+  // Remove projectile after animation completes
+  setTimeout(() => {
+    if (projectile.parentNode) {
+      document.body.removeChild(projectile);
+    }
+  }, 600);
 }
 
 // Add screen flash effect for feedback
@@ -726,6 +795,10 @@ function handleFightWon() {
     if (gameState.isInfiniteMode) {
       // Infinite mode: advance to next level
       gameState.infiniteLevel++;
+
+      // Track infinite level trophies
+      trackInfiniteLevel(gameState.infiniteLevel);
+
       setupFight();
     } else if (gameState.currentFight === gameState.maxFights) {
       // Final fight won - calculate and save time-based score
@@ -738,12 +811,26 @@ function handleFightWon() {
       // Play final death sound for level 4 victory
       audioManager.playSoundEffect("roboFinalDeath");
 
+      // Track story mode completion
+      const noHits = gameState.lives === 3;
+      trackStoryModeComplete(noHits);
+
       // Show victory screen after a brief delay
       const timeText = formatTimeForDisplay(totalGameTime);
       setTimeout(() => {
         gameOverScreen.showVictory(timeText, isNewHighScore, totalGameTime);
       }, 1000);
     } else {
+      // Track fight 1 completion
+      if (gameState.currentFight === 1) {
+        trackFight1Complete();
+
+        // Check if level 1 was completed without hits
+        if (gameState.lives === 3) {
+          trackLevel1NoHits();
+        }
+      }
+
       // Show time warp transition
       showTimeWarp();
     }
@@ -775,6 +862,9 @@ function showTimeWarp() {
   elements.message.textContent = "Traveling to next fight...";
   elements.message.style.color = "#0ff";
 
+  // Track that we're in a time warp
+  isInTimewarp = true;
+
   // Play timewarp sound effect
   audioManager.playSoundEffect("timewarp");
 
@@ -786,10 +876,15 @@ function showTimeWarp() {
 
     if (gameState.crystalCharges <= 0) {
       elements.message.textContent = "Crystal depleted!";
+      trackCrystalDepleted();
     }
   }
 
+  // Track time warp completion
+  trackTimeWarpComplete();
+
   setTimeout(() => {
+    isInTimewarp = false;
     gameState.currentFight++;
     setupFight();
   }, GAME_CONFIG.TIME_WARP_DURATION);
@@ -830,6 +925,11 @@ function togglePause() {
     // Track when pause started
     gameState.lastPauseTime = Date.now();
     elements.pauseOverlay.classList.add("show");
+
+    // Check if paused during time warp for trophy
+    if (isInTimewarp) {
+      trackPauseDuringTimewarp();
+    }
   } else {
     // Add paused time to total when resuming
     if (gameState.lastPauseTime) {

@@ -31,7 +31,7 @@
     <div id="story-panel">
       <div id="story-panel-content">
         <div id="story-panel-image">
-          <img id="story-img" src="images/story-1.png" alt="Story Panel" />
+          <img id="story-img" src="images/story1.jpg" alt="Story Panel" />
         </div>
         <div id="story-panel-text">
           <p id="story-text">Story text will appear here...</p>
@@ -158,7 +158,7 @@
       <p>Mini Jam 179: Recursion</p>
       <div class="button-container">
         <div class="start-btn-wrapper">
-          <button class="title-btn" id="start-btn">Start Game</button>
+          <button class="title-btn" id="start-btn">Start Fight</button>
           <div id="high-score">
             <div class="high-score-time">
               Best Time: <span id="high-score-value">N/A</span>
@@ -190,7 +190,31 @@
         <button class="title-btn audio-toggle-btn" id="audio-toggle-title">
           <img src="images/icon-musicnote.png" alt="Audio" class="audio-icon" />
         </button>
+        <button class="title-btn trophy-icon-btn" id="trophy-btn">
+          <img src="images/icon-star.png" alt="Trophies" class="trophy-icon" />
+        </button>
         <button class="title-btn htp-icon-btn" id="htp-btn">?</button>
+      </div>
+    </div>
+
+    <!-- Trophy Popup -->
+    <div id="trophy-popup">
+      <button id="close-trophy">&times;</button>
+      <h2>Trophies</h2>
+
+      <div id="trophy-grid">
+        <!-- Trophy items will be dynamically inserted here -->
+      </div>
+    </div>
+
+    <!-- Trophy Detail Popup -->
+    <div id="trophy-detail-popup">
+      <button id="close-trophy-detail">&times;</button>
+      <div id="trophy-detail-content">
+        <img id="trophy-detail-icon" src="" alt="Trophy Icon" />
+        <h3 id="trophy-detail-name"></h3>
+        <div id="trophy-detail-requirement"></div>
+        <div id="trophy-detail-flavor"></div>
       </div>
     </div>
 
@@ -355,9 +379,22 @@
 
     <script type="module">
       import { initTitleScreen } from "./title-screen.js";
+      import { loadingScreen } from "./loading-screen.js";
 
-      // Initialize title screen on page load
-      initTitleScreen();
+      // Show loading screen
+      loadingScreen.show();
+
+      // Simulate asset loading
+      loadingScreen.simulateProgress(2000);
+
+      // Wait for page to fully load
+      window.addEventListener("load", async () => {
+        // Complete loading and show start button
+        await loadingScreen.complete(() => {
+          // Initialize title screen when user clicks start
+          initTitleScreen();
+        });
+      });
     </script>
   </body>
 </html>

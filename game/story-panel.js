@@ -1,45 +1,46 @@
 import { audioManager } from "./audio-manager.js";
+import { trackStoryViewed } from "./trophy-manager.js";
 
 // Story panel data
 const STORY_PANELS = [
   {
     id: 1,
-    image: "images/story-1.png",
+    image: "images/story0.jpg",
     text: "It's the year 2147, and most of humanity has either gone cyborg or full on clanker.",
   },
   {
     id: 2,
-    image: "images/story-2.png",
+    image: "images/story1.jpg",
     text: "I'm in the lunchroom ready to eat up my tasty lunch.",
   },
   {
     id: 3,
-    image: "images/story-3.png",
+    image: "images/story2.jpg",
     text: "A clanker busts in and starts cutting up my sandwich, then eats BOTH halves.",
   },
   {
     id: 4,
-    image: "images/story-4.png",
+    image: "images/story3.jpg",
     text: "Then you know what? He drank my juice too!",
   },
   {
     id: 5,
-    image: "images/story-5.png",
+    image: "images/story4.jpg",
     text: "I was getting all sad but then he pulled out this weird crystal and said 'don't worry, your food's not gone for good' and blue light came out of the crystal.",
   },
   {
     id: 6,
-    image: "images/story-6.png",
+    image: "images/story5.jpg",
     text: "Holy smokes, there was my sandwich and juice, all good as new.",
   },
   {
     id: 7,
-    image: "images/story-5.png", // Reusing image
+    image: "images/story6.jpg",
     text: "Then he ate them again. I was so pissed.",
   },
   {
     id: 8,
-    image: "images/story-6.png", // Reusing image
+    image: "images/story7.jpg",
     text: "Now it's time for payback!",
   },
 ];
@@ -132,6 +133,8 @@ export class StoryPanel {
       this.updatePanel();
     } else {
       // On last panel, next button closes the story
+      // Track that user viewed the full story
+      trackStoryViewed();
       this.close();
     }
   }
