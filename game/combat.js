@@ -30,6 +30,7 @@ const elements = {
   hearts: document.getElementById("hearts"),
   fightInfo: document.getElementById("fight-info"),
   timerFill: document.getElementById("timer-fill"),
+  timerText: document.getElementById("timer-text"),
   timerPaused: document.getElementById("timer-paused"),
   crystalEnergy: document.getElementById("crystal-energy"),
   crystalFill: document.getElementById("crystal-fill"),
@@ -171,10 +172,14 @@ function cleanupSpriteSheet() {
   elements.poseImg.style.display = "block";
   const container = elements.poseImg.parentElement;
 
-  // Remove any existing sprite viewport
+  // Remove any existing sprite structure (scaler div contains clipper)
   const existingClipper = container.querySelector(".sprite-clipper");
   if (existingClipper) {
-    container.removeChild(existingClipper);
+    // The clipper is inside a scaler div, so remove the scaler (parent of clipper)
+    const scaler = existingClipper.parentElement;
+    if (scaler && scaler.parentElement === container) {
+      container.removeChild(scaler);
+    }
   }
   elements.poseImg.style.transform = ""; // Reset transform on static image element
 }
@@ -322,12 +327,20 @@ function startTimer() {
   gameState.timer = gameState.baseTimerDuration;
   elements.timerFill.style.width = "100%";
 
+  // Update timer text initially
+  const secondsRemaining = Math.ceil(gameState.timer / 1000);
+  elements.timerText.textContent = secondsRemaining;
+
   gameState.timerInterval = setInterval(() => {
     if (gameState.isPaused) return;
 
     gameState.timer -= 100;
     const percentage = (gameState.timer / gameState.baseTimerDuration) * 100;
     elements.timerFill.style.width = `${percentage}%`;
+
+    // Update timer text (show seconds remaining, rounded up)
+    const secondsRemaining = Math.ceil(gameState.timer / 1000);
+    elements.timerText.textContent = secondsRemaining;
 
     if (gameState.timer <= 0) {
       clearInterval(gameState.timerInterval);
@@ -342,6 +355,8 @@ function stopTimer() {
     clearInterval(gameState.timerInterval);
     gameState.timerInterval = null;
   }
+  // Clear the timer text
+  elements.timerText.textContent = "";
 }
 
 // Handle timeout
@@ -435,14 +450,18 @@ function shakeScreen() {
 function handleAttack(action) {
   if (!gameState.pendingPose) return;
 
+  // Store the pending pose and clear it immediately to prevent multiple clicks
+  const currentPose = gameState.pendingPose;
+  gameState.pendingPose = null;
+
   // Add button press feedback immediately
   addButtonFeedback(action);
 
   stopTimer();
   elements.attacksDiv.classList.remove("show");
 
-  const correct = action === gameState.pendingPose.correct;
-  const poseId = gameState.pendingPose.id;
+  const correct = action === currentPose.correct;
+  const poseId = currentPose.id;
 
   // Sound effect map for each pose
   const hitSoundMap = {
@@ -469,7 +488,7 @@ function handleAttack(action) {
     }
 
     // Show damage feedback pose (player successfully damaged enemy)
-    setPose({ img: gameState.pendingPose.dmgImg, desc: "Hit!" });
+    setPose({ img: currentPose.dmgImg, desc: "Hit!" });
 
     setTimeout(() => {
       elements.message.textContent = "Perfect counter!";
@@ -505,14 +524,14 @@ function handleAttack(action) {
 
     // Show hit feedback pose (enemy hit the player)
     // Use sprite sheet if available, otherwise use static image
-    if (gameState.pendingPose.hitSprite) {
+    if (currentPose.hitSprite) {
       setPose({
-        img: gameState.pendingPose.hitImg,
+        img: currentPose.hitImg,
         desc: "Blocked!",
-        sprite: gameState.pendingPose.hitSprite,
+        sprite: currentPose.hitSprite,
       });
     } else {
-      setPose({ img: gameState.pendingPose.hitImg, desc: "Blocked!" });
+      setPose({ img: currentPose.hitImg, desc: "Blocked!" });
     }
 
     setTimeout(() => {

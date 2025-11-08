@@ -13,11 +13,24 @@ export class SpriteSheet {
     this.offsetX = config.offsetX || 0;
     this.offsetY = config.offsetY || 0;
 
-    // Optional properties for handling gaps and content size
-    this.frameContentWidth = config.frameContentWidth || this.frameWidth;
-    this.frameContentHeight = config.frameContentHeight || this.frameHeight;
-    this.gapX = config.gapX || 0;
-    this.gapY = config.gapY || 0;
+    // Handle different config types:
+    // 1. If frameContentWidth is defined, we assume a complex sprite with offsets and gaps.
+    //    In this case, frameWidth/Height are treated as the top-left offset.
+    // 2. Otherwise, we assume a simple sprite where frameWidth/Height is the full size of the content.
+    if (config.frameContentWidth !== undefined) {
+      this.frameContentWidth = config.frameContentWidth;
+      this.frameContentHeight = config.frameContentHeight;
+      this.gapX = config.gapX || 0;
+      this.gapY = config.gapY || 0;
+    } else {
+      // Fallback for simple sprites (like the hit animations)
+      this.frameContentWidth = this.frameWidth;
+      this.frameContentHeight = this.frameHeight;
+      this.frameWidth = 0; // No offset
+      this.frameHeight = 0; // No offset
+      this.gapX = 0;
+      this.gapY = 0;
+    }
 
     this.totalFrames = this.rows * this.cols;
     this.currentFrame = 0;
