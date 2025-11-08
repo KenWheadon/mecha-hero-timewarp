@@ -4,6 +4,7 @@ const STORAGE_KEYS = {
   HIGH_SCORE: 'mecha-hero-high-score',
   FIRST_TIME_FLAGS: 'mecha-hero-first-time',
   INFINITE_HIGH_SCORE: 'mecha-hero-infinite-high-score',
+  STORY_SEEN: 'mecha-hero-story-seen',
 };
 
 // Get high score (best time in seconds, lower is better)
@@ -106,9 +107,20 @@ export function getInfiniteStarRating(level) {
   }
 }
 
+// Check if story has been seen
+export function hasSeenStory() {
+  return localStorage.getItem(STORAGE_KEYS.STORY_SEEN) === 'true';
+}
+
+// Mark story as seen
+export function markStorySeen() {
+  localStorage.setItem(STORAGE_KEYS.STORY_SEEN, 'true');
+}
+
 // Reset all progress (for testing or user request)
 export function resetAllProgress() {
   localStorage.removeItem(STORAGE_KEYS.HIGH_SCORE);
   localStorage.removeItem(STORAGE_KEYS.FIRST_TIME_FLAGS);
   localStorage.removeItem(STORAGE_KEYS.INFINITE_HIGH_SCORE);
+  localStorage.removeItem(STORAGE_KEYS.STORY_SEEN);
 }

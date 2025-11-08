@@ -1,6 +1,7 @@
 // How to Play Module - manages the tutorial modal with improved UX
 
 import { audioManager } from "./audio-manager.js";
+import { storyPanel } from "./story-panel.js";
 
 export class HowToPlay {
   constructor() {
@@ -8,6 +9,7 @@ export class HowToPlay {
       overlay: document.getElementById("overlay"),
       modal: document.getElementById("how-to-play"),
       closeBtn: document.getElementById("close-htp"),
+      viewStoryBtn: document.getElementById("view-story-btn"),
     };
 
     this.setupEventListeners();
@@ -20,13 +22,26 @@ export class HowToPlay {
       this.close();
     });
 
+    // View Story button
+    this.elements.viewStoryBtn.addEventListener("click", () => {
+      audioManager.playSoundEffect("btnClick");
+      // Close the How to Play modal first
+      this.close();
+      // Then open the story panel
+      storyPanel.replay();
+    });
+
     // Close on overlay click
     this.elements.overlay.addEventListener("click", () => {
       this.close();
     });
 
-    // Add hover sound effect to close button
+    // Add hover sound effect to buttons
     this.elements.closeBtn.addEventListener("mouseenter", () => {
+      audioManager.playSoundEffect("btnHover");
+    });
+
+    this.elements.viewStoryBtn.addEventListener("mouseenter", () => {
       audioManager.playSoundEffect("btnHover");
     });
   }
