@@ -28,6 +28,9 @@ let spriteLoadCheckInterval = null;
 // Game over screen manager
 let gameOverScreen = null;
 
+// Track if event listeners have been initialized
+let eventListenersInitialized = false;
+
 // Cache DOM elements
 const elements = {
   pause: document.getElementById("pause"),
@@ -35,7 +38,6 @@ const elements = {
   fightInfo: document.getElementById("fight-info"),
   timerFill: document.getElementById("timer-fill"),
   timerText: document.getElementById("timer-text"),
-  timerPaused: document.getElementById("timer-paused"),
   crystalEnergy: document.getElementById("crystal-energy"),
   crystalFill: document.getElementById("crystal-fill"),
   enemyHpFill: document.getElementById("enemy-hp-fill"),
@@ -47,6 +49,9 @@ const elements = {
   restart: document.getElementById("restart"),
   quitBtn: document.getElementById("quit-btn"),
   audioToggleCombat: document.getElementById("audio-toggle-combat"),
+  pauseOverlay: document.getElementById("pause-overlay"),
+  pauseResumeBtn: document.getElementById("pause-resume-btn"),
+  pauseQuitBtn: document.getElementById("pause-quit-btn"),
 };
 
 // Initialize game
@@ -65,38 +70,56 @@ export function initGame(isInfiniteMode = false) {
   }
 
   setupFight();
-  elements.pause.addEventListener("click", () => {
-    audioManager.playSoundEffect("btnClick");
-    togglePause();
-  });
-  elements.restart.addEventListener("click", () => {
-    audioManager.playSoundEffect("btnClick");
-    restartGame();
-  });
-  elements.quitBtn.addEventListener("click", () => {
-    audioManager.playSoundEffect("btnClick");
-    quitToMainMenu();
-  });
-  elements.audioToggleCombat.addEventListener("click", () => {
-    audioManager.playSoundEffect("btnClick");
-    toggleAudio();
-  });
-  elements.attacks.forEach((btn) => {
-    btn.addEventListener("click", () => handleAttack(btn.dataset.action));
-  });
 
-  // Add hover sound effects to all buttons
-  [
-    elements.pause,
-    elements.restart,
-    elements.audioToggleCombat,
-    elements.quitBtn,
-    ...elements.attacks,
-  ].forEach((btn) => {
-    btn.addEventListener("mouseenter", () => {
-      audioManager.playSoundEffect("btnHover");
+  // Only initialize event listeners once to prevent duplicates
+  if (!eventListenersInitialized) {
+    elements.pause.addEventListener("click", () => {
+      audioManager.playSoundEffect("btnClick");
+      togglePause();
     });
-  });
+    elements.restart.addEventListener("click", () => {
+      audioManager.playSoundEffect("btnClick");
+      restartGame();
+    });
+    elements.quitBtn.addEventListener("click", () => {
+      audioManager.playSoundEffect("btnClick");
+      quitToMainMenu();
+    });
+    elements.audioToggleCombat.addEventListener("click", () => {
+      audioManager.playSoundEffect("btnClick");
+      toggleAudio();
+    });
+    elements.attacks.forEach((btn) => {
+      btn.addEventListener("click", () => handleAttack(btn.dataset.action));
+    });
+
+    // Pause popup buttons
+    elements.pauseResumeBtn.addEventListener("click", () => {
+      audioManager.playSoundEffect("btnClick");
+      togglePause();
+    });
+    elements.pauseQuitBtn.addEventListener("click", () => {
+      audioManager.playSoundEffect("btnClick");
+      quitToMainMenu();
+    });
+
+    // Add hover sound effects to all buttons
+    [
+      elements.pause,
+      elements.restart,
+      elements.audioToggleCombat,
+      elements.quitBtn,
+      elements.pauseResumeBtn,
+      elements.pauseQuitBtn,
+      ...elements.attacks,
+    ].forEach((btn) => {
+      btn.addEventListener("mouseenter", () => {
+        audioManager.playSoundEffect("btnHover");
+      });
+    });
+
+    eventListenersInitialized = true;
+  }
 
   // Start combat audio
   audioManager.play("combat");
@@ -743,18 +766,14 @@ function togglePause() {
   if (gameState.isPaused) {
     // Track when pause started
     gameState.lastPauseTime = Date.now();
-    elements.pause.textContent = "Resume";
-    elements.quitBtn.style.display = "inline-block";
-    elements.timerPaused.style.display = "block";
+    elements.pauseOverlay.classList.add("show");
   } else {
     // Add paused time to total when resuming
     if (gameState.lastPauseTime) {
       gameState.totalPausedTime += Date.now() - gameState.lastPauseTime;
       gameState.lastPauseTime = null;
     }
-    elements.pause.textContent = "Pause";
-    elements.quitBtn.style.display = "none";
-    elements.timerPaused.style.display = "none";
+    elements.pauseOverlay.classList.remove("show");
   }
 }
 
@@ -763,9 +782,7 @@ function restartGame() {
   stopTimer();
   cleanupSpriteSheet();
   elements.restart.style.display = "none";
-  elements.pause.textContent = "Pause";
-  elements.quitBtn.style.display = "none";
-  elements.timerPaused.style.display = "none";
+  elements.pauseOverlay.classList.remove("show");
 
   // Hide game over screens
   if (gameOverScreen) {
@@ -776,6 +793,7 @@ function restartGame() {
   audioManager.play("combat");
 
   gameState = createInitialGameState();
+  gameState.isInfiniteMode = false; // Explicitly reset to normal mode
   initHearts();
   setupFight();
 }
@@ -784,6 +802,13 @@ function restartGame() {
 function quitToMainMenu() {
   stopTimer();
   cleanupSpriteSheet();
+
+  // Hide pause overlay and game elements
+  elements.pauseOverlay.classList.remove("show");
+  gameState.isPaused = false;
+  // Also reset the UI elements related to pausing
+  elements.pause.textContent = "Pause";
+  elements.quitBtn.style.display = "none";
 
   // Hide game elements and show title screen
   document.getElementById("game").style.display = "none";
