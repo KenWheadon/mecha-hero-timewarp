@@ -196,23 +196,24 @@ function setPose(pose, useSprite = null) {
     elements.poseImg.style.display = "none";
     const container = elements.poseImg.parentElement;
 
-    // 1. Create the Clipping Container
+    // Create the structure for scaling and clipping: scaler -> clipper -> img
+    // 1. The SCALER container. This will be scaled.
+    const scaler = document.createElement("div");
+    scaler.style.transform = `scale(${activeSpriteSheet.scale}) translate(${activeSpriteSheet.offsetX}px, ${activeSpriteSheet.offsetY}px)`;
+    scaler.style.transformOrigin = "center center";
+    container.appendChild(scaler); // Add the scaler to the DOM
+
+    // 2. The CLIPPER container. Sized to one frame, clips overflow.
     const clipper = document.createElement("div");
     clipper.className = "sprite-clipper";
-    clipper.style.width = `${activeSpriteSheet.frameWidth}px`;
-    clipper.style.height = `${activeSpriteSheet.frameHeight}px`;
-    container.appendChild(clipper);
+    clipper.style.width = `${activeSpriteSheet.frameContentWidth}px`;
+    clipper.style.height = `${activeSpriteSheet.frameContentHeight}px`;
+    scaler.appendChild(clipper); // Clipper goes inside the scaler
 
-    // 2. Apply scaling and offset to the clipper itself.
-    // This makes the entire visible sprite area larger.
-    clipper.style.transform = `scale(${activeSpriteSheet.scale}) translate(${activeSpriteSheet.offsetX}px, ${activeSpriteSheet.offsetY}px)`;
-    clipper.style.transformOrigin = "center center";
-
-    // 3. Create the Image Element (inside the clipper)
+    // 3. The IMAGE element itself, which will be moved around inside the clipper.
     const spriteImg = document.createElement("img");
     spriteImg.src = activeSpriteSheet.imagePath;
     clipper.appendChild(spriteImg);
-
     // Wait for sprite to load, then start animation
     spriteLoadCheckInterval = setInterval(() => {
       if (activeSpriteSheet && activeSpriteSheet.isLoaded) {

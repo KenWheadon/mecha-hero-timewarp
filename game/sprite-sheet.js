@@ -13,6 +13,12 @@ export class SpriteSheet {
     this.offsetX = config.offsetX || 0;
     this.offsetY = config.offsetY || 0;
 
+    // Optional properties for handling gaps and content size
+    this.frameContentWidth = config.frameContentWidth || this.frameWidth;
+    this.frameContentHeight = config.frameContentHeight || this.frameHeight;
+    this.gapX = config.gapX || 0;
+    this.gapY = config.gapY || 0;
+
     this.totalFrames = this.rows * this.cols;
     this.currentFrame = 0;
     this.isPlaying = false;
@@ -37,13 +43,13 @@ export class SpriteSheet {
    * Play the animation
    */
   play(element) {
-    if (this.isPlaying) return;
+    // If it's already playing, do nothing. If it's a non-looping animation that finished, this allows it to be re-triggered.
+    if (this.isPlaying) {
+      return;
+    }
+    this.reset(); // Ensure state is clean before playing.
 
     this.isPlaying = true;
-    this.currentFrame = 0;
-
-    // Initial application of the first frame
-    if (element) this.applyToElement(element);
 
     this.animationInterval = setInterval(() => {
       this.currentFrame++;
@@ -88,11 +94,15 @@ export class SpriteSheet {
     const row = Math.floor(this.currentFrame / this.cols);
     const col = this.currentFrame % this.cols;
 
+    // The total width/height of one cell in the grid
+    const cellWidth = this.frameWidth + this.frameContentWidth + this.gapX; // offsetLeft + content + offsetRight
+    const cellHeight = this.frameHeight + this.frameContentHeight + this.gapY; // offsetTop + content + offsetBottom
+
     return {
-      x: col * this.frameWidth,
-      y: row * this.frameHeight,
-      width: this.frameWidth,
-      height: this.frameHeight,
+      x: col * cellWidth + this.frameWidth, // The start of the content for the current frame
+      y: row * cellHeight + this.frameHeight, // The start of the content for the current frame
+      width: this.frameContentWidth,
+      height: this.frameContentHeight,
     };
   }
 
@@ -146,12 +156,19 @@ export class SpriteSheet {
     // and transforming an actual <img> element inside it.
 
     // 1. Set the size of the <img> tag to the full sprite sheet dimensions.
-    imgElement.style.width = `${this.cols * this.frameWidth}px`;
-    imgElement.style.height = `${this.rows * this.frameHeight}px`;
+    imgElement.style.width = `${
+      this.cols * (this.frameWidth + this.frameContentWidth + this.gapX)
+    }px`;
+    imgElement.style.height = `${
+      this.rows * (this.frameHeight + this.frameContentHeight + this.gapY)
+    }px`;
 
     // 2. Calculate the negative offset to show the correct frame.
-    const imgX = -col * this.frameWidth;
-    const imgY = -row * this.frameHeight;
+    // This should be the top-left of the content area for the current frame.
+    const cellWidth = this.frameWidth + this.frameContentWidth + this.gapX;
+    const cellHeight = this.frameHeight + this.frameContentHeight + this.gapY;
+    const imgX = -(col * cellWidth + this.frameWidth); // Negative offset to the content area
+    const imgY = -(row * cellHeight + this.frameHeight); // Negative offset to the content area
 
     // 3. Apply transform to the <img>.
     imgElement.style.transform = `translate(${imgX}px, ${imgY}px)`;

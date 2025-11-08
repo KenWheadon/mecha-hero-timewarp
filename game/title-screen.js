@@ -3,6 +3,8 @@
 import { neutralPose } from "./config.js";
 import { initGame } from "./combat.js";
 import { audioManager } from "./audio-manager.js";
+import { SpriteSheet } from "./sprite-sheet.js";
+import { getSpriteConfig } from "./sprites-config.js";
 import { getHighScore, formatTime } from "./storage-manager.js";
 import { HowToPlay } from "./how-to-play.js";
 
@@ -20,6 +22,10 @@ const elements = {
 
 // Initialize How to Play modal
 let howToPlayModal;
+
+// For logo animation
+let logoSpriteSheet = null;
+let logoAnimationInterval = null;
 
 // Initialize title screen
 export function initTitleScreen() {
@@ -51,7 +57,9 @@ function loadHighScore() {
 function setPose(pose) {
   elements.poseImg.src = pose.img;
   elements.poseImg.onerror = () => {
-    console.error(`Missing image: ${pose.img}${pose.desc ? ` (${pose.desc})` : ''}`);
+    console.error(
+      `Missing image: ${pose.img}${pose.desc ? ` (${pose.desc})` : ""}`
+    );
   };
 }
 
@@ -67,11 +75,13 @@ function setupEventListeners() {
   });
 
   // Add hover sound effects to all clickable buttons
-  [elements.startBtn, elements.htpBtn, elements.audioToggleTitle].forEach((btn) => {
-    btn.addEventListener("mouseenter", () => {
-      audioManager.playSoundEffect("btnHover");
-    });
-  });
+  [elements.startBtn, elements.htpBtn, elements.audioToggleTitle].forEach(
+    (btn) => {
+      btn.addEventListener("mouseenter", () => {
+        audioManager.playSoundEffect("btnHover");
+      });
+    }
+  );
 }
 
 // Ensure audio is unlocked on first user interaction
@@ -88,6 +98,11 @@ function onStartGame() {
   // Remove colorful background when entering game
   document.body.classList.remove("title-active");
   initGame();
+  // Clean up logo animation if it's running
+  if (logoAnimationInterval) {
+    clearInterval(logoAnimationInterval);
+    logoAnimationInterval = null;
+  }
 }
 
 // Handle how to play button
@@ -105,15 +120,44 @@ function startTitleGlitch() {
 
     // After glitch animation, replace with logo
     setTimeout(() => {
-      // Replace the title text with an image
-      elements.title.innerHTML =
-        '<img id="logo-img" src="images/logo-thin.png" alt="MECHA HERO" style="max-width: 30%; height: auto; cursor: pointer;" />';
+      // Clear title text and animation
+      elements.title.innerHTML = "";
       elements.title.style.animation = "none";
       elements.title.style.marginBottom = "10px";
+      elements.title.style.cursor = "pointer";
 
-      // Add click event to logo
-      const logoImg = document.getElementById("logo-img");
-      logoImg.addEventListener("click", onLogoClick);
+      // Setup sprite animation
+      const spriteConfig = getSpriteConfig("logo-thin");
+      logoSpriteSheet = new SpriteSheet(spriteConfig);
+
+      // Create the structure for scaling and clipping: scaler -> clipper -> img
+      // 1. The SCALER container. This will be scaled.
+      const scaler = document.createElement("div");
+      // This scale makes the sprite visually match the original logo's size
+      scaler.style.transformOrigin = "center center";
+      elements.title.appendChild(scaler);
+
+      // 2. The CLIPPER container. Sized to one frame, clips overflow.
+      const clipper = document.createElement("div");
+      clipper.className = "sprite-clipper";
+      clipper.style.width = `${logoSpriteSheet.frameContentWidth}px`;
+      clipper.style.height = `${logoSpriteSheet.frameContentHeight}px`;
+      scaler.appendChild(clipper); // Clipper goes inside the scaler
+
+      // 3. The IMAGE element itself, which will be moved around inside the clipper.
+      const spriteImg = document.createElement("img");
+      spriteImg.src = logoSpriteSheet.imagePath;
+      // The image goes inside the clipper
+      clipper.appendChild(spriteImg);
+
+      spriteImg.onload = () => {
+        // Play the animation (it will loop based on its config)
+        // We pass the CLIPPER to the play method, as it contains the img
+        logoSpriteSheet.play(clipper);
+      };
+
+      // Add click event to the title container which now holds the sprite
+      elements.title.addEventListener("click", onLogoClick);
     }, 300);
   }, 3000);
 }
@@ -121,12 +165,19 @@ function startTitleGlitch() {
 // Handle logo click - switch to thick version and start pulsing
 function onLogoClick() {
   const logoImg = document.getElementById("logo-img");
-  if (logoImg && !logoImg.classList.contains("logo-pulsing")) {
-    logoImg.src = "images/logo-thick.png";
-    logoImg.classList.add("logo-pulsing");
-    // Switch to main intro audio
-    audioManager.play("titleMain");
+  // If the logo is already thick, do nothing.
+  if (logoImg) return;
+
+  // Clear the animation interval and sprite
+  if (logoAnimationInterval) {
+    clearInterval(logoAnimationInterval);
+    logoAnimationInterval = null;
   }
+  logoSpriteSheet = null;
+  elements.title.innerHTML =
+    '<img id="logo-img" src="images/logo-thick.png" alt="MECHA HERO" class="logo-pulsing" style="max-width: 30%; height: auto;" />';
+
+  audioManager.play("titleMain");
 }
 
 // Toggle audio on/off

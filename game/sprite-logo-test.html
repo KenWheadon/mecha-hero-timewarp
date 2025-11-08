@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Visual Sprite Cropper</title>
+    <style>
+      body {
+        font-family: sans-serif;
+        background-color: #222;
+        color: #fff;
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+        margin: 0;
+        padding: 20px;
+        box-sizing: border-box;
+      }
+      .main-content {
+        display: flex;
+        flex-grow: 1;
+        gap: 20px;
+        overflow: hidden;
+      }
+      .controls {
+        padding: 20px;
+        background-color: #333;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        min-width: 350px;
+        overflow-y: auto;
+      }
+      .editor {
+        flex-grow: 1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: #111;
+        border: 1px solid #555;
+        overflow: auto;
+      }
+      .editor-container {
+        position: relative;
+        line-height: 0; /* remove whitespace below image */
+        border: 2px dashed hotpink;
+      }
+      /* This is the viewport that we will "shrink" with the handles */
+      #viewport {
+        position: relative;
+        overflow: hidden;
+        background-color: #444;
+      }
+      /* The animation plays inside this element */
+      #animation-player {
+        position: absolute;
+      }
+      #animation-player img {
+        position: absolute;
+      }
+      /* The handles for cropping */
+      .crop-handle {
+        position: absolute;
+        background: cyan;
+        z-index: 20;
+      }
+      .crop-handle.vertical {
+        width: 100%;
+        height: 10px;
+        cursor: ns-resize;
+      }
+      .crop-handle.horizontal {
+        width: 10px;
+        height: 100%;
+        cursor: ew-resize;
+      }
+      #handle-top {
+        top: -5px;
+        left: 0;
+      }
+      #handle-bottom {
+        bottom: -5px;
+        left: 0;
+      }
+      #handle-left {
+        top: 0;
+        left: -5px;
+      }
+      #handle-right {
+        top: 0;
+        right: -5px;
+      }
+      .output-values {
+        background: #1a1a1a;
+        padding: 15px;
+        border-radius: 5px;
+        margin-top: 10px;
+      }
+      .output-values {
+        background: #1a1a1a;
+        padding: 15px;
+        border-radius: 5px;
+        margin-top: 10px;
+      }
+      .output-values pre {
+        margin: 0;
+        color: #0f0;
+        font-size: 14px;
+        line-height: 1.5;
+      }
+      button {
+        padding: 10px;
+        font-size: 16px;
+        cursor: pointer;
+        margin-top: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Visual Sprite Cropper</h1>
+    <div class="main-content">
+      <div class="controls">
+        <h2>Instructions</h2>
+        <p>1. The full-frame animation is playing on the right.</p>
+        <p>
+          2. Drag the <b>cyan handles</b> inward to "crop" the view and hide the
+          blank space around the graphic.
+        </p>
+        <p>3. Copy the final values into your `sprites-config.js` file.</p>
+        <div class="output-values">
+          <h3>Live Values:</h3>
+          <pre id="live-output">...</pre>
+        </div>
+        <div class="output-values">
+          <h3>Final Config Values:</h3>
+          <pre id="final-output">...</pre>
+        </div>
+      </div>
+      <div class="editor">
+        <div class="editor-container">
+          <div id="viewport">
+            <div id="animation-player"></div>
+            <div id="handle-top" class="crop-handle vertical"></div>
+            <div id="handle-bottom" class="crop-handle vertical"></div>
+            <div id="handle-left" class="crop-handle horizontal"></div>
+            <div id="handle-right" class="crop-handle horizontal"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script type="module">
+      import { SpriteSheet } from "./sprite-sheet.js";
+      import { getSpriteConfig } from "./sprites-config.js";
+
+      const viewport = document.getElementById("viewport");
+      const player = document.getElementById("animation-player");
+      const handles = {
+        top: document.getElementById("handle-top"),
+        bottom: document.getElementById("handle-bottom"),
+        left: document.getElementById("handle-left"),
+        right: document.getElementById("handle-right"),
+      };
+      const liveOutput = document.getElementById("live-output");
+      const finalOutput = document.getElementById("final-output");
+
+      const baseConfig = getSpriteConfig("logo-thin");
+      const imgWidth = 3072;
+      const imgHeight = 3072;
+      const cols = baseConfig.cols;
+      const rows = baseConfig.rows;
+      const fullFrameWidth = imgWidth / cols;
+      const fullFrameHeight = imgHeight / rows;
+
+      let crop = { top: 0, left: 0, right: 0, bottom: 0 }; // Values are how much to crop from each side
+      let draggingHandle = null;
+
+      function updateView() {
+        const contentWidth = fullFrameWidth - crop.left - crop.right;
+        const contentHeight = fullFrameHeight - crop.top - crop.bottom;
+
+        viewport.style.width = `${contentWidth}px`;
+        viewport.style.height = `${contentHeight}px`;
+
+        player.style.left = `-${crop.left}px`;
+        player.style.top = `-${crop.top}px`;
+
+        updateOutputs();
+      }
+
+      function updateOutputs() {
+        const contentWidth = Math.round(
+          fullFrameWidth - crop.left - crop.right
+        );
+        const contentHeight = Math.round(
+          fullFrameHeight - crop.top - crop.bottom
+        );
+        const offsetX = Math.round(crop.left);
+        const offsetY = Math.round(crop.top);
+
+        liveOutput.textContent = `offsetX: ${offsetX}\noffsetY: ${offsetY}\nwidth: ${contentWidth}\nheight: ${contentHeight}`;
+
+        const gapX = fullFrameWidth - offsetX - contentWidth;
+        const gapY = fullFrameHeight - offsetY - contentHeight;
+
+        finalOutput.textContent = `frameContentWidth: ${contentWidth},\nframeContentHeight: ${contentHeight},\nframeWidth: ${offsetX}, // This is the X offset\nframeHeight: ${offsetY}, // This is the Y offset\ngapX: ${Math.round(
+          gapX
+        )},\ngapY: ${Math.round(gapY)},`;
+      }
+
+      // --- Event Listeners for Handles ---
+      Object.keys(handles).forEach((key) => {
+        handles[key].addEventListener("mousedown", (e) => {
+          draggingHandle = key;
+          e.preventDefault();
+        });
+      });
+
+      window.addEventListener("mousemove", (e) => {
+        if (!draggingHandle) return;
+
+        if (draggingHandle === "top") crop.top += e.movementY;
+        if (draggingHandle === "bottom") crop.bottom -= e.movementY;
+        if (draggingHandle === "left") crop.left += e.movementX;
+        if (draggingHandle === "right") crop.right -= e.movementX;
+
+        // Clamp values to prevent inversion
+        crop.top = Math.max(0, crop.top);
+        crop.bottom = Math.max(0, crop.bottom);
+        crop.left = Math.max(0, crop.left);
+        crop.right = Math.max(0, crop.right);
+        if (crop.left + crop.right >= fullFrameWidth)
+          crop.right = fullFrameWidth - crop.left - 1;
+        if (crop.top + crop.bottom >= fullFrameHeight)
+          crop.bottom = fullFrameHeight - crop.top - 1;
+
+        updateView();
+      });
+
+      window.addEventListener("mouseup", () => {
+        draggingHandle = null;
+      });
+
+      // --- Initial Setup ---
+      function setupAnimation() {
+        // Configure the animation player to be the size of a full, uncropped frame
+        player.style.width = `${fullFrameWidth}px`;
+        player.style.height = `${fullFrameHeight}px`;
+
+        // Use a simple config with no gaps or offsets for the animation itself
+        const simpleConfig = {
+          ...baseConfig,
+          frameContentWidth: fullFrameWidth,
+          frameContentHeight: fullFrameHeight,
+          frameWidth: 0, // No offset
+          frameHeight: 0, // No offset
+          gapX: 0, // No gap
+          gapY: 0, // No gap
+        };
+
+        const spriteSheet = new SpriteSheet(simpleConfig);
+        const spriteImg = document.createElement("img");
+        spriteImg.src = spriteSheet.imagePath;
+        player.appendChild(spriteImg);
+
+        spriteImg.onload = () => {
+          spriteSheet.play(player);
+        };
+
+        // Set initial view
+        updateView();
+      }
+
+      setupAnimation();
+    </script>
+  </body>
+</html>

@@ -139,6 +139,11 @@ body.title-active::before {
   filter: drop-shadow(8px 8px 0px #000)
     drop-shadow(-2px -2px 0px rgba(255, 255, 255, 0.5));
   position: relative;
+  /* Flex properties for centering the sprite logo */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
 }
 
 @keyframes rainbowText {

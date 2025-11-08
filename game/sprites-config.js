@@ -78,6 +78,23 @@ export const SPRITE_CONFIGS = {
   "pose5-hit": createHitSpriteConfig(
     "images/pose5-hit-spritesheet-2316-2454.png"
   ),
+  // Use a direct configuration for the logo to handle custom offsets and gaps correctly.
+  "logo-thin": {
+    imagePath: "images/logo-thin-spritesheet-3072-3072.png",
+    rows: 6,
+    cols: 6,
+    fps: 12,
+    loop: true,
+    scale: 1.5,
+    offsetX: 0,
+    offsetY: 0,
+    frameContentWidth: 279, // The actual width of the graphic in the frame
+    frameContentHeight: 277, // The actual height of the graphic in the frame
+    frameWidth: 117, // This is the X offset from the test page
+    frameHeight: 118, // This is the Y offset from the test page
+    gapX: 116, // Horizontal gap between frames
+    gapY: 117, // Vertical gap between frames
+  },
 };
 
 /**
