@@ -167,7 +167,10 @@
               class="audio-icon"
             />
           </button>
-          <button id="pause">Pause</button>
+          <div class="pause-controls">
+            <button id="pause">Pause</button>
+            <button id="quit-btn">Quit</button>
+          </div>
         </div>
       </div>
 
@@ -260,12 +263,15 @@
             <div class="star" data-star="3"></div>
           </div>
           <div class="victory-message">
-            The mecha threat has been neutralized.<br>
+            The mecha threat has been neutralized.<br />
             Time flows freely once more!
           </div>
         </div>
 
-        <button class="game-over-restart">Play Again</button>
+        <div class="game-over-buttons">
+          <button class="game-over-main-menu">Main Menu</button>
+          <button class="game-over-restart">Play Again</button>
+        </div>
       </div>
     </div>
 
@@ -281,12 +287,15 @@
             <div id="defeat-fight" class="fight-value">1</div>
           </div>
           <div class="defeat-message">
-            Your mecha has fallen.<br>
+            Your mecha has fallen.<br />
             The time loop continues...
           </div>
         </div>
 
-        <button class="game-over-restart">Try Again</button>
+        <div class="game-over-buttons">
+          <button class="game-over-main-menu">Main Menu</button>
+          <button class="game-over-restart">Try Again</button>
+        </div>
       </div>
     </div>
 

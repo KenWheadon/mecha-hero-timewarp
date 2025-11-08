@@ -5,7 +5,13 @@ import { initGame } from "./combat.js";
 import { audioManager } from "./audio-manager.js";
 import { SpriteSheet } from "./sprite-sheet.js";
 import { getSpriteConfig } from "./sprites-config.js";
-import { getHighScore, formatTime, getStarRating, getInfiniteHighScore, getInfiniteStarRating } from "./storage-manager.js";
+import {
+  getHighScore,
+  formatTime,
+  getStarRating,
+  getInfiniteHighScore,
+  getInfiniteStarRating,
+} from "./storage-manager.js";
 import { HowToPlay } from "./how-to-play.js";
 
 // Cache DOM elements
@@ -63,13 +69,13 @@ function loadHighScore() {
 
 // Update high score stars and progress message
 function updateHighScoreStars(timeInSeconds) {
-  const stars = document.querySelectorAll('#high-score .star-small');
-  const progressMessage = document.getElementById('star-progress-message');
+  const stars = document.querySelectorAll("#high-score .star-small");
+  const progressMessage = document.getElementById("star-progress-message");
 
   if (timeInSeconds === null) {
     // No high score yet - all stars locked
-    stars.forEach(star => star.classList.remove('unlocked'));
-    progressMessage.textContent = 'Complete the game!';
+    stars.forEach((star) => star.classList.remove("unlocked"));
+    progressMessage.textContent = "Complete the game!";
     return;
   }
 
@@ -78,26 +84,27 @@ function updateHighScoreStars(timeInSeconds) {
   // Update star visuals
   stars.forEach((star, index) => {
     if (index < rating) {
-      star.classList.add('unlocked');
+      star.classList.add("unlocked");
     } else {
-      star.classList.remove('unlocked');
+      star.classList.remove("unlocked");
     }
   });
 
   // Set progress message based on current rating
   if (rating === 3) {
-    progressMessage.textContent = 'Perfect! 3 stars!';
+    progressMessage.textContent = "Perfect! 3 stars!";
   } else if (rating === 2) {
-    progressMessage.textContent = 'Under 1 minute for 3 stars';
+    progressMessage.textContent = "Under 1 minute for 3 stars";
   } else {
-    progressMessage.textContent = 'Under 2 minutes for 2 stars';
+    progressMessage.textContent = "Under 2 minutes for 2 stars";
   }
 }
 
 // Load and display infinite mode high score
 function loadInfiniteHighScore() {
   const highScore = getInfiniteHighScore();
-  elements.infiniteScoreValue.textContent = highScore === null ? "N/A" : highScore;
+  elements.infiniteScoreValue.textContent =
+    highScore === null ? "N/A" : highScore;
 
   // Update stars and progress message
   updateInfiniteHighScoreStars(highScore);
@@ -105,13 +112,13 @@ function loadInfiniteHighScore() {
 
 // Update infinite mode high score stars and progress message
 function updateInfiniteHighScoreStars(level) {
-  const stars = document.querySelectorAll('#infinite-high-score .star-small');
-  const progressMessage = document.getElementById('infinite-progress-message');
+  const stars = document.querySelectorAll("#infinite-high-score .star-small");
+  const progressMessage = document.getElementById("infinite-progress-message");
 
   if (level === null) {
     // No high score yet - all stars locked, show requirement for first star
-    stars.forEach(star => star.classList.remove('unlocked'));
-    progressMessage.textContent = 'Reach level 5 for 1 star';
+    stars.forEach((star) => star.classList.remove("unlocked"));
+    progressMessage.textContent = "Reach level 5 for 1 star";
     return;
   }
 
@@ -120,21 +127,21 @@ function updateInfiniteHighScoreStars(level) {
   // Update star visuals
   stars.forEach((star, index) => {
     if (index < rating) {
-      star.classList.add('unlocked');
+      star.classList.add("unlocked");
     } else {
-      star.classList.remove('unlocked');
+      star.classList.remove("unlocked");
     }
   });
 
   // Set progress message based on current rating
   if (rating === 3) {
-    progressMessage.textContent = 'Amazing! 3 stars!';
+    progressMessage.textContent = "Amazing! 3 stars!";
   } else if (rating === 2) {
-    progressMessage.textContent = 'Reach level 15 for 3 stars';
+    progressMessage.textContent = "Reach level 15 for 3 stars";
   } else if (rating === 1) {
-    progressMessage.textContent = 'Reach level 10 for 2 stars';
+    progressMessage.textContent = "Reach level 10 for 2 stars";
   } else {
-    progressMessage.textContent = 'Reach level 5 for 1 star';
+    progressMessage.textContent = "Reach level 5 for 1 star";
   }
 }
 
@@ -161,13 +168,16 @@ function setupEventListeners() {
   });
 
   // Add hover sound effects to all clickable buttons
-  [elements.startBtn, elements.infiniteBtn, elements.htpBtn, elements.audioToggleTitle].forEach(
-    (btn) => {
-      btn.addEventListener("mouseenter", () => {
-        audioManager.playSoundEffect("btnHover");
-      });
-    }
-  );
+  [
+    elements.startBtn,
+    elements.infiniteBtn,
+    elements.htpBtn,
+    elements.audioToggleTitle,
+  ].forEach((btn) => {
+    btn.addEventListener("mouseenter", () => {
+      audioManager.playSoundEffect("btnHover");
+    });
+  });
 }
 
 // Ensure audio is unlocked on first user interaction
@@ -184,6 +194,9 @@ function onStartGame() {
   // Remove colorful background when entering game
   document.body.classList.remove("title-active");
   initGame(false);
+  // Ensure quit button is hidden on game start
+  document.getElementById("quit-btn").style.display = "none";
+
   // Clean up logo animation if it's running
   if (logoAnimationInterval) {
     clearInterval(logoAnimationInterval);
@@ -200,6 +213,9 @@ function onStartInfiniteMode() {
   // Remove colorful background when entering game
   document.body.classList.remove("title-active");
   initGame(true); // Pass true for infinite mode
+  // Ensure quit button is hidden on game start
+  document.getElementById("quit-btn").style.display = "none";
+
   // Clean up logo animation if it's running
   if (logoAnimationInterval) {
     clearInterval(logoAnimationInterval);

@@ -584,6 +584,41 @@ body.title-active::before {
   box-shadow: none;
 }
 
+/* Container for pause/quit buttons to stack them vertically */
+.pause-controls {
+  position: relative; /* Create a positioning context for the absolute quit button */
+  display: inline-block; /* Allow the container to size to its content */
+}
+
+/* Quit button (hidden by default) */
+#quit-btn {
+  display: none; /* Hidden by default, shown on pause */
+  padding: 12px 28px;
+  background: #808080; /* Grey color */
+  border: var(--border-medium) solid #000;
+  color: #000;
+  font-size: 18px;
+  font-weight: 900;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  box-shadow: 6px 6px 0px #000;
+  transition: all 0.15s ease;
+  font-family: inherit;
+  /* Position it absolutely below the pause button */
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-top: 10px; /* Space between pause and quit */
+}
+
+#quit-btn:hover {
+  transform: translate(3px, 3px);
+  box-shadow: 3px 3px 0px #000;
+  background: #a9a9a9;
+}
+
 /* TIMER */
 #timer {
   width: 100%;
@@ -1869,6 +1904,13 @@ body.title-active::before {
   font-family: inherit;
   margin-top: 20px;
 }
+.game-over-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-top: 30px;
+  flex-wrap: wrap;
+}
 
 .game-over-restart:hover {
   transform: translate(4px, 4px);
@@ -1879,6 +1921,27 @@ body.title-active::before {
 .game-over-restart:active {
   transform: translate(8px, 8px);
   box-shadow: var(--shadow-brutal-active);
+}
+
+.game-over-main-menu {
+  background: #808080; /* Grey color */
+  border: var(--border-thick) solid #000;
+  color: #000;
+  font-size: 28px;
+  font-weight: 900;
+  padding: 20px 50px;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  box-shadow: var(--shadow-brutal);
+  transition: all 0.15s ease;
+  font-family: inherit;
+}
+
+.game-over-main-menu:hover {
+  transform: translate(4px, 4px);
+  box-shadow: var(--shadow-brutal-hover);
+  background: #a9a9a9;
 }
 
 /* Responsive - Tablet */
@@ -1909,6 +1972,10 @@ body.title-active::before {
   }
 
   .game-over-restart {
+    font-size: 24px;
+    padding: 18px 40px;
+  }
+  .game-over-main-menu {
     font-size: 24px;
     padding: 18px 40px;
   }
@@ -1971,6 +2038,11 @@ body.title-active::before {
   }
 
   .game-over-restart {
+    font-size: 20px;
+    padding: 15px 35px;
+    letter-spacing: 2px;
+  }
+  .game-over-main-menu {
     font-size: 20px;
     padding: 15px 35px;
     letter-spacing: 2px;

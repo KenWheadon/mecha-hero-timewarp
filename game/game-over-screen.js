@@ -8,7 +8,9 @@ export class GameOverScreen {
     this.victoryScreen = document.getElementById("victory-screen");
     this.defeatScreen = document.getElementById("defeat-screen");
     this.restartButtons = document.querySelectorAll(".game-over-restart");
+    this.mainMenuButtons = document.querySelectorAll(".game-over-main-menu");
     this.onRestartCallback = null;
+    this.onMainMenuCallback = null;
 
     this.initEventListeners();
   }
@@ -28,6 +30,21 @@ export class GameOverScreen {
       btn.addEventListener("mouseenter", () => {
         audioManager.playSoundEffect("btnHover");
       });
+    });
+
+    // Add click handlers to all main menu buttons
+    this.mainMenuButtons.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        audioManager.playSoundEffect("btnClick");
+        this.hide();
+        if (this.onMainMenuCallback) {
+          this.onMainMenuCallback();
+        }
+      });
+
+      btn.addEventListener("mouseenter", () =>
+        audioManager.playSoundEffect("btnHover")
+      );
     });
   }
 
@@ -152,5 +169,13 @@ export class GameOverScreen {
    */
   onRestart(callback) {
     this.onRestartCallback = callback;
+  }
+
+  /**
+   * Set callback for when main menu is clicked
+   * @param {Function} callback - Function to call on main menu click
+   */
+  onMainMenu(callback) {
+    this.onMainMenuCallback = callback;
   }
 }

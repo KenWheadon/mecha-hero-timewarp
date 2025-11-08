@@ -45,6 +45,7 @@ const elements = {
   attacks: document.querySelectorAll(".attack-btn"),
   attacksDiv: document.getElementById("attacks"),
   restart: document.getElementById("restart"),
+  quitBtn: document.getElementById("quit-btn"),
   audioToggleCombat: document.getElementById("audio-toggle-combat"),
 };
 
@@ -60,6 +61,7 @@ export function initGame(isInfiniteMode = false) {
   if (!gameOverScreen) {
     gameOverScreen = new GameOverScreen();
     gameOverScreen.onRestart(restartGame);
+    gameOverScreen.onMainMenu(quitToMainMenu);
   }
 
   setupFight();
@@ -70,6 +72,10 @@ export function initGame(isInfiniteMode = false) {
   elements.restart.addEventListener("click", () => {
     audioManager.playSoundEffect("btnClick");
     restartGame();
+  });
+  elements.quitBtn.addEventListener("click", () => {
+    audioManager.playSoundEffect("btnClick");
+    quitToMainMenu();
   });
   elements.audioToggleCombat.addEventListener("click", () => {
     audioManager.playSoundEffect("btnClick");
@@ -84,6 +90,7 @@ export function initGame(isInfiniteMode = false) {
     elements.pause,
     elements.restart,
     elements.audioToggleCombat,
+    elements.quitBtn,
     ...elements.attacks,
   ].forEach((btn) => {
     btn.addEventListener("mouseenter", () => {
@@ -123,16 +130,16 @@ function calculateInfiniteTimerDuration(level) {
 
   // Reduce by 0.5s per level until 2s
   if (level <= 17) {
-    baseDuration = 10000 - ((level - 1) * 500);
+    baseDuration = 10000 - (level - 1) * 500;
   } else if (level <= 27) {
     // At level 17 we're at 2s, now reduce by 0.1s until 1s
-    baseDuration = 2000 - ((level - 17) * 100);
+    baseDuration = 2000 - (level - 17) * 100;
   } else if (level <= 47) {
     // At level 27 we're at 1s, now reduce by 0.025s until 0.5s
-    baseDuration = 1000 - ((level - 27) * 25);
+    baseDuration = 1000 - (level - 27) * 25;
   } else {
     // At level 47 we're at 0.5s, now reduce by 0.01s
-    baseDuration = 500 - ((level - 47) * 10);
+    baseDuration = 500 - (level - 47) * 10;
     // Don't go below 100ms
     if (baseDuration < 100) baseDuration = 100;
   }
@@ -737,6 +744,7 @@ function togglePause() {
     // Track when pause started
     gameState.lastPauseTime = Date.now();
     elements.pause.textContent = "Resume";
+    elements.quitBtn.style.display = "inline-block";
     elements.timerPaused.style.display = "block";
   } else {
     // Add paused time to total when resuming
@@ -745,6 +753,7 @@ function togglePause() {
       gameState.lastPauseTime = null;
     }
     elements.pause.textContent = "Pause";
+    elements.quitBtn.style.display = "none";
     elements.timerPaused.style.display = "none";
   }
 }
@@ -755,6 +764,7 @@ function restartGame() {
   cleanupSpriteSheet();
   elements.restart.style.display = "none";
   elements.pause.textContent = "Pause";
+  elements.quitBtn.style.display = "none";
   elements.timerPaused.style.display = "none";
 
   // Hide game over screens
@@ -768,6 +778,25 @@ function restartGame() {
   gameState = createInitialGameState();
   initHearts();
   setupFight();
+}
+
+// Quit to main menu
+function quitToMainMenu() {
+  stopTimer();
+  cleanupSpriteSheet();
+
+  // Hide game elements and show title screen
+  document.getElementById("game").style.display = "none";
+  const titleScreen = document.getElementById("title-screen");
+  titleScreen.style.display = "block";
+
+  // Re-import and re-initialize the title screen to reset its state
+  import("./title-screen.js").then((titleScreenModule) => {
+    titleScreenModule.initTitleScreen();
+  });
+
+  // Ensure combat music stops and title music starts
+  audioManager.play("titleIntro");
 }
 
 // Toggle audio on/off
