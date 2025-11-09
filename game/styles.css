@@ -54,6 +54,16 @@
   animation: logoFloat 2s ease-in-out infinite;
 }
 
+/* Container for the logo, whether static or sprite */
+#loading-logo-container {
+  width: 200px;
+  height: 200px; /* Adjust height to match width for a square container */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  animation: logoFloat 2s ease-in-out infinite;
+}
+
 @keyframes logoFloat {
   0%,
   100% {

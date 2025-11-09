@@ -12,6 +12,7 @@ export class LoadingScreen {
     this.startTime = null;
     this.isComplete = false;
     this.onStartCallback = null;
+    this.onCompleteCallback = null;
   }
 
   // Helper function to add both click and touch event listeners
@@ -51,9 +52,10 @@ export class LoadingScreen {
     this.elements.progressText.textContent = `${Math.floor(clampedPercent)}%`;
   }
 
-  async complete(onStartCallback) {
-    // Store the callback
-    this.onStartCallback = onStartCallback;
+  async complete(onCompleteCallback, onStartCallback) {
+    // Store the callbacks
+    this.onCompleteCallback = onCompleteCallback;
+    this.onStartCallback = onStartCallback; // For when the button is clicked
 
     // Mark as complete
     this.isComplete = true;
@@ -74,7 +76,12 @@ export class LoadingScreen {
     await this.delay(300);
 
     // Transform progress bar into start button
-    this.showStartButton();
+    this.showStartButton(); // This will now use the stored callbacks
+
+    // Execute the onCompleteCallback immediately
+    if (this.onCompleteCallback) {
+      this.onCompleteCallback();
+    }
   }
 
   showStartButton() {
@@ -101,7 +108,8 @@ export class LoadingScreen {
       const animate = () => {
         const elapsed = Date.now() - startTime;
         const progress = Math.min(1, elapsed / duration);
-        const currentProgress = startProgress + (100 - startProgress) * progress;
+        const currentProgress =
+          startProgress + (100 - startProgress) * progress;
 
         this.updateProgress(currentProgress);
 

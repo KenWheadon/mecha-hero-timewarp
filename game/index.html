@@ -13,11 +13,7 @@
     <!-- Loading Screen -->
     <div id="loading-screen">
       <div id="loading-content">
-        <img
-          src="images/company-logo.png"
-          alt="Company Logo"
-          id="loading-logo"
-        />
+        <div id="loading-logo-container"></div>
         <div id="loading-progress-bar">
           <div id="loading-progress-fill"></div>
         </div>
@@ -64,46 +60,48 @@
       <div class="htp-section htp-accordion active">
         <h3 class="htp-accordion-header">
           <span>Basic Gameplay</span>
-          <span class="htp-accordion-icon" style="transform: rotate(180deg);">▼</span>
+          <span class="htp-accordion-icon" style="transform: rotate(180deg)"
+            >▼</span
+          >
         </h3>
-        <div class="htp-accordion-content" style="max-height: 1000px;">
-        <div class="htp-basic-grid">
-          <div class="htp-card">
-            <div class="htp-icon">
-              <img src="images/rocket.png" alt="Watch & Counter" />
+        <div class="htp-accordion-content" style="max-height: 1000px">
+          <div class="htp-basic-grid">
+            <div class="htp-card">
+              <div class="htp-icon">
+                <img src="images/rocket.png" alt="Watch & Counter" />
+              </div>
+              <div class="htp-content">
+                <strong>Watch & Counter</strong>
+                <p>
+                  Enemy shows an attack pose, you respond with the correct
+                  counter move.
+                </p>
+              </div>
             </div>
-            <div class="htp-content">
-              <strong>Watch & Counter</strong>
-              <p>
-                Enemy shows an attack pose, you respond with the correct counter
-                move.
-              </p>
+            <div class="htp-card">
+              <div class="htp-icon">
+                <img src="images/icon-stopwatch.png" alt="Beat the Timer" />
+              </div>
+              <div class="htp-content">
+                <strong>Beat the Timer</strong>
+                <p>
+                  Each fight gives you less time per pose: 10s → 6s → 4s → 2s.
+                </p>
+              </div>
+            </div>
+            <div class="htp-card">
+              <div class="htp-icon">
+                <img src="images/heart.png" alt="3 Hearts Only" />
+              </div>
+              <div class="htp-content">
+                <strong>3 Hearts Only</strong>
+                <p>
+                  A wrong answer or timeout costs 1 heart. Lose all 3 and it's
+                  game over.
+                </p>
+              </div>
             </div>
           </div>
-          <div class="htp-card">
-            <div class="htp-icon">
-              <img src="images/icon-stopwatch.png" alt="Beat the Timer" />
-            </div>
-            <div class="htp-content">
-              <strong>Beat the Timer</strong>
-              <p>
-                Each fight gives you less time per pose: 10s → 6s → 4s → 2s.
-              </p>
-            </div>
-          </div>
-          <div class="htp-card">
-            <div class="htp-icon">
-              <img src="images/heart.png" alt="3 Hearts Only" />
-            </div>
-            <div class="htp-content">
-              <strong>3 Hearts Only</strong>
-              <p>
-                A wrong answer or timeout costs 1 heart. Lose all 3 and it's
-                game over.
-              </p>
-            </div>
-          </div>
-        </div>
         </div>
       </div>
 
@@ -113,32 +111,32 @@
           <span class="htp-accordion-icon">▼</span>
         </h3>
         <div class="htp-accordion-content">
-        <div class="htp-fight-grid">
-          <div class="htp-fight-card fight-1">
-            <div class="fight-number">Fight 1</div>
-            <div class="fight-detail">2 Poses</div>
-            <div class="fight-detail">2 Enemy HP</div>
-            <div class="fight-detail">10s Timer</div>
+          <div class="htp-fight-grid">
+            <div class="htp-fight-card fight-1">
+              <div class="fight-number">Fight 1</div>
+              <div class="fight-detail">2 Poses</div>
+              <div class="fight-detail">2 Enemy HP</div>
+              <div class="fight-detail">10s Timer</div>
+            </div>
+            <div class="htp-fight-card fight-2">
+              <div class="fight-number">Fight 2</div>
+              <div class="fight-detail">4 Poses</div>
+              <div class="fight-detail">4 Enemy HP</div>
+              <div class="fight-detail">6s Timer</div>
+            </div>
+            <div class="htp-fight-card fight-3">
+              <div class="fight-number">Fight 3</div>
+              <div class="fight-detail">4 Poses</div>
+              <div class="fight-detail">4 Enemy HP</div>
+              <div class="fight-detail">4s Timer</div>
+            </div>
+            <div class="htp-fight-card fight-4">
+              <div class="fight-number">Fight 4</div>
+              <div class="fight-detail">4 Poses</div>
+              <div class="fight-detail">8 Enemy HP</div>
+              <div class="fight-detail">2s Timer</div>
+            </div>
           </div>
-          <div class="htp-fight-card fight-2">
-            <div class="fight-number">Fight 2</div>
-            <div class="fight-detail">4 Poses</div>
-            <div class="fight-detail">4 Enemy HP</div>
-            <div class="fight-detail">6s Timer</div>
-          </div>
-          <div class="htp-fight-card fight-3">
-            <div class="fight-number">Fight 3</div>
-            <div class="fight-detail">4 Poses</div>
-            <div class="fight-detail">4 Enemy HP</div>
-            <div class="fight-detail">4s Timer</div>
-          </div>
-          <div class="htp-fight-card fight-4">
-            <div class="fight-number">Fight 4</div>
-            <div class="fight-detail">4 Poses</div>
-            <div class="fight-detail">8 Enemy HP</div>
-            <div class="fight-detail">2s Timer</div>
-          </div>
-        </div>
         </div>
       </div>
 
@@ -148,17 +146,17 @@
           <span class="htp-accordion-icon">▼</span>
         </h3>
         <div class="htp-accordion-content">
-        <div class="htp-mechanic">
-          <strong>Crystal Energy</strong>
-          <p>
-            The Clanker has a time crystal that needs to be depleated before you
-            can truely defeat them!
-          </p>
-        </div>
-        <div class="htp-mechanic">
-          <strong>Pause Anytime</strong>
-          <p>Need a break? Hit pause to freeze the action.</p>
-        </div>
+          <div class="htp-mechanic">
+            <strong>Crystal Energy</strong>
+            <p>
+              The Clanker has a time crystal that needs to be depleated before
+              you can truely defeat them!
+            </p>
+          </div>
+          <div class="htp-mechanic">
+            <strong>Pause Anytime</strong>
+            <p>Need a break? Hit pause to freeze the action.</p>
+          </div>
         </div>
       </div>
 
@@ -270,11 +268,7 @@
     <div id="game">
       <!-- Audio Button (Top Left) -->
       <button id="audio-toggle-combat" class="audio-toggle-btn">
-        <img
-          src="images/icon-musicnote.png"
-          alt="Audio"
-          class="audio-icon"
-        />
+        <img src="images/icon-musicnote.png" alt="Audio" class="audio-icon" />
       </button>
 
       <!-- Time Crystal Display (Top Center) -->
@@ -288,7 +282,12 @@
         <div id="player-container">
           <div id="player-hearts"></div>
           <div id="player-box">
-            <img id="player-img" src="images/player-default.png" alt="Player" onerror="console.error('Missing image: ' + this.src)" />
+            <img
+              id="player-img"
+              src="images/player-default.png"
+              alt="Player"
+              onerror="console.error('Missing image: ' + this.src)"
+            />
           </div>
           <!-- Horizontal Timer Bar -->
           <div id="timer-bar-container">
@@ -354,7 +353,7 @@
       <button id="restart">Restart Game</button>
 
       <!-- Hidden Quit Button (for backwards compatibility) -->
-      <button id="quit-btn" style="display: none;">Quit</button>
+      <button id="quit-btn" style="display: none">Quit</button>
     </div>
 
     <!-- Victory Screen -->
@@ -429,6 +428,8 @@
       import { storyPanel } from "./story-panel.js";
       import { hasSeenStory, markStorySeen } from "./storage-manager.js";
       import { initResponsiveScaling } from "./responsive-scale.js";
+      import { SpriteSheet } from "./sprite-sheet.js";
+      import { getSpriteConfig } from "./sprites-config.js";
 
       // Initialize responsive scaling
       initResponsiveScaling();
@@ -436,29 +437,69 @@
       // Show loading screen
       loadingScreen.show();
 
+      // Set initial static logo
+      const logoContainer = document.getElementById("loading-logo-container");
+      logoContainer.innerHTML = `<img src="images/company-logo.png" alt="Company Logo" id="loading-logo" />`;
+
       // Simulate asset loading
       loadingScreen.simulateProgress(2000);
 
       // Wait for page to fully load
       window.addEventListener("load", async () => {
         // Complete loading and show start button
-        await loadingScreen.complete(() => {
-          // Check if this is the first time loading the game
-          if (!hasSeenStory()) {
-            // Show story panel over the loading screen
-            storyPanel.open(() => {
-              // Mark story as seen and hide loading screen
-              markStorySeen();
-              loadingScreen.hide();
-              // Initialize title screen after story is complete
-              initTitleScreen();
+        await loadingScreen.complete(
+          async () => {
+            // Switch to sprite animation
+            logoContainer.innerHTML = ""; // Clear static logo
+
+            const spriteConfig = getSpriteConfig("company-logo");
+            const logoSprite = new SpriteSheet(spriteConfig);
+
+            // Create sprite structure
+            const scaler = document.createElement("div");
+            scaler.style.transform = `scale(${logoSprite.scale})`;
+            scaler.style.transformOrigin = "center center";
+            logoContainer.appendChild(scaler);
+
+            const clipper = document.createElement("div");
+            clipper.className = "sprite-clipper";
+            clipper.style.width = `${logoSprite.frameContentWidth}px`;
+            clipper.style.height = `${logoSprite.frameContentHeight}px`;
+            scaler.appendChild(clipper);
+
+            const spriteImg = document.createElement("img");
+            spriteImg.src = logoSprite.imagePath;
+            clipper.appendChild(spriteImg);
+
+            // Wait for sprite to load, then play
+            await new Promise((resolve) => {
+              const loadCheck = setInterval(() => {
+                if (logoSprite.isLoaded) {
+                  clearInterval(loadCheck);
+                  logoSprite.play(clipper);
+                  resolve();
+                }
+              }, 50);
             });
-          } else {
-            // Hide loading screen and go straight to title screen
-            loadingScreen.hide();
-            initTitleScreen();
+          },
+          () => {
+            // Check if this is the first time loading the game
+            if (!hasSeenStory()) {
+              // Show story panel over the loading screen
+              storyPanel.open(() => {
+                // Mark story as seen and hide loading screen
+                markStorySeen();
+                loadingScreen.hide();
+                // Initialize title screen after story is complete
+                initTitleScreen();
+              });
+            } else {
+              // Hide loading screen and go straight to title screen
+              loadingScreen.hide();
+              initTitleScreen();
+            }
           }
-        });
+        );
       });
     </script>
   </body>

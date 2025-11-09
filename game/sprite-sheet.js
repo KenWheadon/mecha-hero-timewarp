@@ -65,9 +65,6 @@ export class SpriteSheet {
     }
     this.reset(); // Ensure state is clean before playing.
 
-    // Store element reference for pause/resume
-    this.lastElement = element;
-
     this.isPlaying = true;
 
     this.animationInterval = setInterval(() => {
@@ -121,6 +118,26 @@ export class SpriteSheet {
 
       if (element && this.isPlaying) this.applyToElement(element);
     }, this.frameDelay);
+  }
+
+  /**
+   * Pause the animation
+   */
+  pause() {
+    if (this.isPlaying) {
+      this.stop();
+      this.isPlaying = true; // Keep the state as playing, but interval is stopped
+    }
+  }
+
+  /**
+   * Resume a paused animation
+   */
+  resume() {
+    // Only resume if it was playing and there's no active interval
+    if (this.isPlaying && !this.animationInterval) {
+      this.play(this.currentElement); // Re-call play to restart the interval
+    }
   }
 
   /**
@@ -132,86 +149,6 @@ export class SpriteSheet {
       clearInterval(this.animationInterval);
       this.animationInterval = null;
     }
-  }
-
-  /**
-   * Pause the animation (keeps current frame)
-   */
-  pause() {
-    if (this.animationInterval) {
-      clearInterval(this.animationInterval);
-      this.animationInterval = null;
-    }
-    this.isPlaying = false;
-  }
-
-  /**
-   * Resume the animation from current frame
-   */
-  resume() {
-    if (this.isPlaying) return; // Already playing
-
-    this.isPlaying = true;
-
-    // Store reference to the element (we'll need it passed in)
-    if (!this.lastElement) {
-      console.warn("Cannot resume: no element reference stored");
-      return;
-    }
-
-    const element = this.lastElement;
-
-    this.animationInterval = setInterval(() => {
-      // Safety check: if element no longer exists, stop animation
-      if (element && !element.isConnected) {
-        this.stop();
-        return;
-      }
-
-      if (this.pingPong) {
-        // Ping pong mode: forward, backward, forward
-        this.currentFrame += this.direction;
-
-        // Check bounds
-        if (this.currentFrame >= this.totalFrames - 1) {
-          // Reached the end, go backward
-          this.direction = -1;
-          this.cycleCount++;
-        } else if (this.currentFrame <= 0) {
-          // Reached the beginning
-          if (this.cycleCount < 2) {
-            // Not done yet, go forward again
-            this.direction = 1;
-            this.cycleCount++;
-          } else {
-            // Completed forward-backward-forward, stop or loop
-            if (this.loop) {
-              this.cycleCount = 0;
-              this.direction = 1;
-              this.currentFrame = 0;
-            } else {
-              this.stop();
-              return;
-            }
-          }
-        }
-      } else {
-        // Standard mode
-        this.currentFrame++;
-
-        // Apply style updates for the new frame
-        if (this.currentFrame >= this.totalFrames) {
-          if (this.loop) {
-            this.currentFrame = 0;
-          } else {
-            this.stop();
-            return;
-          }
-        }
-      }
-
-      if (element && this.isPlaying) this.applyToElement(element);
-    }, this.frameDelay);
   }
 
   /**

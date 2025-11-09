@@ -105,6 +105,17 @@ export const SPRITE_CONFIGS = {
     gapX: 116, // Horizontal gap between frames
     gapY: 117, // Vertical gap between frames
   },
+  // Company logo for loading screen
+  "company-logo": createHitSpriteConfig(
+    "images/company-logo-spritesheet-1386-1818.png",
+    {
+      rows: 6, // Correct number of rows
+      cols: 6,
+      scale: 0.8, // Reduced scale to make it smaller
+      fps: 12,
+      pingPong: true, // Play forward, then backward, and repeat
+    }
+  ),
 };
 
 /**
