@@ -806,6 +806,7 @@ body.title-active::before {
   box-shadow: 20px 20px 0px #000;
   text-align: center;
   animation: slideIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transform-origin: center center;
 }
 
 #pause-title {
@@ -1248,6 +1249,7 @@ body.title-active::before {
   z-index: 10;
   box-shadow: 16px 16px 0px #000;
   color: #000;
+  transform-origin: center center;
 }
 
 #how-to-play h2 {
@@ -1557,6 +1559,7 @@ body.title-active::before {
   z-index: 10;
   box-shadow: 16px 16px 0px #000;
   color: #000;
+  transform-origin: center center;
 }
 
 #trophy-popup h2 {
@@ -1688,6 +1691,7 @@ body.title-active::before {
   box-shadow: 20px 20px 0px #000;
   color: #000;
   text-align: center;
+  transform-origin: center center;
 }
 
 #close-trophy-detail {
@@ -1873,6 +1877,7 @@ body.title-active::before {
   z-index: 20;
   max-width: 700px;
   width: 90%;
+  transform-origin: center center;
 }
 
 #story-panel-content {
@@ -2017,6 +2022,7 @@ body.title-active::before {
   z-index: 15;
   max-width: 500px;
   width: 90%;
+  transform-origin: center center;
 }
 
 #onboarding-content {
@@ -2581,11 +2587,9 @@ body.title-active::before {
 
 @keyframes slideIn {
   from {
-    transform: translateY(-100px) scale(0.8);
     opacity: 0;
   }
   to {
-    transform: translateY(0) scale(1);
     opacity: 1;
   }
 }

@@ -1,22 +1,50 @@
 // Responsive scaling system to ensure the game always fits on screen
 export function initResponsiveScaling() {
   let updateTimeout;
+  let titleLogoHeight = 200; // Estimated height after logo animation
 
   function updateScale() {
     const titleScreen = document.getElementById("title-screen");
     const gameScreen = document.getElementById("game");
     const victoryScreen = document.getElementById("victory-screen");
     const defeatScreen = document.getElementById("defeat-screen");
+    const htpModal = document.getElementById("how-to-play");
+    const trophyModal = document.getElementById("trophy-popup");
+    const trophyDetailModal = document.getElementById("trophy-detail-popup");
+    const storyPanel = document.getElementById("story-panel");
+    const onboardingPopup = document.getElementById("onboarding-popup");
+    const pauseOverlay = document.getElementById("pause-overlay");
+    const pausePopup = document.getElementById("pause-popup");
 
     // Get the viewport dimensions
     const viewportWidth = window.innerWidth;
     const viewportHeight = window.innerHeight;
 
-    // Determine which screen is visible
+    // Determine which screen/modal is visible
     let visibleScreen = null;
+    let isModal = false;
+    let isStoryPanel = false;
 
-    // Check for game over screens first (they're overlays)
-    if (victoryScreen && victoryScreen.style.display === "flex") {
+    // Check for modals first (in order of z-index priority)
+    if (storyPanel && storyPanel.style.display === "block") {
+      visibleScreen = storyPanel;
+      isStoryPanel = true;
+    } else if (pauseOverlay && pauseOverlay.classList.contains("show")) {
+      visibleScreen = pausePopup;
+      isModal = true;
+    } else if (trophyDetailModal && trophyDetailModal.style.display === "block") {
+      visibleScreen = trophyDetailModal;
+      isModal = true;
+    } else if (onboardingPopup && onboardingPopup.style.display === "block") {
+      visibleScreen = onboardingPopup;
+      isModal = true;
+    } else if (htpModal && htpModal.style.display === "block") {
+      visibleScreen = htpModal;
+      isModal = true;
+    } else if (trophyModal && trophyModal.style.display === "block") {
+      visibleScreen = trophyModal;
+      isModal = true;
+    } else if (victoryScreen && victoryScreen.style.display === "flex") {
       visibleScreen = victoryScreen.querySelector(".game-over-container");
     } else if (defeatScreen && defeatScreen.style.display === "flex") {
       visibleScreen = defeatScreen.querySelector(".game-over-container");
@@ -29,24 +57,52 @@ export function initResponsiveScaling() {
     if (!visibleScreen) return;
 
     // Reset scale temporarily to measure natural size
-    visibleScreen.style.transform = "scale(1)";
+    const currentTransform = visibleScreen.style.transform;
+    if (isModal) {
+      visibleScreen.style.transform = "translate(-50%, -50%) scale(1)";
+    } else {
+      visibleScreen.style.transform = "scale(1)";
+    }
 
-    // For game over containers, we need to wait a tick for the browser to calculate size
+    // Use requestAnimationFrame for smooth measurement
     requestAnimationFrame(() => {
       // Get the actual content dimensions
-      const contentWidth = visibleScreen.scrollWidth;
-      const contentHeight = visibleScreen.scrollHeight;
+      let contentWidth = visibleScreen.scrollWidth;
+      let contentHeight = visibleScreen.scrollHeight;
+
+      // Special handling for title screen - adjust for logo animation height
+      if (visibleScreen === titleScreen) {
+        const titleElement = document.getElementById("title");
+        const hasLogo = titleElement && titleElement.querySelector('img');
+
+        if (!hasLogo) {
+          // Pre-calculate assuming logo will appear (prevents shift)
+          const currentTitleHeight = titleElement ? titleElement.offsetHeight : 0;
+          const heightDiff = Math.max(0, titleLogoHeight - currentTitleHeight);
+          contentHeight += heightDiff;
+        } else {
+          // Logo is present, cache its height for future calculations
+          titleLogoHeight = titleElement.offsetHeight;
+        }
+      }
 
       // Calculate scale factors for both width and height
-      // Leave some margin (0.95) to prevent touching edges
-      const scaleX = (viewportWidth * 0.95) / contentWidth;
-      const scaleY = (viewportHeight * 0.95) / contentHeight;
+      // For modals, use more aggressive scaling (98% of viewport) to fill space better
+      // For game screens, use 95% to leave some breathing room
+      const margin = (isModal || isStoryPanel) ? 0.98 : 0.95;
+      const scaleX = (viewportWidth * margin) / contentWidth;
+      const scaleY = (viewportHeight * margin) / contentHeight;
 
       // Use the smaller scale to ensure everything fits, cap at 1 to prevent upscaling
       const scale = Math.min(scaleX, scaleY, 1);
 
       // Apply the scale transform
-      visibleScreen.style.transform = `scale(${scale})`;
+      // For modals with translate, preserve that transform
+      if (isModal || isStoryPanel) {
+        visibleScreen.style.transform = `translate(-50%, -50%) scale(${scale})`;
+      } else {
+        visibleScreen.style.transform = `scale(${scale})`;
+      }
     });
   }
 
@@ -76,13 +132,19 @@ export function initResponsiveScaling() {
   const gameScreen = document.getElementById("game");
   const victoryScreen = document.getElementById("victory-screen");
   const defeatScreen = document.getElementById("defeat-screen");
+  const htpModal = document.getElementById("how-to-play");
+  const trophyModal = document.getElementById("trophy-popup");
+  const trophyDetailModal = document.getElementById("trophy-detail-popup");
+  const storyPanel = document.getElementById("story-panel");
+  const onboardingPopup = document.getElementById("onboarding-popup");
+  const pauseOverlay = document.getElementById("pause-overlay");
 
   // Observe all screens for display changes
-  [titleScreen, gameScreen, victoryScreen, defeatScreen].forEach(screen => {
+  [titleScreen, gameScreen, victoryScreen, defeatScreen, htpModal, trophyModal, trophyDetailModal, storyPanel, onboardingPopup, pauseOverlay].forEach(screen => {
     if (screen) {
       observer.observe(screen, {
         attributes: true,
-        attributeFilter: ["style"],
+        attributeFilter: ["style", "class"],
         childList: true,
         subtree: true
       });
