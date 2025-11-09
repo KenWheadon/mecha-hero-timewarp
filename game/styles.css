@@ -692,7 +692,12 @@ body.title-active::before {
 .heart {
   width: 50px;
   height: 50px;
-  transition: all 0.2s ease;
+  transition: filter 0.3s ease, opacity 0.3s ease;
+}
+
+.heart.depleted {
+  filter: brightness(0);
+  opacity: 1; /* Ensure opacity is full for the silhouette */
 }
 
 /* FIGHT INFO */
@@ -1728,7 +1733,7 @@ body.title-active::before {
 #enemy-hearts .heart {
   width: 35px;
   height: 35px;
-  transition: opacity 0.3s ease;
+  transition: filter 0.3s ease, opacity 0.3s ease;
 }
 
 #enemy-container {
@@ -1748,12 +1753,14 @@ body.title-active::before {
 /* Message - position between crystals and combat area */
 #message {
   position: absolute;
-  top: 30%;
+  top: 150px; /* Positioned below the crystal display */
   left: 50%;
   transform: translateX(-50%);
   width: 80%;
   max-width: 600px;
   margin: 0;
+  padding-top: 10px;
+  z-index: 50; /* Ensure it's above the combat area but below popups */
 }
 
 /* Restart button - position at bottom */

@@ -92,7 +92,9 @@ const elements = {
   pauseResumeBtn: document.getElementById("pause-resume-btn"),
   pauseQuitBtn: document.getElementById("pause-quit-btn"),
   timewarpOverlay: document.getElementById("timewarp-overlay"),
-  timewarpAnimationContainer: document.getElementById("timewarp-animation-container"),
+  timewarpAnimationContainer: document.getElementById(
+    "timewarp-animation-container"
+  ),
   timewarpMessage: document.getElementById("timewarp-message"),
 };
 
@@ -187,7 +189,11 @@ function initHearts() {
 function updateHearts() {
   const hearts = elements.playerHearts.querySelectorAll(".heart");
   hearts.forEach((heart, i) => {
-    heart.style.opacity = i < gameState.hearts ? "1" : "0.3";
+    if (i < gameState.hearts) {
+      heart.classList.remove("depleted");
+    } else {
+      heart.classList.add("depleted");
+    }
   });
   // Update player image to match HP
   updatePlayerImage();
@@ -292,7 +298,11 @@ function updateEnemyHearts() {
     const heart = document.createElement("img");
     heart.className = "heart";
     heart.src = "images/heart.png";
-    heart.style.opacity = i < gameState.enemyHP ? "1" : "0.3";
+    if (i >= gameState.enemyHP) {
+      heart.classList.add("depleted");
+    } else {
+      heart.classList.remove("depleted");
+    }
     heart.onerror = () => {
       console.error("Missing image: images/heart.png");
     };
@@ -1026,10 +1036,20 @@ function animateTimewarpParticles() {
     // Draw particle with glow
     const glowSize = particle.size * 3;
     const gradient = timewarpParticleCtx.createRadialGradient(
-      particle.x, particle.y, 0,
-      particle.x, particle.y, glowSize
+      particle.x,
+      particle.y,
+      0,
+      particle.x,
+      particle.y,
+      glowSize
     );
-    gradient.addColorStop(0, particle.color + Math.floor(particle.alpha * pulse * 255).toString(16).padStart(2, "0"));
+    gradient.addColorStop(
+      0,
+      particle.color +
+        Math.floor(particle.alpha * pulse * 255)
+          .toString(16)
+          .padStart(2, "0")
+    );
     gradient.addColorStop(0.5, particle.color + "40");
     gradient.addColorStop(1, particle.color + "00");
 
@@ -1041,7 +1061,13 @@ function animateTimewarpParticles() {
     // Draw core
     timewarpParticleCtx.fillStyle = particle.color;
     timewarpParticleCtx.beginPath();
-    timewarpParticleCtx.arc(particle.x, particle.y, particle.size * pulse, 0, Math.PI * 2);
+    timewarpParticleCtx.arc(
+      particle.x,
+      particle.y,
+      particle.size * pulse,
+      0,
+      Math.PI * 2
+    );
     timewarpParticleCtx.fill();
   });
 
@@ -1098,13 +1124,17 @@ function showTimeWarp() {
   elements.timewarpAnimationContainer.appendChild(timewarpParticleCanvas);
 
   // Set canvas size to match container
-  const containerRect = elements.timewarpAnimationContainer.getBoundingClientRect();
+  const containerRect =
+    elements.timewarpAnimationContainer.getBoundingClientRect();
   timewarpParticleCanvas.width = containerRect.width || 450;
   timewarpParticleCanvas.height = containerRect.height || 450;
   timewarpParticleCtx = timewarpParticleCanvas.getContext("2d");
 
   // Initialize particles
-  initTimewarpParticles(timewarpParticleCanvas.width, timewarpParticleCanvas.height);
+  initTimewarpParticles(
+    timewarpParticleCanvas.width,
+    timewarpParticleCanvas.height
+  );
 
   // Create sprite structure: scaler -> clipper -> img
   const scaler = document.createElement("div");
@@ -1173,7 +1203,10 @@ function showTimeWarp() {
   };
 
   // Hide popup and advance to next fight after duration
-  timewarpTimeoutId = setTimeout(completeTimewarp, GAME_CONFIG.TIME_WARP_DURATION);
+  timewarpTimeoutId = setTimeout(
+    completeTimewarp,
+    GAME_CONFIG.TIME_WARP_DURATION
+  );
 }
 
 // Game over
@@ -1251,7 +1284,11 @@ function togglePause() {
     elements.pauseOverlay.classList.remove("show");
 
     // Resume timewarp if it was paused during timewarp
-    if (isInTimewarp && timewarpTimeoutId === null && timewarpRemainingTime !== null) {
+    if (
+      isInTimewarp &&
+      timewarpTimeoutId === null &&
+      timewarpRemainingTime !== null
+    ) {
       // Check if sprite was still loading when paused
       if (timewarpSprite && !timewarpSprite.isLoaded && timewarpClipper) {
         // Resume the loading interval

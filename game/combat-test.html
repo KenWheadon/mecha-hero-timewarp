@@ -150,6 +150,10 @@
         object-fit: contain;
       }
 
+      .heart.depleted {
+        filter: brightness(0);
+      }
+
       #player-box {
         flex: 1;
         width: 100%;
@@ -331,7 +335,7 @@
       /* Message Text */
       #message {
         position: absolute;
-        bottom: 50px;
+        top: 100px; /* Positioned below the crystal display */
         left: 50%;
         transform: translateX(-50%);
         font-size: 24px;
@@ -339,7 +343,7 @@
         color: #fff;
         text-shadow: 3px 3px 0 #000;
         text-align: center;
-        width: 80%;
+        width: 90%;
       }
 
       /* Test Controls */
@@ -471,7 +475,11 @@
 
         // Update heart opacity
         hearts.forEach((heart, index) => {
-          heart.style.opacity = index < hp ? "1" : "0.3";
+          if (index < hp) {
+            heart.classList.remove("depleted");
+          } else {
+            heart.classList.add("depleted");
+          }
         });
       }
 
