@@ -13,6 +13,7 @@
     <!-- Loading Screen -->
     <div id="loading-screen">
       <div id="loading-content">
+        <div id="producer-text">Produced by Weird Demon Games</div>
         <div id="loading-logo-container"></div>
         <div id="loading-progress-bar">
           <div id="loading-progress-fill"></div>
@@ -236,6 +237,52 @@
       </div>
     </div>
 
+    <!-- Credits Popup -->
+    <div id="credits-popup">
+      <button id="close-credits">&times;</button>
+      <h2>Credits</h2>
+      <div id="credits-content">
+        <div class="credit-section">
+          <div class="credit-role">Game Designer / Producer</div>
+          <div class="credit-name">Ken Wheadon</div>
+        </div>
+        <div class="credit-section">
+          <div class="credit-role">Logo</div>
+          <div class="credit-name">Jessy-Jean Kafka</div>
+        </div>
+        <div class="credit-section">
+          <div class="credit-role">Background Music</div>
+          <div class="credit-name">Suno 4.5</div>
+        </div>
+        <div class="credit-section">
+          <div class="credit-role">Audio Effects</div>
+          <div class="credit-name">Ken Wheadon</div>
+        </div>
+        <div class="credit-section">
+          <div class="credit-role">QA</div>
+          <div class="credit-name">Ken Wheadon</div>
+        </div>
+        <div class="credit-section">
+          <div class="credit-role">Code</div>
+          <div class="credit-name">Grok, Claude, Gemini</div>
+        </div>
+        <div class="credit-section">
+          <div class="credit-role">Art</div>
+          <div class="credit-name">ChatGPT, Seedream</div>
+        </div>
+        <div class="credit-section">
+          <div class="credit-role">Animations</div>
+          <div class="credit-name">Ludo</div>
+        </div>
+        <div class="credit-section">
+          <div class="credit-role">Other Tools</div>
+          <div class="credit-name">
+            tinyPNG, Squoosh, piskelapp, VS Code, Github, online-voice-recorder
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Pause Overlay and Popup -->
     <div id="pause-overlay">
       <div id="pause-popup">
@@ -430,6 +477,8 @@
       import { initResponsiveScaling } from "./responsive-scale.js";
       import { SpriteSheet } from "./sprite-sheet.js";
       import { getSpriteConfig } from "./sprites-config.js";
+      import { creditsPopup } from "./credits-popup.js";
+      import { visibilityManager } from "./visibility-manager.js";
 
       // Initialize responsive scaling
       initResponsiveScaling();
@@ -440,6 +489,9 @@
       // Set initial static logo
       const logoContainer = document.getElementById("loading-logo-container");
       logoContainer.innerHTML = `<img src="images/company-logo.png" alt="Company Logo" id="loading-logo" />`;
+
+      // Monitor the CSS animation for the logo container
+      visibilityManager.monitorCSSAnimation(logoContainer);
 
       // Preload critical game assets (victory and defeat sprites)
       const criticalAssets = [
@@ -482,10 +534,18 @@
                 if (logoSprite.isLoaded) {
                   clearInterval(loadCheck);
                   logoSprite.play(clipper);
+                  // Monitor visibility to pause/resume animation
+                  visibilityManager.monitorSpriteAnimation(
+                    logoContainer,
+                    logoSprite
+                  );
                   resolve();
                 }
               }, 50);
             });
+
+            // Attach credits popup to logo
+            creditsPopup.attachToLogo(logoContainer);
           },
           () => {
             // Check if this is the first time loading the game

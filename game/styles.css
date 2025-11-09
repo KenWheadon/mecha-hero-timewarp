@@ -48,6 +48,16 @@
   width: 90%;
 }
 
+#producer-text {
+  font-size: 22px;
+  color: var(--color-text);
+  text-shadow: 3px 3px 0px #000000;
+  letter-spacing: 2px;
+  opacity: 0; /* Hidden by default */
+  transition: opacity 1s ease-in-out; /* Smooth fade-in */
+  margin-bottom: 20px; /* Space between text and logo */
+}
+
 #loading-logo {
   width: 200px;
   height: auto;
@@ -62,6 +72,10 @@
   justify-content: center;
   align-items: center;
   animation: logoFloat 2s ease-in-out infinite;
+}
+
+#producer-text.visible {
+  opacity: 1; /* Make it visible */
 }
 
 @keyframes logoFloat {
@@ -2378,6 +2392,109 @@ body.title-active::before {
 
 #trophy-detail-flavor.locked {
   display: none;
+}
+
+/* CREDITS POPUP */
+#credits-popup {
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--color-card);
+  border: var(--border-thick) solid #000;
+  padding: 40px;
+  max-width: 600px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+  z-index: 10001;
+  box-shadow: 16px 16px 0px #000;
+  color: #000;
+  transform-origin: center center;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+#credits-popup h2 {
+  margin-top: 0;
+  font-size: 42px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: #000;
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-accent) 100%);
+  padding: 20px;
+  border: var(--border-medium) solid #000;
+  box-shadow: 8px 8px 0px #000;
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+#close-credits {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: var(--color-danger);
+  border: var(--border-medium) solid #000;
+  color: #000;
+  font-size: 28px;
+  font-weight: 900;
+  cursor: pointer;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 4px 4px 0px #000;
+  transition: all 0.15s ease;
+  font-family: inherit;
+}
+
+#close-credits:hover {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0px #000;
+  background: var(--color-warning);
+}
+
+#close-credits:active {
+  transform: translate(4px, 4px);
+  box-shadow: none;
+}
+
+#credits-content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.credit-section {
+  background: #f0f0f0;
+  border: var(--border-medium) solid #000;
+  padding: 20px;
+  box-shadow: 6px 6px 0px #000;
+  transition: all 0.15s ease;
+}
+
+.credit-section:hover {
+  transform: translate(2px, 2px);
+  box-shadow: 4px 4px 0px #000;
+}
+
+.credit-role {
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #666;
+  margin-bottom: 8px;
+}
+
+.credit-name {
+  font-size: 20px;
+  font-weight: 900;
+  color: #000;
+  letter-spacing: 0.5px;
 }
 
 /* Trophy Notification */

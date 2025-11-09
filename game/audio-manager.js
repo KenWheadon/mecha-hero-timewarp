@@ -6,6 +6,7 @@ class AudioManager {
       titleIntro: null,
       titleMain: null,
       combat: null,
+      infinity: null,
     };
     this.soundEffects = {
       btnClick: null,
@@ -32,6 +33,7 @@ class AudioManager {
       titleIntro: 0.3,
       titleMain: 0.3,
       combat: 0.3,
+      infinity: 0.3,
     };
     // Volume settings for each sound effect (0.0 to 1.0)
     this.volumes = {
@@ -72,6 +74,7 @@ class AudioManager {
     this.tracks.titleIntro = new Audio("audio/intro-song.mp3");
     this.tracks.titleMain = new Audio("audio/intro-2.mp3");
     this.tracks.combat = new Audio("audio/main-audio.mp3");
+    this.tracks.infinity = new Audio("audio/infi-audio.mp3");
 
     // Set all tracks to loop and apply volume settings
     Object.keys(this.tracks).forEach((key) => {

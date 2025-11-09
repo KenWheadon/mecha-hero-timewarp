@@ -6,6 +6,7 @@ export class LoadingScreen {
       progressFill: document.getElementById("loading-progress-fill"),
       progressText: document.getElementById("loading-progress-text"),
       startButton: document.getElementById("loading-start-btn"),
+      producerText: document.getElementById("producer-text"),
     };
 
     this.minimumLoadTime = 3000; // 3 seconds
@@ -88,6 +89,11 @@ export class LoadingScreen {
     // Hide progress elements
     this.elements.progressBar.style.display = "none";
     this.elements.progressText.style.display = "none";
+
+    // Show producer text with fade-in
+    if (this.elements.producerText) {
+      this.elements.producerText.classList.add("visible");
+    }
 
     // Show and setup start button
     this.elements.startButton.style.display = "block";

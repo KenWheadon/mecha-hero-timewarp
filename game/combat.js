@@ -168,8 +168,12 @@ export function initGame(isInfiniteMode = false) {
     eventListenersInitialized = true;
   }
 
-  // Start combat audio
-  audioManager.play("combat");
+  // Start combat audio (infinity mode uses different track)
+  if (isInfiniteMode) {
+    audioManager.play("infinity");
+  } else {
+    audioManager.play("combat");
+  }
 }
 
 // Initialize hearts display (player hearts)
@@ -1391,11 +1395,12 @@ function restartGame() {
     gameOverScreen.hide();
   }
 
-  // Restart combat music
-  audioManager.play("combat");
+  // Restart combat music (use the current mode's track)
+  const wasInfiniteMode = gameState.isInfiniteMode;
+  audioManager.play(wasInfiniteMode ? "infinity" : "combat");
 
   gameState = createInitialGameState();
-  gameState.isInfiniteMode = false; // Explicitly reset to normal mode
+  gameState.isInfiniteMode = wasInfiniteMode;
   initHearts();
   setupFight();
 }

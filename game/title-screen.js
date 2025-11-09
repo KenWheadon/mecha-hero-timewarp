@@ -22,6 +22,7 @@ import {
   trackLogoClick,
   trackEyeballShower,
 } from "./trophy-manager.js";
+import { visibilityManager } from "./visibility-manager.js";
 
 // Cache DOM elements
 const elements = {
@@ -44,6 +45,7 @@ let howToPlayModal;
 // For logo animation
 let logoSpriteSheet = null;
 let logoAnimationInterval = null;
+let logoVisibilityKey = null;
 
 // Helper function to add both click and touch event listeners
 function addTouchAndClickListener(element, handler) {
@@ -235,6 +237,10 @@ function onStartGame() {
     clearInterval(logoAnimationInterval);
     logoAnimationInterval = null;
   }
+  if (logoVisibilityKey) {
+    visibilityManager.stopMonitoring(logoVisibilityKey);
+    logoVisibilityKey = null;
+  }
 }
 
 // Handle infinite mode button
@@ -254,6 +260,10 @@ function onStartInfiniteMode() {
   if (logoAnimationInterval) {
     clearInterval(logoAnimationInterval);
     logoAnimationInterval = null;
+  }
+  if (logoVisibilityKey) {
+    visibilityManager.stopMonitoring(logoVisibilityKey);
+    logoVisibilityKey = null;
   }
 }
 
@@ -316,6 +326,12 @@ function startTitleGlitch() {
         // Play the animation (it will loop based on its config)
         // We pass the CLIPPER to the play method, as it contains the img
         logoSpriteSheet.play(clipper);
+
+        // Monitor visibility to pause/resume animation when not visible
+        logoVisibilityKey = visibilityManager.monitorSpriteAnimation(
+          elements.title,
+          logoSpriteSheet
+        );
       };
 
       // Add click and touch event to the title container which now holds the sprite
@@ -341,9 +357,19 @@ function onLogoClick() {
     clearInterval(logoAnimationInterval);
     logoAnimationInterval = null;
   }
+  if (logoVisibilityKey) {
+    visibilityManager.stopMonitoring(logoVisibilityKey);
+    logoVisibilityKey = null;
+  }
   logoSpriteSheet = null;
   elements.title.innerHTML =
     '<img id="logo-img" src="images/logo-thick.png" alt="MECHA HERO" class="logo-pulsing" style="max-width: 30%; height: auto;" />';
+
+  // Monitor the CSS pulsing animation
+  const newLogoImg = document.getElementById("logo-img");
+  if (newLogoImg) {
+    logoVisibilityKey = visibilityManager.monitorCSSAnimation(newLogoImg);
+  }
 
   audioManager.play("titleMain");
 }

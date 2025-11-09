@@ -4,7 +4,8 @@
       "Bash(dir:*)",
       "Bash(python -m http.server:*)",
       "Bash(node:*)",
-      "Bash(start chrome index.html)"
+      "Bash(start chrome index.html)",
+      "Bash(findstr:*)"
     ],
     "deny": [],
     "ask": []
