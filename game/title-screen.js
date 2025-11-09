@@ -288,6 +288,8 @@ function startTitleGlitch() {
       const scaler = document.createElement("div");
       // This scale makes the sprite visually match the original logo's size
       scaler.style.transformOrigin = "center center";
+      // Add pop-in animation
+      scaler.style.animation = "logoPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)";
       elements.title.appendChild(scaler);
 
       // 2. The CLIPPER container. Sized to one frame, clips overflow.
