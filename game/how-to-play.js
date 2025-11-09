@@ -10,6 +10,7 @@ export class HowToPlay {
       modal: document.getElementById("how-to-play"),
       closeBtn: document.getElementById("close-htp"),
       viewStoryBtn: document.getElementById("view-story-btn"),
+      accordionHeaders: document.querySelectorAll(".htp-accordion-header"),
     };
 
     // Bind methods to preserve 'this' context
@@ -20,6 +21,7 @@ export class HowToPlay {
     this.handleViewStoryHover = this.handleViewStoryHover.bind(this);
 
     this.setupEventListeners();
+    this.setupAccordion();
   }
 
   // Helper function to add both click and touch event listeners
@@ -79,6 +81,49 @@ export class HowToPlay {
     // Add hover sound effect to buttons
     this.elements.closeBtn.addEventListener("mouseenter", this.handleCloseHover);
     this.elements.viewStoryBtn.addEventListener("mouseenter", this.handleViewStoryHover);
+  }
+
+  setupAccordion() {
+    this.elements.accordionHeaders.forEach((header) => {
+      this.addTouchAndClickListener(header, () => {
+        const section = header.parentElement;
+        const content = section.querySelector(".htp-accordion-content");
+        const icon = header.querySelector(".htp-accordion-icon");
+        const isOpen = section.classList.contains("active");
+
+        // Play sound effect
+        audioManager.playSoundEffect("btnClick");
+
+        // Close all other sections
+        this.elements.accordionHeaders.forEach((otherHeader) => {
+          if (otherHeader !== header) {
+            const otherSection = otherHeader.parentElement;
+            const otherContent = otherSection.querySelector(".htp-accordion-content");
+            const otherIcon = otherHeader.querySelector(".htp-accordion-icon");
+
+            otherSection.classList.remove("active");
+            otherContent.style.maxHeight = null;
+            otherIcon.style.transform = "rotate(0deg)";
+          }
+        });
+
+        // Toggle current section
+        if (isOpen) {
+          section.classList.remove("active");
+          content.style.maxHeight = null;
+          icon.style.transform = "rotate(0deg)";
+        } else {
+          section.classList.add("active");
+          content.style.maxHeight = content.scrollHeight + "px";
+          icon.style.transform = "rotate(180deg)";
+        }
+      });
+
+      // Add hover sound effect
+      header.addEventListener("mouseenter", () => {
+        audioManager.playSoundEffect("btnHover");
+      });
+    });
   }
 
   open() {

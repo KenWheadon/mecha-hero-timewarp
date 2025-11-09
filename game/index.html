@@ -61,15 +61,12 @@
       <button id="close-htp">&times;</button>
       <h2>How to Play</h2>
 
-      <div class="htp-intro">
-        <p>
-          Counter the enemy mecha's attacks before time runs out! Each fight
-          gets harder with more poses and less time.
-        </p>
-      </div>
-
-      <div class="htp-section">
-        <h3>Basic Gameplay</h3>
+      <div class="htp-section htp-accordion active">
+        <h3 class="htp-accordion-header">
+          <span>Basic Gameplay</span>
+          <span class="htp-accordion-icon" style="transform: rotate(180deg);">▼</span>
+        </h3>
+        <div class="htp-accordion-content" style="max-height: 1000px;">
         <div class="htp-basic-grid">
           <div class="htp-card">
             <div class="htp-icon">
@@ -107,10 +104,15 @@
             </div>
           </div>
         </div>
+        </div>
       </div>
 
-      <div class="htp-section">
-        <h3>Fight Progression</h3>
+      <div class="htp-section htp-accordion">
+        <h3 class="htp-accordion-header">
+          <span>Fight Progression</span>
+          <span class="htp-accordion-icon">▼</span>
+        </h3>
+        <div class="htp-accordion-content">
         <div class="htp-fight-grid">
           <div class="htp-fight-card fight-1">
             <div class="fight-number">Fight 1</div>
@@ -137,10 +139,15 @@
             <div class="fight-detail">2s Timer</div>
           </div>
         </div>
+        </div>
       </div>
 
-      <div class="htp-section">
-        <h3>Special Mechanics</h3>
+      <div class="htp-section htp-accordion">
+        <h3 class="htp-accordion-header">
+          <span>Special Mechanics</span>
+          <span class="htp-accordion-icon">▼</span>
+        </h3>
+        <div class="htp-accordion-content">
         <div class="htp-mechanic">
           <strong>Crystal Energy</strong>
           <p>
@@ -151,6 +158,7 @@
         <div class="htp-mechanic">
           <strong>Pause Anytime</strong>
           <p>Need a break? Hit pause to freeze the action.</p>
+        </div>
         </div>
       </div>
 

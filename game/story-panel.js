@@ -6,42 +6,42 @@ const STORY_PANELS = [
   {
     id: 1,
     image: "images/story0.jpg",
-    text: "It's the year 2147, and most of humanity has either gone cyborg or full on clanker.",
+    text: "It's the year 2147. Humanity's evolved and most folks are half-cyborg like me. And the rest? Full-on heartless clankers made of nothing but chrome and circuits. But who cares about a history lession when it's LUNCHTIME...",
   },
   {
     id: 2,
     image: "images/story1.jpg",
-    text: "I'm in the lunchroom ready to eat up my tasty lunch.",
+    text: "Check it out! One beautiful synth-ham sandwich and an ice-cold OJ juicebox. Nothing like chowing down to reset the energy levels. Life is GOOD, or at least it was...",
   },
   {
     id: 3,
     image: "images/story2.jpg",
-    text: "A clanker busts in and starts cutting up my sandwich, then eats BOTH halves.",
+    text: "Then THIS clanker barges in, sword already out and slices my sandwich clean in half. Just when I was gonna protest about sharing MY sandwich he steps forward and inhales BOTH pieces like a vacuum! The AUDACITY!",
   },
   {
     id: 4,
     image: "images/story3.jpg",
-    text: "Then you know what? He drank my juice too!",
+    text: "Oh, and you know that chrome-dome he wasn't done either. He grabbed my juice box and drained it dry. I couldn't get another OJ even if I wanted, they only had grape and apple left!",
   },
   {
     id: 5,
     image: "images/story4.jpg",
-    text: "I was getting all sad but then he pulled out this weird crystal and said 'don't worry, your food's not gone for good' and blue light came out of the crystal.",
+    text: "I'm sitting there ready to cry when he whips out this glowing blue crystal. 'Chill out, cyborg baby' he says. 'Your food's not gone - just in the past.' Then WHOOSH—the crystal explodes with energy and I start to see something too good to be true!",
   },
   {
     id: 6,
     image: "images/story5.jpg",
-    text: "Holy smokes, there was my sandwich and juice, all good as new.",
+    text: "HOLY SMOKES. My sandwich and juice are back, good as new. Just floating there all perfect and delicious-looking again. This is amazing!",
   },
   {
     id: 7,
     image: "images/story6.jpg",
-    text: "Then he ate them again. I was so pissed.",
+    text: "Then he ate them again, and laughed while doing it. It's one thing to steal my lunch once, BUT TWICE? That's it, I officially LOST IT!",
   },
   {
     id: 8,
     image: "images/story7.jpg",
-    text: "Now it's time for payback!",
+    text: "PAYBACK TIME! Nobody messes with my lunchtime vibes and gets away with it! Time to introduce this tin can to my cybernetic bat!",
   },
 ];
 
