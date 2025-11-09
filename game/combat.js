@@ -241,10 +241,13 @@ function setupFight() {
   updateEnemyHearts();
   updateCrystalDisplay();
 
-  // Enable/disable attack buttons based on available attacks
+  // Show/hide attack buttons based on available attacks
   elements.attacks.forEach((btn) => {
     const action = btn.dataset.action;
-    btn.disabled = !gameState.availableAttacks.includes(action);
+    const isAvailable = gameState.availableAttacks.includes(action);
+    btn.disabled = !isAvailable;
+    // Hide buttons that are not available instead of showing them as locked
+    btn.style.display = isAvailable ? "flex" : "none";
   });
 
   // Check for first-time onboarding popup (skip in infinite mode)
@@ -511,9 +514,9 @@ function startTimer() {
 
     // Update color based on percentage
     elements.timerBarFill.classList.remove("warning", "danger");
-    if (percentage <= 10) {
+    if (percentage <= 33) {
       elements.timerBarFill.classList.add("danger");
-    } else if (percentage <= 30) {
+    } else if (percentage <= 66) {
       elements.timerBarFill.classList.add("warning");
     }
 

@@ -1418,23 +1418,18 @@ body.title-active::before {
 #timer-bar-fill {
   width: 100%;
   height: 100%;
-  background: linear-gradient(
-    to right,
-    var(--color-primary) 0%,
-    var(--color-warning) 50%,
-    var(--color-primary) 100%
-  );
+  background: #ffff99; /* Light Yellow */
   transition: width 0.1s linear, background 0.3s ease;
   position: absolute;
   left: 0;
 }
 
 #timer-bar-fill.warning {
-  background: linear-gradient(to right, var(--color-warning) 0%, #ffaa00 100%);
+  background: #ffcc99; /* Light Orange */
 }
 
 #timer-bar-fill.danger {
-  background: linear-gradient(to right, var(--color-danger) 0%, #ff6600 100%);
+  background: #ff9999; /* Light Red */
   animation: pulse-red 0.5s infinite;
 }
 
@@ -1469,11 +1464,14 @@ body.title-active::before {
   width: 15%;
   min-width: 80px;
   opacity: 0;
-  transition: opacity 0.2s ease;
+  transform: translateX(-200px);
+  transition: opacity 0.4s ease,
+    transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 #defense-buttons.show {
   opacity: 1;
+  transform: translateX(0);
 }
 
 #defense-buttons .attack-btn {
