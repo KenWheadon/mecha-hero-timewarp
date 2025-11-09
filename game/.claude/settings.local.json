@@ -3,7 +3,8 @@
     "allow": [
       "Bash(dir:*)",
       "Bash(python -m http.server:*)",
-      "Bash(node:*)"
+      "Bash(node:*)",
+      "Bash(start chrome index.html)"
     ],
     "deny": [],
     "ask": []

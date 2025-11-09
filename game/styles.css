@@ -1304,7 +1304,7 @@ body.title-active::before {
   text-align: center;
 }
 
-#how-to-play h3 {
+#how-to-play h3:not(.htp-accordion-header) {
   font-size: 24px;
   font-weight: 900;
   text-transform: uppercase;
@@ -1342,8 +1342,7 @@ body.title-active::before {
 
 /* Accordion Styles */
 .htp-accordion {
-  margin-bottom: 8px;
-  overflow: hidden;
+  margin-bottom: 20px;
 }
 
 .htp-accordion-header {
@@ -1352,13 +1351,34 @@ body.title-active::before {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 15px 0;
-  margin: 0;
-  transition: opacity 0.2s ease;
+  padding: 15px 20px;
+  margin: 0 0 12px 0;
+  background: linear-gradient(135deg, var(--color-warning) 0%, #ffcc00 100%);
+  border: var(--border-medium) solid #000;
+  box-shadow: 8px 8px 0px #000;
+  transition: all 0.15s ease;
+  color: #000;
+  font-size: 24px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-family: "Courier New", "Courier", monospace;
+  position: relative;
+  z-index: 1;
+  /* Touch optimizations */
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 }
 
 .htp-accordion-header:hover {
-  opacity: 0.7;
+  transform: translate(4px, 4px);
+  box-shadow: 4px 4px 0px #000;
+  background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-primary) 100%);
+}
+
+.htp-accordion-header:active {
+  transform: translate(8px, 8px);
+  box-shadow: none;
 }
 
 .htp-accordion-icon {
@@ -1374,6 +1394,7 @@ body.title-active::before {
   padding: 0;
   opacity: 0;
   visibility: hidden;
+  margin-top: 0;
 }
 
 .htp-accordion.active .htp-accordion-content {
