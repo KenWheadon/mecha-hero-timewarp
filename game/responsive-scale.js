@@ -24,6 +24,7 @@ export function initResponsiveScaling() {
     let visibleScreen = null;
     let isModal = false;
     let isStoryPanel = false;
+    let isPausePopup = false;
 
     // Check for modals first (in order of z-index priority)
     if (storyPanel && storyPanel.style.display === "block") {
@@ -31,6 +32,7 @@ export function initResponsiveScaling() {
       isStoryPanel = true;
     } else if (pauseOverlay && pauseOverlay.classList.contains("show")) {
       visibleScreen = pausePopup;
+      isPausePopup = true;
       isModal = true;
     } else if (trophyDetailModal && trophyDetailModal.style.display === "block") {
       visibleScreen = trophyDetailModal;
@@ -58,9 +60,11 @@ export function initResponsiveScaling() {
 
     // Reset scale temporarily to measure natural size
     const currentTransform = visibleScreen.style.transform;
-    if (isModal) {
+    if (isModal && !isPausePopup) {
+      // Modals with translate(-50%, -50%) positioning
       visibleScreen.style.transform = "translate(-50%, -50%) scale(1)";
     } else {
+      // Regular elements or pause popup (centered by flex)
       visibleScreen.style.transform = "scale(1)";
     }
 
@@ -98,7 +102,8 @@ export function initResponsiveScaling() {
 
       // Apply the scale transform
       // For modals with translate, preserve that transform
-      if (isModal || isStoryPanel) {
+      // Pause popup is centered by flex, so it doesn't need translate
+      if ((isModal || isStoryPanel) && !isPausePopup) {
         visibleScreen.style.transform = `translate(-50%, -50%) scale(${scale})`;
       } else {
         visibleScreen.style.transform = `scale(${scale})`;
