@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Combat UI Test - Mecha Hero</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Arial", sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        overflow: hidden;
+      }
+
+      #combat-container {
+        width: 90vw;
+        max-width: 1200px;
+        height: 90vh;
+        max-height: 800px;
+        position: relative;
+        background: rgba(255, 255, 255, 0.1);
+        border: 4px solid #000;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+      }
+
+      /* Top UI Elements */
+      #audio-btn {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        width: 70px;
+        height: 70px;
+        background: #00ff00;
+        border: 4px solid #000;
+        cursor: pointer;
+        transition: transform 0.2s;
+        z-index: 100;
+      }
+
+      #audio-btn:hover {
+        transform: scale(1.1);
+      }
+
+      #audio-btn img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        padding: 10px;
+      }
+
+      #pause-btn {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        padding: 15px 30px;
+        background: #ff0000;
+        color: #fff;
+        border: 4px solid #000;
+        font-size: 24px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: transform 0.2s;
+        text-transform: uppercase;
+        z-index: 100;
+      }
+
+      #pause-btn:hover {
+        transform: scale(1.05);
+      }
+
+      /* Time Crystal Display */
+      #crystal-display {
+        position: absolute;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        gap: 15px;
+        align-items: center;
+        z-index: 100;
+      }
+
+      .crystal-item {
+        width: 50px;
+        height: 50px;
+        position: relative;
+      }
+
+      .crystal-item img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        filter: drop-shadow(0 0 8px rgba(0, 255, 255, 0.8));
+      }
+
+      .crystal-item.depleted img {
+        filter: brightness(0);
+      }
+
+      .infinite-symbol {
+        font-size: 40px;
+        color: #00ffff;
+        font-weight: bold;
+        text-shadow: 0 0 10px #00ffff, 3px 3px 0 #000;
+      }
+
+      /* Combat Area */
+      #combat-area {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 95%;
+        height: 60%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+      }
+
+      /* Player Container */
+      #player-container {
+        width: 25%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+      }
+
+      #player-hearts {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+
+      .heart {
+        width: 40px;
+        height: 40px;
+        object-fit: contain;
+      }
+
+      #player-box {
+        flex: 1;
+        width: 100%;
+        background: #fff;
+        border: 6px solid #000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        overflow: hidden;
+      }
+
+      #player-img {
+        max-width: 90%;
+        max-height: 90%;
+        object-fit: contain;
+        image-rendering: pixelated;
+      }
+
+      /* Defense Buttons */
+      #defense-buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        justify-content: center;
+        width: 15%;
+        margin-top: 8%;
+      }
+
+      .defense-btn {
+        height: 80px;
+        background: #ffff00;
+        border: 5px solid #000;
+        cursor: pointer;
+        transition: all 0.2s;
+        position: relative;
+        box-shadow: 0 4px 0 #000;
+      }
+
+      .defense-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 7px 0 #000, 0 0 20px rgba(255, 255, 0, 0.6);
+      }
+
+      .defense-btn:active {
+        transform: translateY(2px);
+        box-shadow: 0 2px 0 #000;
+      }
+
+      .defense-btn img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        padding: 10px;
+      }
+
+      .defense-btn:disabled {
+        opacity: 0.3;
+        cursor: not-allowed;
+      }
+
+      .defense-btn:disabled:hover {
+        transform: none;
+        box-shadow: 0 4px 0 #000;
+      }
+
+      /* Enemy Container */
+      #enemy-section {
+        width: 60%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+      }
+
+      #enemy-hearts {
+        display: flex;
+        gap: 8px;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+
+      #enemy-hearts .heart {
+        width: 35px;
+        height: 35px;
+      }
+
+      #enemy-box {
+        flex: 1;
+        width: 100%;
+        background: #fff;
+        border: 6px solid #000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        overflow: hidden;
+      }
+
+      #enemy-img {
+        max-width: 90%;
+        max-height: 90%;
+        object-fit: contain;
+        image-rendering: pixelated;
+      }
+
+      /* Horizontal Timer Bar */
+      #timer-bar-container {
+        width: 100%;
+        height: 50px;
+        background: #333;
+        border: 5px solid #000;
+        position: relative;
+        display: flex;
+        overflow: hidden;
+        flex-shrink: 0;
+      }
+
+      #timer-bar-fill {
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          to right,
+          #00ff00 0%,
+          #ffff00 50%,
+          #00ff00 100%
+        );
+        transition: width 0.1s linear, background 0.3s ease;
+        position: absolute;
+        left: 0;
+      }
+
+      #timer-bar-fill.warning {
+        background: linear-gradient(to right, #ffff00 0%, #ffaa00 100%);
+      }
+
+      #timer-bar-fill.danger {
+        background: linear-gradient(to right, #ff0000 0%, #ff6600 100%);
+        animation: pulse-red 0.5s infinite;
+      }
+
+      @keyframes pulse-red {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.7;
+        }
+      }
+
+      #timer-text {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 28px;
+        font-weight: bold;
+        color: #fff;
+        text-shadow: 3px 3px 0 #000;
+        z-index: 10;
+      }
+
+      /* Instruction Text */
+      #instruction {
+        position: absolute;
+        bottom: 100px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 32px;
+        font-weight: bold;
+        color: #fff;
+        text-shadow: 3px 3px 0 #000;
+        text-align: center;
+        width: 80%;
+      }
+
+      /* Message Text */
+      #message {
+        position: absolute;
+        bottom: 50px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 24px;
+        font-weight: bold;
+        color: #fff;
+        text-shadow: 3px 3px 0 #000;
+        text-align: center;
+        width: 80%;
+      }
+
+      /* Test Controls */
+      #test-controls {
+        position: absolute;
+        bottom: 10px;
+        left: 10px;
+        background: rgba(0, 0, 0, 0.8);
+        color: #fff;
+        padding: 10px;
+        border-radius: 5px;
+        font-size: 12px;
+        z-index: 200;
+      }
+
+      #test-controls button {
+        margin: 5px;
+        padding: 5px 10px;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="combat-container">
+      <!-- Audio Button (Top Left) -->
+      <button id="audio-btn">
+        <img src="images/icon-musicnote.png" alt="Audio" />
+      </button>
+
+      <!-- Pause Button (Top Right) -->
+      <button id="pause-btn">PAUSE</button>
+
+      <!-- Time Crystal Display (Top Center) -->
+      <div id="crystal-display">
+        <!-- Will be populated dynamically -->
+      </div>
+
+      <!-- Combat Area -->
+      <div id="combat-area">
+        <!-- Player Container -->
+        <div id="player-container">
+          <div id="player-hearts">
+            <img src="images/heart.png" alt="Heart" class="heart" />
+            <img src="images/heart.png" alt="Heart" class="heart" />
+            <img src="images/heart.png" alt="Heart" class="heart" />
+          </div>
+          <div id="player-box">
+            <img id="player-img" src="images/player-default.png" alt="Player" />
+          </div>
+          <!-- Horizontal Timer Bar -->
+          <div id="timer-bar-container">
+            <div id="timer-bar-fill"></div>
+            <div id="timer-text">10</div>
+          </div>
+        </div>
+
+        <!-- Defense Buttons -->
+        <div id="defense-buttons">
+          <button class="defense-btn" data-action="shield">
+            <img src="images/shield.png" alt="Shield" />
+          </button>
+          <button class="defense-btn" data-action="rocket">
+            <img src="images/rocket.png" alt="Rocket" />
+          </button>
+          <button class="defense-btn" data-action="sword">
+            <img src="images/sword.png" alt="Sword" />
+          </button>
+          <button class="defense-btn" data-action="plasma">
+            <img src="images/plasma.png" alt="Plasma" />
+          </button>
+        </div>
+
+        <!-- Enemy Section -->
+        <div id="enemy-section">
+          <div id="enemy-hearts">
+            <!-- Will be populated dynamically -->
+          </div>
+          <div id="enemy-box">
+            <img id="enemy-img" src="images/pose1.png" alt="Enemy" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Instruction -->
+      <div id="instruction">Get ready...</div>
+
+      <!-- Message -->
+      <div id="message"></div>
+
+      <!-- Test Controls -->
+      <div id="test-controls">
+        <div><strong>Test Controls:</strong></div>
+        <button onclick="testPlayerHP(3)">Player: Full HP</button>
+        <button onclick="testPlayerHP(2)">Player: 2 HP</button>
+        <button onclick="testPlayerHP(1)">Player: 1 HP</button>
+        <button onclick="testPlayerHP(0)">Player: 0 HP</button>
+        <br />
+        <button onclick="testEnemyHP(8)">Enemy: 8 HP</button>
+        <button onclick="testEnemyHP(4)">Enemy: 4 HP</button>
+        <button onclick="testEnemyHP(2)">Enemy: 2 HP</button>
+        <button onclick="testEnemyHP(1)">Enemy: 1 HP</button>
+        <br />
+        <button onclick="testTimer(100)">Timer: 100%</button>
+        <button onclick="testTimer(50)">Timer: 50%</button>
+        <button onclick="testTimer(25)">Timer: 25%</button>
+        <button onclick="testTimer(5)">Timer: 5%</button>
+        <br />
+        <button onclick="testCrystals('normal', 3)">Crystals: 3/3</button>
+        <button onclick="testCrystals('normal', 1)">Crystals: 1/3</button>
+        <button onclick="testCrystals('normal', 0)">Crystals: 0/3</button>
+        <button onclick="testCrystals('infinite')">Infinite Mode</button>
+      </div>
+    </div>
+
+    <script>
+      // Test functions for UI
+      function testPlayerHP(hp) {
+        const playerImg = document.getElementById("player-img");
+        const hearts = document.querySelectorAll("#player-hearts .heart");
+
+        // Update player image based on HP
+        const imageMap = {
+          3: "images/player-default.png",
+          2: "images/player-2hp.png",
+          1: "images/player-1hp.png",
+          0: "images/player-0hp.png",
+        };
+        playerImg.src = imageMap[hp] || imageMap[3];
+
+        // Update heart opacity
+        hearts.forEach((heart, index) => {
+          heart.style.opacity = index < hp ? "1" : "0.3";
+        });
+      }
+
+      function testEnemyHP(hp) {
+        const enemyHearts = document.getElementById("enemy-hearts");
+        enemyHearts.innerHTML = "";
+
+        for (let i = 0; i < hp; i++) {
+          const heart = document.createElement("img");
+          heart.src = "images/heart.png";
+          heart.alt = "Heart";
+          heart.className = "heart";
+          enemyHearts.appendChild(heart);
+        }
+      }
+
+      function testTimer(percentage) {
+        const timerFill = document.getElementById("timer-bar-fill");
+        const timerText = document.getElementById("timer-text");
+
+        timerFill.style.width = percentage + "%";
+
+        // Update color based on percentage
+        timerFill.classList.remove("warning", "danger");
+        if (percentage <= 10) {
+          timerFill.classList.add("danger");
+        } else if (percentage <= 30) {
+          timerFill.classList.add("warning");
+        }
+
+        // Update text
+        const seconds = Math.ceil((percentage / 100) * 10);
+        timerText.textContent = seconds;
+      }
+
+      function testCrystals(mode, count = 3) {
+        const crystalDisplay = document.getElementById("crystal-display");
+        crystalDisplay.innerHTML = "";
+
+        if (mode === "infinite") {
+          // Infinite mode: 1 crystal + infinity symbol
+          const crystalItem = document.createElement("div");
+          crystalItem.className = "crystal-item";
+          const crystalImg = document.createElement("img");
+          crystalImg.src = "images/timecrystal.png";
+          crystalImg.alt = "Crystal";
+          crystalItem.appendChild(crystalImg);
+          crystalDisplay.appendChild(crystalItem);
+
+          const infiniteSymbol = document.createElement("div");
+          infiniteSymbol.className = "infinite-symbol";
+          infiniteSymbol.textContent = "∞";
+          crystalDisplay.appendChild(infiniteSymbol);
+        } else {
+          // Normal mode: show 3 crystals total
+          const maxCrystals = 3;
+          for (let i = 0; i < maxCrystals; i++) {
+            const crystalItem = document.createElement("div");
+            crystalItem.className = "crystal-item";
+
+            const crystalImg = document.createElement("img");
+            crystalImg.src = "images/timecrystal.png";
+            crystalImg.alt = "Crystal";
+            crystalItem.appendChild(crystalImg);
+
+            if (i >= count) {
+              crystalItem.classList.add("depleted");
+            }
+
+            crystalDisplay.appendChild(crystalItem);
+          }
+        }
+      }
+
+      // Initialize with default values
+      window.addEventListener("load", () => {
+        testPlayerHP(3);
+        testEnemyHP(4);
+        testTimer(100);
+        testCrystals("normal", 3);
+      });
+
+      // Timer simulation for demo
+      let timerInterval;
+      function startTimerDemo() {
+        let currentPercentage = 100;
+        timerInterval = setInterval(() => {
+          currentPercentage -= 1;
+          if (currentPercentage <= 0) {
+            clearInterval(timerInterval);
+            currentPercentage = 0;
+          }
+          testTimer(currentPercentage);
+        }, 100);
+      }
+
+      // Auto-start timer demo
+      setTimeout(() => {
+        startTimerDemo();
+      }, 2000);
+    </script>
+  </body>
+</html>

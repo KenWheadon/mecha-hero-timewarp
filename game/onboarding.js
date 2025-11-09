@@ -15,19 +15,19 @@ const elements = {
 const FIGHT_INSTRUCTIONS = {
   1: {
     title: "Fight 1: Basics",
-    text: "Welcome to your first fight! Watch the enemy's pose and click the correct counter move before time runs out. You have 10 seconds per move. Only 2 attacks are unlocked: Shield Bash and Rocket Fist.",
+    text: "I gotta watch the clanker's pose and select the correct counter before he attacks. Clankers still booting up so I should have 10 seconds per move.",
   },
   2: {
     title: "Fight 2: More Attacks",
-    text: "The enemy is getting stronger! All 4 attacks are now unlocked. Timer reduced to 6 seconds. Watch your Crystal Energy - it drains when warping to the next fight!",
+    text: "That time crystal is INCREDIBLE, but also a pain in my ass! Gotta keep kicking butt until it runs out of juice - looks like I got 8 seconds now.",
   },
   3: {
     title: "Fight 3: Speed Up",
-    text: "Things are heating up! You only have 4 seconds to counter each pose. Crystal energy is running low - make it count!",
+    text: "Things are heating up with only 5 seconds to counter each move. I think the crystal energy is running low though, I have this bucket of bolts in my sights now!",
   },
   4: {
     title: "Fight 4: Final Battle",
-    text: "This is it - the final showdown! Only 2 seconds per move and the enemy has 8 HP. Stay focused and counter perfectly to win!",
+    text: "This is it - the final showdown! Only 3 seconds per move and the enemy has 8 HP. I gotta stay focused and counter perfectly to win!",
   },
 };
 
