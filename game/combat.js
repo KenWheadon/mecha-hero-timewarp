@@ -179,6 +179,9 @@ export function initGame(isInfiniteMode = false) {
   } else {
     audioManager.play("combat");
   }
+
+  // Activate colorful background for combat
+  document.body.classList.add("combat-active");
 }
 
 // Initialize hearts display (player hearts)
@@ -973,57 +976,54 @@ function handleAttack(action) {
 
 // Handle fight won
 function handleFightWon() {
-  // Enemy defeated
+  // Check if it's the final fight of story mode
+  if (
+    !gameState.isInfiniteMode &&
+    gameState.currentFight === gameState.maxFights
+  ) {
+    // Final fight won: show destroyed pose immediately
+    const totalGameTime = calculateTotalGameTime();
+    const isNewHighScore = saveHighScore(totalGameTime);
 
-  // Show damaged pose
-  setPose(damagedPose);
+    setPose(finalDestroyPose);
 
-  // Play robot death sound
-  audioManager.playSoundEffect("roboDeath");
+    // Play final death sound for level 4 victory
+    audioManager.playSoundEffect("roboFinalDeath");
 
-  setTimeout(() => {
-    if (gameState.isInfiniteMode) {
-      // Infinite mode: advance to next level
-      gameState.infiniteLevel++;
+    // Track story mode completion
+    const noHits = gameState.hearts === 3;
+    trackStoryModeComplete(noHits);
 
-      // Track infinite level trophies
-      trackInfiniteLevel(gameState.infiniteLevel);
+    // Show victory screen after a brief delay
+    const timeText = formatTimeForDisplay(totalGameTime);
+    setTimeout(() => {
+      gameOverScreen.showVictory(timeText, isNewHighScore, totalGameTime);
+    }, 1000);
+  } else {
+    // For infinite mode or fights 1-3, show damaged pose then transition
+    setPose(damagedPose);
+    audioManager.playSoundEffect("roboDeath");
 
-      setupFight();
-    } else if (gameState.currentFight === gameState.maxFights) {
-      // Final fight won - calculate and save time-based score
-      const totalGameTime = calculateTotalGameTime();
-      const isNewHighScore = saveHighScore(totalGameTime);
-
-      setPose(finalDestroyPose);
-
-      // Play final death sound for level 4 victory
-      audioManager.playSoundEffect("roboFinalDeath");
-
-      // Track story mode completion
-      const noHits = gameState.hearts === 3;
-      trackStoryModeComplete(noHits);
-
-      // Show victory screen after a brief delay
-      const timeText = formatTimeForDisplay(totalGameTime);
-      setTimeout(() => {
-        gameOverScreen.showVictory(timeText, isNewHighScore, totalGameTime);
-      }, 1000);
-    } else {
-      // Track fight 1 completion
-      if (gameState.currentFight === 1) {
-        trackFight1Complete();
-
-        // Check if level 1 was completed without hits
-        if (gameState.hearts === 3) {
-          trackLevel1NoHits();
+    setTimeout(() => {
+      if (gameState.isInfiniteMode) {
+        // Infinite mode: advance to next level
+        gameState.infiniteLevel++;
+        trackInfiniteLevel(gameState.infiniteLevel);
+        setupFight();
+      } else {
+        // Story mode (fights 1-3): show time warp
+        // Track fight 1 completion
+        if (gameState.currentFight === 1) {
+          trackFight1Complete();
+          // Check if level 1 was completed without hits
+          if (gameState.hearts === 3) {
+            trackLevel1NoHits();
+          }
         }
+        showTimeWarp();
       }
-
-      // Show time warp transition
-      showTimeWarp();
-    }
-  }, GAME_CONFIG.DAMAGED_STATE_DURATION);
+    }, GAME_CONFIG.DAMAGED_STATE_DURATION);
+  }
 }
 
 // Calculate total game time (excluding paused time)
@@ -1485,6 +1485,28 @@ function quitToMainMenu() {
   // Hide game over screens (defeat/win popups)
   if (gameOverScreen) {
     gameOverScreen.hide();
+  }
+
+  // Explicitly stop and hide the time warp if it's active
+  if (isInTimewarp) {
+    // Stop the main timeout
+    if (timewarpTimeoutId) {
+      clearTimeout(timewarpTimeoutId);
+      timewarpTimeoutId = null;
+    }
+    // Stop the sprite and its loading interval
+    if (timewarpSprite) {
+      timewarpSprite.stop();
+      timewarpSprite.destroy();
+      timewarpSprite = null;
+    }
+    if (timewarpLoadInterval) {
+      clearInterval(timewarpLoadInterval);
+      timewarpLoadInterval = null;
+    }
+    stopTimewarpParticles(); // Stop particle animation
+    elements.timewarpOverlay.classList.remove("show", "closing");
+    isInTimewarp = false;
   }
 
   // Hide pause overlay and game elements

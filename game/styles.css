@@ -194,9 +194,7 @@ body {
 }
 
 /* Combat screen background - light teal */
-body.combat-active {
-  background: #7fffd4;
-}
+/* body.combat-active is now handled by the ::before pseudo-element */
 
 /* Animated colorful background for title screen */
 body::before {
@@ -222,7 +220,8 @@ body::before {
   pointer-events: none;
 }
 
-body.title-active::before {
+body.title-active::before,
+body.combat-active::before {
   opacity: 1;
 }
 

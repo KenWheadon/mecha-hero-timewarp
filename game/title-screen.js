@@ -248,6 +248,7 @@ function onStartGame() {
   elements.titleScreen.style.display = "none";
   elements.game.style.display = "block";
   // Remove colorful background when entering game
+  document.body.classList.remove("combat-active"); // Clean up just in case
   document.body.classList.remove("title-active");
   initGame(false);
   // Show pause button and hide quit button on game start
@@ -271,6 +272,7 @@ function onStartInfiniteMode() {
   elements.titleScreen.style.display = "none";
   elements.game.style.display = "block";
   // Remove colorful background when entering game
+  document.body.classList.remove("combat-active"); // Clean up just in case
   document.body.classList.remove("title-active");
   initGame(true); // Pass true for infinite mode
   // Show pause button and hide quit button on game start
