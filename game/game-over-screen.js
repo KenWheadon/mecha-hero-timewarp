@@ -3,6 +3,7 @@
 import { audioManager } from "./audio-manager.js";
 import { getStarRating, getInfiniteStarRating } from "./storage-manager.js";
 import { SpriteSheet } from "./sprite-sheet.js";
+import { getSpriteConfig } from "./sprites-config.js";
 
 export class GameOverScreen {
   constructor() {
@@ -25,27 +26,15 @@ export class GameOverScreen {
    * Initialize sprite animations for victory and defeat screens
    */
   initSprites() {
-    // Create losing animation sprite (6x6 grid, 244x259 per frame)
-    this.losingSprite = new SpriteSheet({
-      imagePath: "images/losing-spritesheet-1464-1554.png",
-      frameContentWidth: 244,
-      frameContentHeight: 259,
-      rows: 6,
-      cols: 6,
-      fps: 12,
-      loop: true,
-    });
+    // Create losing animation sprite using config
+    const losingConfig = getSpriteConfig("losing-animation");
+    console.log("Losing sprite config:", losingConfig);
+    this.losingSprite = new SpriteSheet(losingConfig);
 
-    // Create winning animation sprite (6x6 grid, 225x263 per frame)
-    this.winningSprite = new SpriteSheet({
-      imagePath: "images/winning-spritesheet-1350-1578.png",
-      frameContentWidth: 225,
-      frameContentHeight: 263,
-      rows: 6,
-      cols: 6,
-      fps: 12,
-      loop: true,
-    });
+    // Create winning animation sprite using config
+    const winningConfig = getSpriteConfig("winning-animation");
+    console.log("Winning sprite config:", winningConfig);
+    this.winningSprite = new SpriteSheet(winningConfig);
   }
 
   // Helper function to add both click and touch event listeners
@@ -132,8 +121,16 @@ export class GameOverScreen {
       img.src = this.winningSprite.imagePath;
       spriteContainer.appendChild(img);
 
-      // Play the animation
-      this.winningSprite.play(spriteContainer);
+      // Wait for sprite to load before playing
+      const playWhenReady = () => {
+        if (this.winningSprite.isLoaded) {
+          this.winningSprite.play(spriteContainer);
+        } else {
+          // Check again in a bit
+          requestAnimationFrame(playWhenReady);
+        }
+      };
+      requestAnimationFrame(playWhenReady);
     }
 
     // Show victory screen
@@ -173,6 +170,20 @@ export class GameOverScreen {
     const fightElement = document.getElementById("defeat-fight");
     fightElement.textContent = fightReached;
 
+    console.log("=== DEFEAT SCREEN DEBUG ===");
+    console.log("spriteContainer:", this.defeatScreen.querySelector(".defeat-player-sprite-container"));
+    console.log("losingSprite:", this.losingSprite);
+    console.log("losingSprite.isLoaded:", this.losingSprite?.isLoaded);
+    console.log("losingSprite config:", {
+      frameContentWidth: this.losingSprite?.frameContentWidth,
+      frameContentHeight: this.losingSprite?.frameContentHeight,
+      frameWidth: this.losingSprite?.frameWidth,
+      frameHeight: this.losingSprite?.frameHeight,
+      rows: this.losingSprite?.rows,
+      cols: this.losingSprite?.cols,
+      totalFrames: this.losingSprite?.totalFrames
+    });
+
     // Setup and play losing sprite animation
     const spriteContainer = this.defeatScreen.querySelector(
       ".defeat-player-sprite-container"
@@ -181,13 +192,36 @@ export class GameOverScreen {
       // Clear any existing content
       spriteContainer.innerHTML = "";
 
-      // Create image element for the sprite
+      // Create the proper sprite structure
+      // The sprite container already has overflow:hidden and position:relative
+      // We just need to add the img element directly (no need for extra clipper)
       const img = document.createElement("img");
       img.src = this.losingSprite.imagePath;
+      img.style.position = "absolute";
+      img.style.top = "0";
+      img.style.left = "0";
       spriteContainer.appendChild(img);
 
-      // Play the animation
-      this.losingSprite.play(spriteContainer);
+      console.log("Image element created, src:", img.src);
+      console.log("Attempting to play sprite animation...");
+      console.log("Sprite container dimensions:", spriteContainer.offsetWidth, "x", spriteContainer.offsetHeight);
+
+      // Wait for sprite to load before playing
+      const playWhenReady = () => {
+        if (this.losingSprite.isLoaded) {
+          console.log("Sprite loaded! Starting animation...");
+          console.log("Image natural dimensions:", img.naturalWidth, "x", img.naturalHeight);
+          this.losingSprite.play(spriteContainer);
+          console.log("Animation playing:", this.losingSprite.isPlaying);
+        } else {
+          console.log("Waiting for sprite to load...");
+          // Check again in a bit
+          requestAnimationFrame(playWhenReady);
+        }
+      };
+      requestAnimationFrame(playWhenReady);
+    } else {
+      console.log("ERROR: Missing spriteContainer or losingSprite!");
     }
 
     // Show defeat screen
@@ -229,8 +263,16 @@ export class GameOverScreen {
       img.src = this.losingSprite.imagePath;
       spriteContainer.appendChild(img);
 
-      // Play the animation
-      this.losingSprite.play(spriteContainer);
+      // Wait for sprite to load before playing
+      const playWhenReady = () => {
+        if (this.losingSprite.isLoaded) {
+          this.losingSprite.play(spriteContainer);
+        } else {
+          // Check again in a bit
+          requestAnimationFrame(playWhenReady);
+        }
+      };
+      requestAnimationFrame(playWhenReady);
     }
 
     // Show defeat screen

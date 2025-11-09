@@ -145,6 +145,46 @@ export class LoadingScreen {
 
     updateProgress();
   }
+
+  /**
+   * Preload specific images and update progress
+   * @param {Array<string>} imageUrls - Array of image URLs to preload
+   * @returns {Promise} - Resolves when all images are loaded
+   */
+  async preloadImages(imageUrls) {
+    if (!imageUrls || imageUrls.length === 0) {
+      this.updateProgress(100);
+      return Promise.resolve();
+    }
+
+    let loadedCount = 0;
+    const totalImages = imageUrls.length;
+
+    const loadPromises = imageUrls.map((url) => {
+      return new Promise((resolve) => {
+        const img = new Image();
+
+        img.onload = () => {
+          loadedCount++;
+          const progress = (loadedCount / totalImages) * 95; // Cap at 95%
+          this.updateProgress(progress);
+          resolve();
+        };
+
+        img.onerror = () => {
+          console.error(`Failed to load image: ${url}`);
+          loadedCount++;
+          const progress = (loadedCount / totalImages) * 95;
+          this.updateProgress(progress);
+          resolve(); // Resolve anyway to not block loading
+        };
+
+        img.src = url;
+      });
+    });
+
+    return Promise.all(loadPromises);
+  }
 }
 
 // Export singleton instance

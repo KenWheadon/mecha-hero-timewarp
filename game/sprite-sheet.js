@@ -61,11 +61,21 @@ export class SpriteSheet {
   play(element) {
     // If it's already playing, do nothing. If it's a non-looping animation that finished, this allows it to be re-triggered.
     if (this.isPlaying) {
+      if (this.imagePath.includes("losing")) {
+        console.log("Animation already playing, returning");
+      }
       return;
     }
     this.reset(); // Ensure state is clean before playing.
 
     this.isPlaying = true;
+    if (this.imagePath.includes("losing")) {
+      console.log("Starting animation for:", this.imagePath);
+      console.log("Element:", element);
+    }
+
+    // Apply the initial frame immediately
+    this.applyToElement(element);
 
     this.animationInterval = setInterval(() => {
       // Safety check: if element no longer exists, stop animation
@@ -214,13 +224,27 @@ export class SpriteSheet {
    * @param {HTMLElement} element - DOM element to apply sprite to
    */
   applyToElement(element) {
-    if (!this.isLoaded) return;
+    const isLosingSprite = this.imagePath.includes("losing");
+
+    if (!this.isLoaded) {
+      if (isLosingSprite) {
+        console.log("Sprite not loaded yet");
+      }
+      return;
+    }
 
     // Find the actual <img> tag inside the provided clipper element.
     const imgElement = element.querySelector("img");
     if (!imgElement) {
+      if (isLosingSprite) {
+        console.log("No img element found in container");
+      }
       // This might run once before the img is appended, which is fine.
       return;
+    }
+
+    if (isLosingSprite) {
+      console.log("Applying frame", this.currentFrame, "to element");
     }
 
     const col = this.currentFrame % this.cols;
@@ -231,12 +255,23 @@ export class SpriteSheet {
     // and transforming an actual <img> element inside it.
 
     // 1. Set the size of the <img> tag to the full sprite sheet dimensions.
-    imgElement.style.width = `${
-      this.cols * (this.frameWidth + this.frameContentWidth + this.gapX)
-    }px`;
-    imgElement.style.height = `${
-      this.rows * (this.frameHeight + this.frameContentHeight + this.gapY)
-    }px`;
+    const fullWidth = this.cols * (this.frameWidth + this.frameContentWidth + this.gapX);
+    const fullHeight = this.rows * (this.frameHeight + this.frameContentHeight + this.gapY);
+
+    imgElement.style.width = `${fullWidth}px`;
+    imgElement.style.height = `${fullHeight}px`;
+
+    if (isLosingSprite) {
+      console.log("Image dimensions set to:", fullWidth, "x", fullHeight);
+      console.log("Frame config:", {
+        frameWidth: this.frameWidth,
+        frameContentWidth: this.frameContentWidth,
+        gapX: this.gapX,
+        frameHeight: this.frameHeight,
+        frameContentHeight: this.frameContentHeight,
+        gapY: this.gapY
+      });
+    }
 
     // 2. Calculate the negative offset to show the correct frame.
     // This should be the top-left of the content area for the current frame.
@@ -244,6 +279,10 @@ export class SpriteSheet {
     const cellHeight = this.frameHeight + this.frameContentHeight + this.gapY;
     const imgX = -(col * cellWidth + this.frameWidth); // Negative offset to the content area
     const imgY = -(row * cellHeight + this.frameHeight); // Negative offset to the content area
+
+    if (isLosingSprite) {
+      console.log("Transform offset:", imgX, imgY, "for col/row:", col, row);
+    }
 
     // 3. Apply transform to the <img>.
     imgElement.style.transform = `translate(${imgX}px, ${imgY}px)`;

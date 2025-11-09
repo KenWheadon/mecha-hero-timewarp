@@ -116,6 +116,26 @@ export const SPRITE_CONFIGS = {
       pingPong: true, // Play forward, then backward, and repeat
     }
   ),
+  // Losing animation for defeat screen
+  "losing-animation": createHitSpriteConfig(
+    "images/losing-spritesheet-1464-1554.png",
+    {
+      rows: 6,
+      cols: 6,
+      fps: 12,
+      loop: true,
+    }
+  ),
+  // Winning animation for victory screen
+  "winning-animation": createHitSpriteConfig(
+    "images/winning-spritesheet-1350-1578.png",
+    {
+      rows: 6,
+      cols: 6,
+      fps: 12,
+      loop: true,
+    }
+  ),
 };
 
 /**
