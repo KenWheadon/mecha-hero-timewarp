@@ -3364,6 +3364,53 @@ body.title-active::before {
   flex-shrink: 0;
 }
 
+.defeat-player-sprite-container {
+  width: 244px;
+  height: 259px;
+  overflow: hidden;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.defeat-player-sprite-container img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+}
+
+.victory-stats-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 30px;
+  margin: 20px 0 30px;
+}
+
+.victory-player-sprite-container {
+  width: 225px;
+  height: 263px;
+  overflow: hidden;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.victory-player-sprite-container img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+}
+
+.victory-info {
+  flex: 1;
+  max-width: 300px;
+}
+
 .fight-reached {
   background: var(--color-danger);
   border: var(--border-medium) solid #000;
@@ -3560,7 +3607,8 @@ body.title-active::before {
     font-size: 64px;
   }
 
-  .defeat-stats-row {
+  .defeat-stats-row,
+  .victory-stats-row {
     flex-direction: column;
     gap: 20px;
   }
@@ -3569,7 +3617,20 @@ body.title-active::before {
     width: 150px;
   }
 
-  .fight-reached {
+  .defeat-player-sprite-container {
+    width: 183px;
+    height: 194px;
+    transform: scale(0.75);
+  }
+
+  .victory-player-sprite-container {
+    width: 169px;
+    height: 197px;
+    transform: scale(0.75);
+  }
+
+  .fight-reached,
+  .victory-info {
     max-width: 100%;
   }
 

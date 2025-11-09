@@ -364,16 +364,22 @@
         <div class="game-over-subtitle">All Enemies Defeated</div>
 
         <div class="victory-content">
-          <img src="images/player-win.png" alt="Victory" class="game-over-player-img" onerror="console.error('Missing image: ' + this.src)" />
-          <div id="victory-badge" class="high-score-badge">NEW RECORD!</div>
-          <div class="time-display">
-            <div class="time-label">Your Time</div>
-            <div id="victory-time" class="time-value">0:00.00</div>
-          </div>
-          <div class="star-rating">
-            <div class="star" data-star="1"></div>
-            <div class="star" data-star="2"></div>
-            <div class="star" data-star="3"></div>
+          <div class="victory-stats-row">
+            <div class="victory-player-sprite-container">
+              <!-- Sprite animation will be injected here -->
+            </div>
+            <div class="victory-info">
+              <div id="victory-badge" class="high-score-badge">NEW RECORD!</div>
+              <div class="time-display">
+                <div class="time-label">Your Time</div>
+                <div id="victory-time" class="time-value">0:00.00</div>
+              </div>
+              <div class="star-rating">
+                <div class="star" data-star="1"></div>
+                <div class="star" data-star="2"></div>
+                <div class="star" data-star="3"></div>
+              </div>
+            </div>
           </div>
           <div class="victory-message">
             The mecha threat has been neutralized.<br />
@@ -396,7 +402,9 @@
 
         <div class="defeat-content">
           <div class="defeat-stats-row">
-            <img src="images/player-0hp.png" alt="Defeated" class="defeat-player-img" onerror="console.error('Missing image: ' + this.src)" />
+            <div class="defeat-player-sprite-container">
+              <!-- Sprite animation will be injected here -->
+            </div>
             <div class="fight-reached">
               <div class="fight-label">Fight Reached</div>
               <div id="defeat-fight" class="fight-value">1</div>

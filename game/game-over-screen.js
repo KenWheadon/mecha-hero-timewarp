@@ -2,6 +2,7 @@
 
 import { audioManager } from "./audio-manager.js";
 import { getStarRating, getInfiniteStarRating } from "./storage-manager.js";
+import { SpriteSheet } from "./sprite-sheet.js";
 
 export class GameOverScreen {
   constructor() {
@@ -12,7 +13,39 @@ export class GameOverScreen {
     this.onRestartCallback = null;
     this.onMainMenuCallback = null;
 
+    // Initialize sprite animations
+    this.losingSprite = null;
+    this.winningSprite = null;
+    this.initSprites();
+
     this.initEventListeners();
+  }
+
+  /**
+   * Initialize sprite animations for victory and defeat screens
+   */
+  initSprites() {
+    // Create losing animation sprite (6x6 grid, 244x259 per frame)
+    this.losingSprite = new SpriteSheet({
+      imagePath: "images/losing-spritesheet-1464-1554.png",
+      frameContentWidth: 244,
+      frameContentHeight: 259,
+      rows: 6,
+      cols: 6,
+      fps: 12,
+      loop: true,
+    });
+
+    // Create winning animation sprite (6x6 grid, 225x263 per frame)
+    this.winningSprite = new SpriteSheet({
+      imagePath: "images/winning-spritesheet-1350-1578.png",
+      frameContentWidth: 225,
+      frameContentHeight: 263,
+      rows: 6,
+      cols: 6,
+      fps: 12,
+      loop: true,
+    });
   }
 
   // Helper function to add both click and touch event listeners
@@ -86,6 +119,23 @@ export class GameOverScreen {
     // Update star rating
     this.updateStarRating(timeInSeconds);
 
+    // Setup and play winning sprite animation
+    const spriteContainer = this.victoryScreen.querySelector(
+      ".victory-player-sprite-container"
+    );
+    if (spriteContainer && this.winningSprite) {
+      // Clear any existing content
+      spriteContainer.innerHTML = "";
+
+      // Create image element for the sprite
+      const img = document.createElement("img");
+      img.src = this.winningSprite.imagePath;
+      spriteContainer.appendChild(img);
+
+      // Play the animation
+      this.winningSprite.play(spriteContainer);
+    }
+
     // Show victory screen
     this.victoryScreen.style.display = "flex";
 
@@ -123,6 +173,23 @@ export class GameOverScreen {
     const fightElement = document.getElementById("defeat-fight");
     fightElement.textContent = fightReached;
 
+    // Setup and play losing sprite animation
+    const spriteContainer = this.defeatScreen.querySelector(
+      ".defeat-player-sprite-container"
+    );
+    if (spriteContainer && this.losingSprite) {
+      // Clear any existing content
+      spriteContainer.innerHTML = "";
+
+      // Create image element for the sprite
+      const img = document.createElement("img");
+      img.src = this.losingSprite.imagePath;
+      spriteContainer.appendChild(img);
+
+      // Play the animation
+      this.losingSprite.play(spriteContainer);
+    }
+
     // Show defeat screen
     this.defeatScreen.style.display = "flex";
 
@@ -149,6 +216,23 @@ export class GameOverScreen {
     const originalMessage = message.innerHTML;
     message.innerHTML = `Level ${levelReached} reached.<br>Can you go further?`;
 
+    // Setup and play losing sprite animation
+    const spriteContainer = this.defeatScreen.querySelector(
+      ".defeat-player-sprite-container"
+    );
+    if (spriteContainer && this.losingSprite) {
+      // Clear any existing content
+      spriteContainer.innerHTML = "";
+
+      // Create image element for the sprite
+      const img = document.createElement("img");
+      img.src = this.losingSprite.imagePath;
+      spriteContainer.appendChild(img);
+
+      // Play the animation
+      this.losingSprite.play(spriteContainer);
+    }
+
     // Show defeat screen
     this.defeatScreen.style.display = "flex";
 
@@ -163,6 +247,14 @@ export class GameOverScreen {
    * Hide both screens
    */
   hide() {
+    // Stop sprite animations
+    if (this.losingSprite) {
+      this.losingSprite.stop();
+    }
+    if (this.winningSprite) {
+      this.winningSprite.stop();
+    }
+
     this.victoryScreen.style.display = "none";
     this.defeatScreen.style.display = "none";
 
