@@ -109,7 +109,7 @@ export function initGame(isInfiniteMode = false) {
   gameState.infiniteLevel = isInfiniteMode ? 1 : 0;
 
   // Generate random defense mapping for this game session
-  gameState.defenseMapping = generateDefenseMapping();
+  gameState.defenseMapping = generateDefenseMapping(isInfiniteMode);
 
   initHearts();
   initOnboarding();
@@ -287,10 +287,12 @@ function setupFight() {
   // Check for first-time onboarding popup (skip in infinite mode)
   if (gameState.isInfiniteMode) {
     // Start game timer on first level
-    if (gameState.infiniteLevel === 1 && gameState.gameStartTime === null) {
-      gameState.gameStartTime = Date.now();
-    }
-    startNewPose();
+    checkAndShowOnboarding("infinite", () => {
+      if (gameState.infiniteLevel === 1 && gameState.gameStartTime === null) {
+        gameState.gameStartTime = Date.now();
+      }
+      startNewPose();
+    });
   } else {
     checkAndShowOnboarding(gameState.currentFight, () => {
       // Start game timer on first fight
@@ -326,27 +328,31 @@ function updateEnemyHearts() {
 function updateCrystalDisplay() {
   elements.crystalDisplay.innerHTML = "";
 
-  // Add label
   const label = document.createElement("div");
   label.className = "crystal-label";
-  label.textContent = "Time Warps Left";
-  elements.crystalDisplay.appendChild(label);
 
   // Create container for crystal items
   const itemsContainer = document.createElement("div");
   itemsContainer.className = "crystal-items-container";
 
   if (gameState.isInfiniteMode) {
-    // Infinite mode: 1 crystal + infinity symbol
+    // Infinite mode: Show "Infinite Level" and the current level number
+    label.textContent = "Infinite Level";
+    elements.crystalDisplay.appendChild(label);
+
+    const levelDisplay = document.createElement("div");
+    levelDisplay.className = "infinite-level-display";
+    levelDisplay.textContent = gameState.infiniteLevel;
+    itemsContainer.appendChild(levelDisplay);
+
     const crystalItem = document.createElement("div");
     crystalItem.className = "crystal-item";
     const crystalImg = document.createElement("img");
     crystalImg.src = "images/timecrystal.png";
     crystalImg.alt = "Crystal";
-    crystalImg.onerror = () => {
-      console.error("Missing image: images/timecrystal.png");
-    };
     crystalItem.appendChild(crystalImg);
+    crystalItem.style.width = "50px"; // Make crystal smaller
+    crystalItem.style.height = "50px";
     itemsContainer.appendChild(crystalItem);
 
     const infiniteSymbol = document.createElement("div");
@@ -354,7 +360,10 @@ function updateCrystalDisplay() {
     infiniteSymbol.textContent = "∞";
     itemsContainer.appendChild(infiniteSymbol);
   } else {
-    // Normal mode: show 3 crystals total
+    // Normal mode: Show "Time Warps Left" and the crystal icons
+    label.textContent = "Time Warps Left";
+    elements.crystalDisplay.appendChild(label);
+
     const maxCrystals = GAME_CONFIG.INITIAL_CRYSTAL_CHARGES;
     for (let i = 0; i < maxCrystals; i++) {
       const crystalItem = document.createElement("div");
@@ -363,9 +372,6 @@ function updateCrystalDisplay() {
       const crystalImg = document.createElement("img");
       crystalImg.src = "images/timecrystal.png";
       crystalImg.alt = "Crystal";
-      crystalImg.onerror = () => {
-        console.error("Missing image: images/timecrystal.png");
-      };
       crystalItem.appendChild(crystalImg);
 
       if (i >= gameState.crystalCharges) {
@@ -1459,9 +1465,13 @@ function restartGame() {
 
   gameState = createInitialGameState();
   gameState.isInfiniteMode = wasInfiniteMode;
+  // If it was infinite mode, reset the level counter
+  if (wasInfiniteMode) {
+    gameState.infiniteLevel = 1;
+  }
 
   // Generate new random defense mapping for the new game
-  gameState.defenseMapping = generateDefenseMapping();
+  gameState.defenseMapping = generateDefenseMapping(wasInfiniteMode);
 
   initHearts();
   setupFight();

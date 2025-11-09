@@ -1,7 +1,6 @@
 // Onboarding Module - handles first-time popups for each level
 
 import { isFirstTime, markFightAsSeen } from "./storage-manager.js";
-import { audioManager } from "./audio-manager.js";
 
 // Cache DOM elements
 const elements = {
@@ -29,6 +28,10 @@ const FIGHT_INSTRUCTIONS = {
   4: {
     title: "Fight 4: Final Battle",
     text: "This is it - the final showdown! Only 3 seconds per move and the enemy has 8 HP. I gotta stay focused and counter perfectly to win!",
+  },
+  infinite: {
+    title: "Infinite Mode",
+    text: "Welcome to Infinite Mode! The correct defence for each of the enemy's attack has been randomized. Survive as long as you can!",
   },
 };
 
@@ -93,7 +96,6 @@ function showOnboarding(fightLevel, callback) {
   elements.text.textContent = instruction.text;
 
   // Show popup
-  audioManager.playSoundEffect("popupAppear");
   elements.overlay.style.display = "block";
   elements.popup.style.display = "block";
 }

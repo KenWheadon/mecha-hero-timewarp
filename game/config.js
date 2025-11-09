@@ -146,18 +146,24 @@ function shuffleArray(array) {
 
 // Generate random defense mapping for the game
 // Level 1: shuffle shield/rocket between poses 2 and 3
-// Level 2+: shuffle sword/plasma between poses 4 and 5
-export function generateDefenseMapping() {
-  // Shuffle the first two defenses for level 1 (shield and rocket)
-  const level1Defenses = shuffleArray(["shield", "rocket"]);
-
-  // Shuffle the last two defenses for level 2+ (sword and plasma)
-  const level2Defenses = shuffleArray(["sword", "plasma"]);
-
-  return {
-    2: level1Defenses[0],  // Pose 2 (Laser Beam)
-    3: level1Defenses[1],  // Pose 3 (Launcher)
-    4: level2Defenses[0],  // Pose 4 (Short Blade)
-    5: level2Defenses[1],  // Pose 5 (Heavy Blade)
-  };
+// Level 2+: shuffle sword/plasma between poses 4 and 5 (only in infinite mode)
+export function generateDefenseMapping(isInfiniteMode = false) {
+  if (isInfiniteMode) {
+    // Infinite Mode: Shuffle all defenses
+    const allDefenses = shuffleArray(["shield", "rocket", "sword", "plasma"]);
+    return {
+      2: allDefenses[0],
+      3: allDefenses[1],
+      4: allDefenses[2],
+      5: allDefenses[3],
+    };
+  } else {
+    // Story Mode: Fixed mapping
+    return {
+      2: "shield", // Pose 2 (Laser Beam)
+      3: "rocket", // Pose 3 (Launcher)
+      4: "sword", // Pose 4 (Short Blade)
+      5: "plasma", // Pose 5 (Heavy Blade)
+    };
+  }
 }

@@ -1407,6 +1407,7 @@ body.title-active::before {
   touch-action: manipulation;
   user-select: none;
   -webkit-user-select: none;
+  transition: box-shadow 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 /* Individual button colors for neobrutal pop */
@@ -1429,14 +1430,15 @@ body.title-active::before {
 .attack-btn img {
   width: 70px;
   height: 70px;
-  object-fit: contain;
   border: 4px solid #000;
   background: rgba(255, 255, 255, 0.5);
   padding: 8px;
+  transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
+  object-fit: contain;
 }
 
 .attack-btn:hover:not(:disabled) {
-  box-shadow: 5px 5px 0px #000;
+  box-shadow: 5px 5px 0px #000; /* Move shadow on hover */
 }
 
 .attack-btn[data-action="shield"]:hover:not(:disabled) {
@@ -1456,8 +1458,10 @@ body.title-active::before {
 }
 
 .attack-btn:active:not(:disabled) {
-  transform: translate(10px, 10px);
-  box-shadow: none;
+  box-shadow: none; /* Remove shadow on active */
+}
+.attack-btn:active:not(:disabled) img {
+  transform: translate(10px, 10px); /* Move the icon instead of the button */
 }
 
 .attack-btn:disabled {
@@ -1623,10 +1627,19 @@ body.title-active::before {
 }
 
 .infinite-symbol {
-  font-size: 40px;
+  font-size: 48px;
   color: var(--color-accent);
   font-weight: 900;
   text-shadow: 0 0 10px var(--color-accent), 3px 3px 0 #000;
+}
+
+/* Infinite Mode Level Display */
+.infinite-level-display {
+  font-size: 48px;
+  color: var(--color-warning);
+  font-weight: 900;
+  text-shadow: 0 0 10px var(--color-warning), 4px 4px 0 #000;
+  line-height: 1;
 }
 
 /* Combat Area - main flexbox layout */
