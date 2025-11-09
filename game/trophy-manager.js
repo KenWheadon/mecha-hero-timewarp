@@ -125,6 +125,38 @@ const TROPHIES = [
     flavorText: "Prison pockets feeling might full of horseshoes.",
     unlocked: false,
   },
+  {
+    id: "spin-to-win",
+    name: "Spin to Win",
+    icon: "images/icon-record.png",
+    requirement: "Make the robot spin 10 times while paused during a Time Warp animation.",
+    flavorText: "DJ Hero over here scratching records in the time stream.",
+    unlocked: false,
+  },
+  {
+    id: "taste-of-victory",
+    name: "Taste of Victory",
+    icon: "images/icon-1stmedal.png",
+    requirement: "Pause on the winning screen.",
+    flavorText: "Savor the moment. You've earned it.",
+    unlocked: false,
+  },
+  {
+    id: "face-your-demons",
+    name: "Face Your Demons",
+    icon: "images/icon-demon.png",
+    requirement: "Pause on the losing screen.",
+    flavorText: "Sometimes you need to sit with defeat for a moment.",
+    unlocked: false,
+  },
+  {
+    id: "never-give-up",
+    name: "Never Give Up",
+    icon: "images/icon-brain.png",
+    requirement: "Select 'Try Again' after losing.",
+    flavorText: "The brain always finds a way. That's the human spirit.",
+    unlocked: false,
+  },
 ];
 
 // Local storage key
@@ -144,6 +176,10 @@ let trophyStats = {
   crystalDepleted: false,
   level1NoHits: false,
   storyModeNoHits: false,
+  robotSpinsDuringTimewarpPause: 0,
+  pausedOnWinScreen: false,
+  pausedOnLoseScreen: false,
+  selectedTryAgain: false,
 };
 
 // Initialize trophy system
@@ -365,6 +401,43 @@ export function trackStoryModeComplete(noHits) {
     trophyStats.storyModeNoHits = true;
     saveTrophyStats();
     unlockTrophy("how-far-up");
+  }
+}
+
+// Track robot spins while paused during timewarp
+export function trackRobotSpinDuringTimewarpPause() {
+  trophyStats.robotSpinsDuringTimewarpPause++;
+  saveTrophyStats();
+
+  if (trophyStats.robotSpinsDuringTimewarpPause >= 10) {
+    unlockTrophy("spin-to-win");
+  }
+}
+
+// Track pause on win screen
+export function trackPauseOnWinScreen() {
+  if (!trophyStats.pausedOnWinScreen) {
+    trophyStats.pausedOnWinScreen = true;
+    saveTrophyStats();
+    unlockTrophy("taste-of-victory");
+  }
+}
+
+// Track pause on lose screen
+export function trackPauseOnLoseScreen() {
+  if (!trophyStats.pausedOnLoseScreen) {
+    trophyStats.pausedOnLoseScreen = true;
+    saveTrophyStats();
+    unlockTrophy("face-your-demons");
+  }
+}
+
+// Track selecting try again after losing
+export function trackTryAgainSelected() {
+  if (!trophyStats.selectedTryAgain) {
+    trophyStats.selectedTryAgain = true;
+    saveTrophyStats();
+    unlockTrophy("never-give-up");
   }
 }
 

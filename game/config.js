@@ -4,9 +4,6 @@ export const neutralPose = {
   id: 1,
   desc: "Neutral Stance",
   img: "images/pose1.png",
-  scale: 1.0,
-  x: 0,
-  y: 0,
 };
 
 export const attackPoses = [
@@ -18,9 +15,6 @@ export const attackPoses = [
     hitSprite: "pose2-hit", // Use sprite sheet for hit animation
     dmgImg: "images/pose2-dmg.png",
     correct: "shield",
-    scale: 1.0,
-    x: 0,
-    y: 0,
   },
   {
     id: 3,
@@ -30,9 +24,6 @@ export const attackPoses = [
     hitSprite: "pose3-hit", // Use sprite sheet for hit animation
     dmgImg: "images/pose3-dmg.png",
     correct: "rocket",
-    scale: 1.0,
-    x: 0,
-    y: 0,
   },
   {
     id: 4,
@@ -42,9 +33,6 @@ export const attackPoses = [
     hitSprite: "pose4-hit", // Use sprite sheet for hit animation
     dmgImg: "images/pose4-dmg.png",
     correct: "sword",
-    scale: 1.0,
-    x: 0,
-    y: 0,
   },
   {
     id: 5,
@@ -54,9 +42,6 @@ export const attackPoses = [
     hitSprite: "pose5-hit", // Use sprite sheet for hit animation
     dmgImg: "images/pose5-dmg.png",
     correct: "plasma",
-    scale: 1.0,
-    x: 0,
-    y: 0,
   },
 ];
 
@@ -64,28 +49,19 @@ export const damagedPose = {
   id: 7,
   desc: "Damaged",
   img: "images/pose7.png",
-  scale: 1.0,
-  x: 0,
-  y: 0,
 };
 
 export const timeWarpPose = {
   id: 8,
   desc: "Time Warp",
   img: "images/pose8.png",
-  sprite: "pose8-timewarp", // Use sprite sheet for time warp animation
-  scale: 1.0,
-  x: 0,
-  y: 0,
+  sprite: "pose8-timewarp", // Use sprite sheet for time warp animation (used in time warp popup, not enemy container)
 };
 
 export const finalDestroyPose = {
   id: 9,
   desc: "Destroyed",
   img: "images/pose9.png",
-  scale: 1.0,
-  x: 0,
-  y: 0,
 };
 
 // Game constants

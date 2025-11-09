@@ -44,10 +44,10 @@ export const SPRITE_CONFIGS = {
     "images/pose3-hit-spritesheet-2064-1548.png"
   ),
   "pose4-hit": createHitSpriteConfig(
-    "images/pose4-hit-spritesheet-1902-1818.png"
+    "images/pose4-hit-spritesheet-2064-1548.png"
   ),
   "pose5-hit": createHitSpriteConfig(
-    "images/pose5-hit-spritesheet-2316-2454.png"
+    "images/pose5-hit-spritesheet-2064-1548.png"
   ),
   // Time warp animation
   "pose8-timewarp": createHitSpriteConfig(

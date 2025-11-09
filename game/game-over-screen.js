@@ -4,6 +4,11 @@ import { audioManager } from "./audio-manager.js";
 import { getStarRating, getInfiniteStarRating } from "./storage-manager.js";
 import { SpriteSheet } from "./sprite-sheet.js";
 import { getSpriteConfig } from "./sprites-config.js";
+import {
+  trackPauseOnWinScreen,
+  trackPauseOnLoseScreen,
+  trackTryAgainSelected,
+} from "./trophy-manager.js";
 
 export class GameOverScreen {
   constructor() {
@@ -58,6 +63,12 @@ export class GameOverScreen {
     this.restartButtons.forEach((btn) => {
       this.addTouchAndClickListener(btn, () => {
         audioManager.playSoundEffect("btnClick");
+
+        // Track try again click if on defeat screen
+        if (this.defeatScreen.style.display === "flex") {
+          trackTryAgainSelected();
+        }
+
         this.hide();
         if (this.onRestartCallback) {
           this.onRestartCallback();

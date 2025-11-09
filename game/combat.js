@@ -22,6 +22,9 @@ import {
   trackInfiniteLevel,
   trackLevel1NoHits,
   trackStoryModeComplete,
+  trackRobotSpinDuringTimewarpPause,
+  trackPauseOnWinScreen,
+  trackPauseOnLoseScreen,
 } from "./trophy-manager.js";
 
 // Game state
@@ -455,6 +458,7 @@ function setPose(pose, useSprite = null) {
     }, 50);
   } else {
     // Use static image
+    // All pose static images now have uniform dimensions and don't need custom scaling
     elements.poseImg.src = pose.img;
     elements.poseImg.onerror = () => {
       console.error(
@@ -462,11 +466,8 @@ function setPose(pose, useSprite = null) {
       );
     };
 
-    // Apply scale and position from config
-    const scale = pose.scale || 1.0;
-    const x = pose.x || 0;
-    const y = pose.y || 0;
-    elements.poseImg.style.transform = `translate(${x}px, ${y}px) scale(${scale})`;
+    // Reset transform - all static pose images are now standardized
+    elements.poseImg.style.transform = "";
   }
 }
 
@@ -1166,6 +1167,23 @@ function showTimeWarp() {
   spriteImg.src = timewarpSprite.imagePath;
   timewarpClipper.appendChild(spriteImg);
 
+  // Add click handler to sprite for spin trophy tracking
+  let spriteRotation = 0;
+  const spinSprite = () => {
+    if (gameState.isPaused && isInTimewarp) {
+      spriteRotation += 360;
+      scaler.style.transform = `scale(${timewarpSprite.scale}) translate(${timewarpSprite.offsetX}px, ${timewarpSprite.offsetY}px) rotate(${spriteRotation}deg)`;
+      scaler.style.transition = "transform 0.5s ease-out";
+      trackRobotSpinDuringTimewarpPause();
+    }
+  };
+  scaler.addEventListener("click", spinSprite);
+  scaler.addEventListener("touchend", (e) => {
+    e.preventDefault();
+    spinSprite();
+  });
+  scaler.style.cursor = "pointer";
+
   // Wait for sprite to load, then start animation and show popup
   timewarpLoadInterval = setInterval(() => {
     if (timewarpSprite.isLoaded) {
@@ -1255,6 +1273,18 @@ function togglePause() {
     // Track when pause started
     gameState.lastPauseTime = Date.now();
     elements.pauseOverlay.classList.add("show");
+
+    // Check if paused on win screen for trophy
+    if (gameOverScreen && gameOverScreen.victoryScreen &&
+        gameOverScreen.victoryScreen.style.display === "flex") {
+      trackPauseOnWinScreen();
+    }
+
+    // Check if paused on lose screen for trophy
+    if (gameOverScreen && gameOverScreen.defeatScreen &&
+        gameOverScreen.defeatScreen.style.display === "flex") {
+      trackPauseOnLoseScreen();
+    }
 
     // Check if paused during time warp for trophy
     if (isInTimewarp) {
