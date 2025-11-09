@@ -354,46 +354,103 @@ function createEyeballShower(element) {
     "#ff3399", // Pink
   ];
 
+  // Get canvas and setup
+  const canvas = document.getElementById("particle-canvas");
+  const ctx = canvas.getContext("2d");
+
+  // Set canvas size to match window
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  // Load eyeball image
+  const eyeballImg = new Image();
+  eyeballImg.src = "images/icon-eyeball.png";
+
+  // Create particle objects
+  const particles = [];
   for (let i = 0; i < particleCount; i++) {
-    const particle = document.createElement("div");
-    particle.className = "eyeball-particle";
-
-    // Random color for each eyeball
-    const randomColor = colors[Math.floor(Math.random() * colors.length)];
-    particle.style.color = randomColor;
-
-    // Position at element center
-    particle.style.left = `${centerX}px`;
-    particle.style.top = `${centerY}px`;
-
-    document.body.appendChild(particle);
-
-    // Random spread angle and distance - shoot further off screen
     const angle = Math.random() * Math.PI * 2;
-    const distance = 400 + Math.random() * 600; // Fly much further
-
-    const targetX = centerX + Math.cos(angle) * distance;
-    const targetY = centerY + Math.sin(angle) * distance;
-
-    // Animate particle with longer duration and more rotation
+    const distance = 400 + Math.random() * 600;
     const duration = 1500 + Math.random() * 1000;
-    const rotations = 3 + Math.random() * 5; // Multiple spins
-    const rotationDegrees = (Math.random() > 0.5 ? 1 : -1) * rotations * 360;
+    const rotations = 3 + Math.random() * 5;
 
-    // Apply transform for spreading effect with spinning
-    setTimeout(() => {
-      particle.style.transform = `translate(${targetX - centerX}px, ${
-        targetY - centerY
-      }px) scale(0.2) rotate(${rotationDegrees}deg)`;
-      particle.style.opacity = "0";
-    }, 10);
+    particles.push({
+      x: centerX,
+      y: centerY,
+      targetX: centerX + Math.cos(angle) * distance,
+      targetY: centerY + Math.sin(angle) * distance,
+      startTime: Date.now(),
+      duration: duration,
+      rotation: 0,
+      targetRotation: (Math.random() > 0.5 ? 1 : -1) * rotations * 360,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      size: 40,
+    });
+  }
 
-    // Remove particle after animation
-    setTimeout(() => {
-      if (particle.parentNode) {
-        document.body.removeChild(particle);
+  // Animation function
+  function animate() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    const now = Date.now();
+    let stillAnimating = false;
+
+    particles.forEach((particle) => {
+      const elapsed = now - particle.startTime;
+      const progress = Math.min(elapsed / particle.duration, 1);
+
+      if (progress < 1) {
+        stillAnimating = true;
       }
-    }, duration + 200);
+
+      // Easing function (ease-out)
+      const easeProgress = 1 - Math.pow(1 - progress, 3);
+
+      // Calculate current position
+      const currentX = particle.x + (particle.targetX - particle.x) * easeProgress;
+      const currentY = particle.y + (particle.targetY - particle.y) * easeProgress;
+      const currentRotation = particle.targetRotation * easeProgress;
+      const currentScale = 1 - progress * 0.8; // Scale down to 0.2
+      const currentOpacity = 1 - progress;
+
+      // Save context state
+      ctx.save();
+
+      // Set opacity
+      ctx.globalAlpha = currentOpacity;
+
+      // Move to particle position
+      ctx.translate(currentX, currentY);
+      ctx.rotate((currentRotation * Math.PI) / 180);
+
+      // Apply glow effect
+      ctx.shadowBlur = 20;
+      ctx.shadowColor = particle.color;
+
+      // Draw eyeball
+      const size = particle.size * currentScale;
+      ctx.drawImage(eyeballImg, -size / 2, -size / 2, size, size);
+
+      // Restore context state
+      ctx.restore();
+    });
+
+    if (stillAnimating) {
+      requestAnimationFrame(animate);
+    } else {
+      // Clear canvas when done
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+  }
+
+  // Start animation when image loads
+  eyeballImg.onload = () => {
+    animate();
+  };
+
+  // Start immediately if image is already cached
+  if (eyeballImg.complete) {
+    animate();
   }
 }
 

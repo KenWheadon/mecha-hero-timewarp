@@ -7,6 +7,9 @@
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
+    <!-- Canvas for particle effects -->
+    <canvas id="particle-canvas"></canvas>
+
     <!-- Loading Screen -->
     <div id="loading-screen">
       <div id="loading-content">
@@ -391,6 +394,10 @@
       import { loadingScreen } from "./loading-screen.js";
       import { storyPanel } from "./story-panel.js";
       import { hasSeenStory, markStorySeen } from "./storage-manager.js";
+      import { initResponsiveScaling } from "./responsive-scale.js";
+
+      // Initialize responsive scaling
+      initResponsiveScaling();
 
       // Show loading screen
       loadingScreen.show();
