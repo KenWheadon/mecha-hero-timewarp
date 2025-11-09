@@ -1759,15 +1759,15 @@ body.title-active::before {
   width: 100%;
   height: 80px;
   padding: 10px;
-  font-size: 0; /* Hide text labels */
 }
 
 #defense-buttons .attack-btn img {
   width: 100%;
   height: 100%;
-  padding: 0;
   border: none;
   background: none;
+  /* Prevent the image from intercepting clicks meant for the button */
+  pointer-events: none;
 }
 
 /* Enemy Section - hearts + pose */
