@@ -1,12 +1,3 @@
-// Sprites Configuration - Store all sprite sheet data
-
-/**
- * Parse sprite filename to extract dimensions
- * Expected format: name-{width}-{height}.png
- * Example: pose2-hit-spritesheet-2112-1548.png
- * @param {string} filename
- * @returns {object} { width, height }
- */
 function parseDimensions(filename) {
   const match = filename.match(/-(\d+)-(\d+)\.png$/);
   if (match) {
@@ -18,13 +9,6 @@ function parseDimensions(filename) {
   throw new Error(`Could not parse dimensions from filename: ${filename}`);
 }
 
-/**
- * Factory function to create a standard sprite configuration.
- * This reduces boilerplate for sprites that share common properties.
- * @param {string} imagePath - Path to the sprite sheet.
- * @param {object} overrides - Optional properties to override defaults.
- * @returns {object} A full sprite configuration object.
- */
 function createHitSpriteConfig(imagePath, overrides = {}) {
   const defaults = {
     rows: 6,
@@ -51,54 +35,14 @@ function createHitSpriteConfig(imagePath, overrides = {}) {
   };
 }
 
-/**
- * Sprite sheet configurations
- * Each sprite config includes:
- * - imagePath: Path to the sprite sheet image
- * - frameWidth: Width of a single frame
- * - frameHeight: Height of a single frame
- * - rows: Number of rows in the sprite sheet (default: 6)
- * - cols: Number of columns in the sprite sheet (default: 6)
- * - fps: Frames per second for animation (default: 12)
- * - loop: Whether to loop the animation (default: true)
- * - scale: Scale factor for the container (default: 1)
- * - offsetX: Horizontal offset in pixels (default: 0)
- * - offsetY: Vertical offset in pixels (default: 0)
- */
 export const SPRITE_CONFIGS = {
   // Pose 2 - manual config to crop bottom whitespace
-  "pose2-hit": {
-    imagePath: "images/pose2-hit-spritesheet-2112-1548.png",
-    rows: 6,
-    cols: 6,
-    fps: 12,
-    loop: true,
-    scale: 1.5,
-    offsetX: 0,
-    offsetY: 0,
-    frameContentWidth: 352, // 2112 / 6 = 352
-    frameContentHeight: 218, // 1548 / 6 = 258, reduced to crop bottom
-    frameWidth: 0, // No left offset
-    frameHeight: 0, // No top offset (adjust to crop from top instead)
-    gapX: 0, // No horizontal gap between frames
-    gapY: 0, // No vertical gap between frames
-  },
-  "pose3-hit": {
-    imagePath: "images/pose3-hit-spritesheet-2406-1962.png",
-    rows: 6,
-    cols: 6,
-    fps: 12,
-    loop: true,
-    scale: 0.8,
-    offsetX: 0,
-    offsetY: 0,
-    frameContentWidth: 401,  // 2406 / 6
-    frameContentHeight: 266, // 1962 / 6 = 327, minus 30 (top) + 31 (bottom) = 266
-    frameWidth: 0,
-    frameHeight: 30,         // Crop 30px from top
-    gapX: 0,
-    gapY: 0,                 // No gap between frames
-  },
+  "pose2-hit": createHitSpriteConfig(
+    "images/pose2-hit-spritesheet-2064-1548.png"
+  ),
+  "pose3-hit": createHitSpriteConfig(
+    "images/pose3-hit-spritesheet-2064-1548.png"
+  ),
   "pose4-hit": createHitSpriteConfig(
     "images/pose4-hit-spritesheet-1902-1818.png"
   ),
@@ -165,11 +109,6 @@ export const SPRITE_CONFIGS = {
   ),
 };
 
-/**
- * Get sprite configuration by name
- * @param {string} name - Sprite name
- * @returns {object} Sprite configuration
- */
 export function getSpriteConfig(name) {
   const config = SPRITE_CONFIGS[name];
   if (!config) {
