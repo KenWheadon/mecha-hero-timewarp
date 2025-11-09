@@ -27,6 +27,25 @@ class AudioManager {
       pose5Charge: null,
       pose5Hit: null,
       pose5Miss: null,
+      // Title Screen & UI
+      titleGlitchIn: null,
+      titleTrans: null,
+      eyeballShow: null,
+      // Story & Popups
+      storyPage: null,
+      popupAppear: null,
+      accordionOpen: null,
+      // Combat
+      playerDamage: null,
+      enemyDamage: null,
+      timerRunningOut: null,
+      shake: null,
+      // Victory Screen
+      awardStar: null,
+      winScreen: null,
+      newRecord: null,
+      // Trophy
+      trophyAward: null,
     };
     // Volume settings for music tracks (0.0 to 1.0)
     this.trackVolumes = {
@@ -58,6 +77,25 @@ class AudioManager {
       pose5Charge: 0.6,
       pose5Hit: 0.7,
       pose5Miss: 0.5,
+      // Title Screen & UI
+      titleGlitchIn: 0.5,
+      titleTrans: 0.5,
+      eyeballShow: 0.6,
+      // Story & Popups
+      storyPage: 0.4,
+      popupAppear: 0.4,
+      accordionOpen: 0.4,
+      // Combat
+      playerDamage: 0.6,
+      enemyDamage: 0.6,
+      timerRunningOut: 0.5,
+      shake: 0.5,
+      // Victory Screen
+      awardStar: 0.5,
+      winScreen: 0.6,
+      newRecord: 0.6,
+      // Trophy
+      trophyAward: 0.6,
     };
     this.currentTrack = null;
     this.isMuted = false;
@@ -111,6 +149,30 @@ class AudioManager {
     this.soundEffects.pose5Charge = new Audio("audio/pose5-charge.mp3");
     this.soundEffects.pose5Hit = new Audio("audio/pose5-hit.mp3");
     this.soundEffects.pose5Miss = new Audio("audio/pose5-miss.mp3");
+
+    // Title Screen & UI
+    this.soundEffects.titleGlitchIn = new Audio("audio/title-glitch-in.mp3");
+    this.soundEffects.titleTrans = new Audio("audio/title-trans.mp3");
+    this.soundEffects.eyeballShow = new Audio("audio/eyeball-show.mp3");
+
+    // Story & Popups
+    this.soundEffects.storyPage = new Audio("audio/story-page.mp3");
+    this.soundEffects.popupAppear = new Audio("audio/popup-appear.mp3");
+    this.soundEffects.accordionOpen = new Audio("audio/accordion-open.mp3");
+
+    // Combat
+    this.soundEffects.playerDamage = new Audio("audio/player-damage.mp3");
+    this.soundEffects.enemyDamage = new Audio("audio/enemy-damage.mp3");
+    this.soundEffects.timerRunningOut = new Audio("audio/timer-runningout.mp3");
+    this.soundEffects.shake = new Audio("audio/shake.mp3");
+
+    // Victory Screen
+    this.soundEffects.awardStar = new Audio("audio/award-star.mp3");
+    this.soundEffects.winScreen = new Audio("audio/win-screen.mp3");
+    this.soundEffects.newRecord = new Audio("audio/new-record.mp3");
+
+    // Trophy
+    this.soundEffects.trophyAward = new Audio("audio/trophy-award.mp3");
 
     // Apply volume settings to all sound effects
     Object.keys(this.soundEffects).forEach((key) => {

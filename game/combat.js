@@ -556,6 +556,10 @@ function startTimer() {
   elements.timerBarFill.style.width = "100%";
   elements.timerBarFill.classList.remove("warning", "danger");
 
+  // Reset timer warning state
+  gameState.hasPlayedWarningSound = false;
+  gameState.hasPlayedDangerSound = false;
+
   // Update timer text initially
   const secondsRemaining = Math.ceil(gameState.timer / 1000);
   elements.timerText.textContent = secondsRemaining;
@@ -571,8 +575,18 @@ function startTimer() {
     elements.timerBarFill.classList.remove("warning", "danger");
     if (percentage <= 33) {
       elements.timerBarFill.classList.add("danger");
+      // Play danger sound on repeat (every second)
+      if (!gameState.hasPlayedDangerSound || gameState.timer % 1000 < 100) {
+        audioManager.playSoundEffect("timerRunningOut");
+        gameState.hasPlayedDangerSound = true;
+      }
     } else if (percentage <= 66) {
       elements.timerBarFill.classList.add("warning");
+      // Play warning sound once
+      if (!gameState.hasPlayedWarningSound) {
+        audioManager.playSoundEffect("timerRunningOut");
+        gameState.hasPlayedWarningSound = true;
+      }
     }
 
     // Update timer text (show seconds remaining, rounded up)
@@ -795,6 +809,7 @@ function flashScreen(isCorrect) {
 
 // Shake animation for incorrect answers
 function shakeScreen() {
+  audioManager.playSoundEffect("shake");
   document.body.style.animation = "shake 0.5s ease";
   setTimeout(() => {
     document.body.style.animation = "";
@@ -853,6 +868,7 @@ function handleAttack(action) {
 
       // Deal damage
       gameState.enemyHP--;
+      audioManager.playSoundEffect("enemyDamage");
       updateEnemyHearts();
 
       if (gameState.enemyHP <= 0) {
@@ -897,6 +913,7 @@ function handleAttack(action) {
 
       // Lose a heart
       gameState.hearts--;
+      audioManager.playSoundEffect("playerDamage");
       updateHearts();
 
       if (gameState.hearts <= 0) {

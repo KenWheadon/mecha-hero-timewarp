@@ -1,5 +1,7 @@
 // Trophy Manager - handles trophy data, unlocking, and persistence
 
+import { audioManager } from "./audio-manager.js";
+
 // Trophy definitions
 const TROPHIES = [
   {
@@ -253,6 +255,9 @@ function unlockTrophy(trophyId) {
 
 // Show trophy unlocked notification
 function showTrophyUnlockedNotification(trophy) {
+  // Play trophy award sound
+  audioManager.playSoundEffect("trophyAward");
+
   // Create notification element
   const notification = document.createElement("div");
   notification.className = "trophy-notification";

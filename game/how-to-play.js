@@ -92,7 +92,7 @@ export class HowToPlay {
         const isOpen = section.classList.contains("active");
 
         // Play sound effect
-        audioManager.playSoundEffect("btnClick");
+        audioManager.playSoundEffect("accordionOpen");
 
         // Close all other sections
         this.elements.accordionHeaders.forEach((otherHeader) => {
@@ -127,7 +127,7 @@ export class HowToPlay {
   }
 
   open() {
-    audioManager.playSoundEffect("btnClick");
+    audioManager.playSoundEffect("popupAppear");
     this.elements.overlay.style.display = "block";
     this.elements.modal.style.display = "block";
   }

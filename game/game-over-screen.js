@@ -104,14 +104,21 @@ export class GameOverScreen {
    * @param {number} timeInSeconds - The time in seconds for star rating calculation
    */
   showVictory(timeText, isNewHighScore, timeInSeconds) {
+    // Play win screen sound
+    audioManager.playSoundEffect("winScreen");
+
     // Update time display
     const timeElement = document.getElementById("victory-time");
     timeElement.textContent = timeText;
 
-    // Update high score badge visibility
+    // Update high score badge visibility with sound
     const badge = document.getElementById("victory-badge");
     if (isNewHighScore) {
       badge.style.display = "block";
+      // Play new record sound after a short delay
+      setTimeout(() => {
+        audioManager.playSoundEffect("newRecord");
+      }, 500);
     } else {
       badge.style.display = "none";
     }
@@ -168,6 +175,8 @@ export class GameOverScreen {
     for (let i = 0; i < rating; i++) {
       setTimeout(() => {
         stars[i].classList.add("unlocked");
+        // Play star award sound for each star
+        audioManager.playSoundEffect("awardStar");
       }, i * 200); // 200ms delay between each star
     }
   }

@@ -1,6 +1,7 @@
 // Onboarding Module - handles first-time popups for each level
 
 import { isFirstTime, markFightAsSeen } from "./storage-manager.js";
+import { audioManager } from "./audio-manager.js";
 
 // Cache DOM elements
 const elements = {
@@ -92,6 +93,7 @@ function showOnboarding(fightLevel, callback) {
   elements.text.textContent = instruction.text;
 
   // Show popup
+  audioManager.playSoundEffect("popupAppear");
   elements.overlay.style.display = "block";
   elements.popup.style.display = "block";
 }

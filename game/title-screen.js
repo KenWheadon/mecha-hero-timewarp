@@ -84,7 +84,8 @@ export function initTitleScreen() {
   // Load and display infinite mode high score
   loadInfiniteHighScore();
 
-  // Queue the intro audio (will play on first user interaction)
+  // Play the intro audio immediately (audio already unlocked from loading screen)
+  audioManager.unlock();
   audioManager.play("titleIntro");
 
   startTitleGlitch();
@@ -285,6 +286,9 @@ function onTrophyClick() {
 // Title glitch effect - replaces title with logo after 3 seconds
 function startTitleGlitch() {
   setTimeout(() => {
+    // Play title glitch sound
+    audioManager.playSoundEffect("titleGlitchIn");
+
     // Add intense glitch effect
     elements.title.style.animation = "glitchIntense 0.3s linear";
 
@@ -352,6 +356,9 @@ function onLogoClick() {
   // Track first logo click for trophy
   trackLogoClick();
 
+  // Play logo transformation sound
+  audioManager.playSoundEffect("titleTrans");
+
   // Clear the animation interval and sprite
   if (logoAnimationInterval) {
     clearInterval(logoAnimationInterval);
@@ -384,7 +391,8 @@ function createEyeballShower(element) {
   // Track eyeball shower trophy
   trackEyeballShower();
 
-  audioManager.playSoundEffect("timewarp"); // A fun sound for the effect
+  // Play eyeball shower sound effect
+  audioManager.playSoundEffect("eyeballShow");
 
   // Array of vibrant colors for the glow effect
   const colors = [
@@ -573,6 +581,7 @@ function openTrophyPopup() {
   });
 
   // Show popup
+  audioManager.playSoundEffect("popupAppear");
   trophyPopup.style.display = "block";
   overlay.style.display = "block";
 }

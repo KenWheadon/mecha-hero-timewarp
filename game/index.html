@@ -277,7 +277,8 @@
         <div class="credit-section">
           <div class="credit-role">Other Tools</div>
           <div class="credit-name">
-            tinyPNG, Squoosh, piskelapp, VS Code, Github, online-voice-recorder
+            tinyPNG, Squoosh, piskelapp, VS Code, Github, online-voice-recorder,
+            freeconvert
           </div>
         </div>
       </div>
@@ -493,13 +494,8 @@
       // Monitor the CSS animation for the logo container
       visibilityManager.monitorCSSAnimation(logoContainer);
 
-      // Preload critical game assets (victory and defeat sprites)
-      const criticalAssets = [
-        "images/losing-spritesheet-1464-1554.png",
-        "images/winning-spritesheet-1350-1578.png",
-      ];
-
-      loadingScreen.preloadImages(criticalAssets);
+      // Start loading all game assets (images and audio)
+      loadingScreen.preloadAllAssets();
 
       // Wait for page to fully load
       window.addEventListener("load", async () => {

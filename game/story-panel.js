@@ -130,7 +130,7 @@ export class StoryPanel {
     this.elements.overlay.style.display = "block";
     this.elements.panel.style.display = "block";
 
-    audioManager.playSoundEffect("btnClick");
+    audioManager.playSoundEffect("popupAppear");
   }
 
   close() {
@@ -147,6 +147,8 @@ export class StoryPanel {
     if (this.currentPanelIndex < STORY_PANELS.length - 1) {
       this.currentPanelIndex++;
       this.updatePanel();
+      // Play story page sound
+      audioManager.playSoundEffect("storyPage");
     } else {
       // On last panel, next button closes the story
       // Track that user viewed the full story
@@ -159,6 +161,8 @@ export class StoryPanel {
     if (this.currentPanelIndex > 0) {
       this.currentPanelIndex--;
       this.updatePanel();
+      // Play story page sound
+      audioManager.playSoundEffect("storyPage");
     }
   }
 
