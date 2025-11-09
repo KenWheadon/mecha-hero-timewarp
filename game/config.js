@@ -91,7 +91,7 @@ export const finalDestroyPose = {
 export const GAME_CONFIG = {
   MAX_HEARTS: 3,
   MAX_FIGHTS: 4,
-  INITIAL_CRYSTAL_CHARGES: 2,
+  INITIAL_CRYSTAL_CHARGES: 3,
 
   // Fight configurations [fight level: { maxHP, availableAttacks, timerDuration, showCrystal }]
   FIGHT_CONFIGS: {

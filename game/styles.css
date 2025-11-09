@@ -663,7 +663,7 @@ body.title-active::before {
 /* GAME SCREEN */
 #game {
   text-align: center;
-  max-width: 900px;
+  max-width: 1300px;
   width: 100%;
   display: none;
   position: relative;
@@ -1266,6 +1266,289 @@ body.title-active::before {
   box-shadow: none;
 }
 
+/* ========================================
+   NEW COMBAT UI LAYOUT
+   ======================================== */
+
+/* Game container - adjust for new absolute positioned elements */
+#game {
+  position: relative;
+  min-height: 100vh;
+}
+
+/* Audio button - top left */
+#audio-toggle-combat {
+  position: absolute !important;
+  top: 20px;
+  left: 20px;
+  width: 70px;
+  height: 70px;
+  padding: 0;
+  z-index: 100;
+  box-shadow: 6px 6px 0px #000;
+}
+
+#audio-toggle-combat .audio-icon {
+  width: 40px;
+  height: 40px;
+  padding: 0;
+}
+
+#audio-toggle-combat:hover {
+  transform: translate(3px, 3px);
+  box-shadow: 3px 3px 0px #000;
+}
+
+#audio-toggle-combat:active {
+  transform: translate(6px, 6px);
+  box-shadow: none;
+}
+
+/* Pause button - top right */
+#pause {
+  position: absolute !important;
+  top: 20px;
+  right: 20px;
+  z-index: 100;
+  margin: 0;
+}
+
+/* Crystal display - top center */
+#crystal-display {
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 15px;
+  align-items: center;
+  z-index: 100;
+}
+
+.crystal-item {
+  width: 50px;
+  height: 50px;
+  position: relative;
+}
+
+.crystal-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 0 8px rgba(0, 255, 255, 0.8));
+}
+
+.crystal-item.depleted img {
+  filter: brightness(0);
+}
+
+.infinite-symbol {
+  font-size: 40px;
+  color: var(--color-accent);
+  font-weight: 900;
+  text-shadow: 0 0 10px var(--color-accent), 3px 3px 0 #000;
+}
+
+/* Combat Area - main flexbox layout */
+#combat-area {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 95%;
+  max-width: 1200px;
+  height: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+/* Player Container */
+#player-container {
+  width: 25%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+}
+
+#player-hearts {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+  min-height: 50px;
+}
+
+#player-box {
+  flex: 1;
+  width: 100%;
+  background: var(--color-card);
+  border: var(--border-thick) solid #000;
+  box-shadow: var(--shadow-brutal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+#player-img {
+  max-width: 90%;
+  max-height: 90%;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+
+/* Horizontal Timer Bar below player */
+#timer-bar-container {
+  width: 100%;
+  height: 50px;
+  background: #333;
+  border: var(--border-thick) solid #000;
+  box-shadow: var(--shadow-brutal);
+  position: relative;
+  display: flex;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+#timer-bar-fill {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    to right,
+    var(--color-primary) 0%,
+    var(--color-warning) 50%,
+    var(--color-primary) 100%
+  );
+  transition: width 0.1s linear, background 0.3s ease;
+  position: absolute;
+  left: 0;
+}
+
+#timer-bar-fill.warning {
+  background: linear-gradient(to right, var(--color-warning) 0%, #ffaa00 100%);
+}
+
+#timer-bar-fill.danger {
+  background: linear-gradient(to right, var(--color-danger) 0%, #ff6600 100%);
+  animation: pulse-red 0.5s infinite;
+}
+
+@keyframes pulse-red {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+#timer-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 28px;
+  font-weight: 900;
+  color: #fff;
+  text-shadow: 3px 3px 0 #000;
+  z-index: 10;
+}
+
+/* Defense Buttons - vertical icon-only */
+#defense-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  justify-content: center;
+  width: 15%;
+  min-width: 80px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+#defense-buttons.show {
+  opacity: 1;
+}
+
+#defense-buttons .attack-btn {
+  width: 100%;
+  height: 80px;
+  padding: 10px;
+  font-size: 0; /* Hide text labels */
+}
+
+#defense-buttons .attack-btn img {
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: none;
+  background: none;
+}
+
+/* Enemy Section - hearts + pose */
+#enemy-section {
+  width: 60%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+}
+
+#enemy-hearts {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
+  min-height: 40px;
+}
+
+#enemy-hearts .heart {
+  width: 35px;
+  height: 35px;
+  transition: opacity 0.3s ease;
+}
+
+#enemy-container {
+  flex: 1;
+  width: 100%;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#enemy-pose {
+  width: 100%;
+  height: 100%;
+}
+
+/* Message - position at bottom */
+#message {
+  position: absolute;
+  bottom: 70px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80%;
+  max-width: 600px;
+  margin: 0;
+}
+
+/* Restart button - position at bottom */
+#restart {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  margin: 0;
+}
+
 /* HOW TO PLAY MODAL */
 #how-to-play {
   display: none;
@@ -1373,7 +1656,11 @@ body.title-active::before {
 .htp-accordion-header:hover {
   transform: translate(4px, 4px);
   box-shadow: 4px 4px 0px #000;
-  background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-primary) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--color-accent) 0%,
+    var(--color-primary) 100%
+  );
 }
 
 .htp-accordion-header:active {

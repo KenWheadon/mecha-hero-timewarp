@@ -254,63 +254,46 @@
     </div>
 
     <div id="game">
-      <!-- Top Bar: Hearts, Fight Info, Controls -->
-      <div id="top-bar">
-        <div id="hearts"></div>
-        <div id="fight-info">Fight: 1/4</div>
-        <div id="controls">
-          <button id="audio-toggle-combat" class="audio-toggle-btn">
-            <img
-              src="images/icon-musicnote.png"
-              alt="Audio"
-              class="audio-icon"
-            />
-          </button>
-          <div class="pause-controls">
-            <button id="pause">Pause</button>
-            <button id="quit-btn">Quit</button>
+      <!-- Audio Button (Top Left) -->
+      <button id="audio-toggle-combat" class="audio-toggle-btn">
+        <img
+          src="images/icon-musicnote.png"
+          alt="Audio"
+          class="audio-icon"
+        />
+      </button>
+
+      <!-- Pause Button (Top Right) -->
+      <button id="pause">Pause</button>
+
+      <!-- Time Crystal Display (Top Center) -->
+      <div id="crystal-display">
+        <!-- Will be populated dynamically -->
+      </div>
+
+      <!-- Combat Area -->
+      <div id="combat-area">
+        <!-- Player Container -->
+        <div id="player-container">
+          <div id="player-hearts"></div>
+          <div id="player-box">
+            <img id="player-img" src="images/player-default.png" alt="Player" onerror="console.error('Missing image: ' + this.src)" />
+          </div>
+          <!-- Horizontal Timer Bar -->
+          <div id="timer-bar-container">
+            <div id="timer-bar-fill"></div>
+            <div id="timer-text"></div>
           </div>
         </div>
-      </div>
 
-      <!-- Timer -->
-      <div id="timer">
-        <div id="timer-text"></div>
-        <div id="timer-fill"></div>
-      </div>
-
-      <!-- Enemy Section: Status Bars + Pose -->
-      <div id="enemy-section">
-        <div id="status-bars">
-          <div id="crystal-energy"><div id="crystal-fill"></div></div>
-          <div id="enemy-hp"><div id="enemy-hp-fill"></div></div>
-        </div>
-        <div id="enemy-container">
-          <div id="enemy-pose">
-            <img
-              id="pose-img"
-              src="images/pose1.png"
-              alt="Enemy Pose"
-              onerror="console.error('Missing image: ' + this.src)"
-            />
-          </div>
-        </div>
-      </div>
-
-      <!-- Instruction and Message -->
-      <div id="instruction">Prepare for battle...</div>
-      <div id="message"></div>
-
-      <!-- Attacks Section -->
-      <div id="attacks-section">
-        <div id="attacks">
+        <!-- Defense Buttons -->
+        <div id="defense-buttons">
           <button class="attack-btn" data-action="shield">
             <img
               src="images/shield.png"
               alt="Shield"
               onerror="console.error('Missing image: ' + this.src)"
             />
-            Shield Bash
           </button>
           <button class="attack-btn" data-action="rocket">
             <img
@@ -318,7 +301,6 @@
               alt="Rocket"
               onerror="console.error('Missing image: ' + this.src)"
             />
-            Rocket Fist
           </button>
           <button class="attack-btn" data-action="sword">
             <img
@@ -326,7 +308,6 @@
               alt="Sword"
               onerror="console.error('Missing image: ' + this.src)"
             />
-            Robo Bat
           </button>
           <button class="attack-btn" data-action="plasma">
             <img
@@ -334,13 +315,35 @@
               alt="Plasma"
               onerror="console.error('Missing image: ' + this.src)"
             />
-            Plasma Glasses
           </button>
+        </div>
+
+        <!-- Enemy Section -->
+        <div id="enemy-section">
+          <div id="enemy-hearts">
+            <!-- Will be populated dynamically -->
+          </div>
+          <div id="enemy-container">
+            <div id="enemy-pose">
+              <img
+                id="pose-img"
+                src="images/pose1.png"
+                alt="Enemy Pose"
+                onerror="console.error('Missing image: ' + this.src)"
+              />
+            </div>
+          </div>
         </div>
       </div>
 
-      <!-- Restart Button -->
+      <!-- Message -->
+      <div id="message"></div>
+
+      <!-- Restart Button (hidden by default) -->
       <button id="restart">Restart Game</button>
+
+      <!-- Hidden Quit Button (for backwards compatibility) -->
+      <button id="quit-btn" style="display: none;">Quit</button>
     </div>
 
     <!-- Victory Screen -->

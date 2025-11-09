@@ -62,18 +62,16 @@ function addTouchAndClickListener(element, handler) {
 // Cache DOM elements
 const elements = {
   pause: document.getElementById("pause"),
-  hearts: document.getElementById("hearts"),
-  fightInfo: document.getElementById("fight-info"),
-  timerFill: document.getElementById("timer-fill"),
+  playerHearts: document.getElementById("player-hearts"),
+  playerImg: document.getElementById("player-img"),
+  timerBarFill: document.getElementById("timer-bar-fill"),
   timerText: document.getElementById("timer-text"),
-  crystalEnergy: document.getElementById("crystal-energy"),
-  crystalFill: document.getElementById("crystal-fill"),
-  enemyHpFill: document.getElementById("enemy-hp-fill"),
+  crystalDisplay: document.getElementById("crystal-display"),
+  enemyHearts: document.getElementById("enemy-hearts"),
   poseImg: document.getElementById("pose-img"),
-  instruction: document.getElementById("instruction"),
   message: document.getElementById("message"),
   attacks: document.querySelectorAll(".attack-btn"),
-  attacksDiv: document.getElementById("attacks"),
+  defenseButtons: document.getElementById("defense-buttons"),
   restart: document.getElementById("restart"),
   quitBtn: document.getElementById("quit-btn"),
   audioToggleCombat: document.getElementById("audio-toggle-combat"),
@@ -153,9 +151,9 @@ export function initGame(isInfiniteMode = false) {
   audioManager.play("combat");
 }
 
-// Initialize hearts display
+// Initialize hearts display (player hearts)
 function initHearts() {
-  elements.hearts.innerHTML = "";
+  elements.playerHearts.innerHTML = "";
   for (let i = 0; i < gameState.hearts; i++) {
     const heart = document.createElement("img");
     heart.className = "heart";
@@ -163,16 +161,34 @@ function initHearts() {
     heart.onerror = () => {
       console.error("Missing image: images/heart.png");
     };
-    elements.hearts.appendChild(heart);
+    elements.playerHearts.appendChild(heart);
   }
+  // Update player image to match HP
+  updatePlayerImage();
 }
 
-// Update hearts display
+// Update hearts display and player image
 function updateHearts() {
-  const hearts = elements.hearts.querySelectorAll(".heart");
+  const hearts = elements.playerHearts.querySelectorAll(".heart");
   hearts.forEach((heart, i) => {
     heart.style.opacity = i < gameState.hearts ? "1" : "0.3";
   });
+  // Update player image to match HP
+  updatePlayerImage();
+}
+
+// Update player image based on HP
+function updatePlayerImage() {
+  const imageMap = {
+    3: "images/player-default.png",
+    2: "images/player-2hp.png",
+    1: "images/player-1hp.png",
+    0: "images/player-0hp.png",
+  };
+  elements.playerImg.src = imageMap[gameState.hearts] || imageMap[3];
+  elements.playerImg.onerror = () => {
+    console.error(`Missing image: ${imageMap[gameState.hearts]}`);
+  };
 }
 
 // Calculate timer duration for infinite mode based on level
@@ -222,20 +238,8 @@ function setupFight() {
   gameState.counteredPoses.clear();
 
   // Update UI
-  if (gameState.isInfiniteMode) {
-    elements.fightInfo.textContent = `Level: ${gameState.infiniteLevel}`;
-  } else {
-    elements.fightInfo.textContent = `Fight: ${gameState.currentFight}/${gameState.maxFights}`;
-  }
-  updateEnemyHP();
-  updateCrystalEnergy();
-
-  // Show/hide crystal energy bar
-  if (config.showCrystal) {
-    elements.crystalEnergy.style.display = "block";
-  } else {
-    elements.crystalEnergy.style.display = "none";
-  }
+  updateEnemyHearts();
+  updateCrystalDisplay();
 
   // Enable/disable attack buttons based on available attacks
   elements.attacks.forEach((btn) => {
@@ -262,17 +266,64 @@ function setupFight() {
   }
 }
 
-// Update enemy HP bar
-function updateEnemyHP() {
-  const percentage = (gameState.enemyHP / gameState.maxEnemyHP) * 100;
-  elements.enemyHpFill.style.width = `${percentage}%`;
+// Update enemy hearts display
+function updateEnemyHearts() {
+  elements.enemyHearts.innerHTML = "";
+  for (let i = 0; i < gameState.maxEnemyHP; i++) {
+    const heart = document.createElement("img");
+    heart.className = "heart";
+    heart.src = "images/heart.png";
+    heart.style.opacity = i < gameState.enemyHP ? "1" : "0.3";
+    heart.onerror = () => {
+      console.error("Missing image: images/heart.png");
+    };
+    elements.enemyHearts.appendChild(heart);
+  }
 }
 
-// Update crystal energy bar
-function updateCrystalEnergy() {
-  const percentage =
-    (gameState.crystalCharges / GAME_CONFIG.INITIAL_CRYSTAL_CHARGES) * 100;
-  elements.crystalFill.style.width = `${percentage}%`;
+// Update crystal display for normal/infinite modes
+function updateCrystalDisplay() {
+  elements.crystalDisplay.innerHTML = "";
+
+  if (gameState.isInfiniteMode) {
+    // Infinite mode: 1 crystal + infinity symbol
+    const crystalItem = document.createElement("div");
+    crystalItem.className = "crystal-item";
+    const crystalImg = document.createElement("img");
+    crystalImg.src = "images/timecrystal.png";
+    crystalImg.alt = "Crystal";
+    crystalImg.onerror = () => {
+      console.error("Missing image: images/timecrystal.png");
+    };
+    crystalItem.appendChild(crystalImg);
+    elements.crystalDisplay.appendChild(crystalItem);
+
+    const infiniteSymbol = document.createElement("div");
+    infiniteSymbol.className = "infinite-symbol";
+    infiniteSymbol.textContent = "∞";
+    elements.crystalDisplay.appendChild(infiniteSymbol);
+  } else {
+    // Normal mode: show 3 crystals total
+    const maxCrystals = GAME_CONFIG.INITIAL_CRYSTAL_CHARGES;
+    for (let i = 0; i < maxCrystals; i++) {
+      const crystalItem = document.createElement("div");
+      crystalItem.className = "crystal-item";
+
+      const crystalImg = document.createElement("img");
+      crystalImg.src = "images/timecrystal.png";
+      crystalImg.alt = "Crystal";
+      crystalImg.onerror = () => {
+        console.error("Missing image: images/timecrystal.png");
+      };
+      crystalItem.appendChild(crystalImg);
+
+      if (i >= gameState.crystalCharges) {
+        crystalItem.classList.add("depleted");
+      }
+
+      elements.crystalDisplay.appendChild(crystalItem);
+    }
+  }
 }
 
 // Clean up active sprite sheet
@@ -370,11 +421,10 @@ function setPose(pose, useSprite = null) {
 function startNewPose() {
   // Reset UI
   elements.message.textContent = "";
-  elements.attacksDiv.classList.remove("show");
+  elements.defenseButtons.classList.remove("show");
 
   // Show neutral stance first
   setPose(neutralPose);
-  elements.instruction.textContent = "Get ready...";
 
   setTimeout(() => {
     showAttackPose();
@@ -387,8 +437,7 @@ function showAttackPose() {
   gameState.pendingPose = pose;
 
   setPose(pose);
-  elements.instruction.textContent = `Counter the ${pose.desc}!`;
-  elements.attacksDiv.classList.add("show");
+  elements.defenseButtons.classList.add("show");
 
   // Play charge sound based on pose ID
   const chargeSoundMap = {
@@ -446,7 +495,8 @@ function selectRandomPose() {
 // Start timer
 function startTimer() {
   gameState.timer = gameState.baseTimerDuration;
-  elements.timerFill.style.width = "100%";
+  elements.timerBarFill.style.width = "100%";
+  elements.timerBarFill.classList.remove("warning", "danger");
 
   // Update timer text initially
   const secondsRemaining = Math.ceil(gameState.timer / 1000);
@@ -457,7 +507,15 @@ function startTimer() {
 
     gameState.timer -= 100;
     const percentage = (gameState.timer / gameState.baseTimerDuration) * 100;
-    elements.timerFill.style.width = `${percentage}%`;
+    elements.timerBarFill.style.width = `${percentage}%`;
+
+    // Update color based on percentage
+    elements.timerBarFill.classList.remove("warning", "danger");
+    if (percentage <= 10) {
+      elements.timerBarFill.classList.add("danger");
+    } else if (percentage <= 30) {
+      elements.timerBarFill.classList.add("warning");
+    }
 
     // Update timer text (show seconds remaining, rounded up)
     const secondsRemaining = Math.ceil(gameState.timer / 1000);
@@ -483,7 +541,7 @@ function stopTimer() {
 // Handle timeout
 function handleTimeout() {
   stopTimer();
-  elements.attacksDiv.classList.remove("show");
+  elements.defenseButtons.classList.remove("show");
 
   // Flash red and shake for timeout
   flashScreen(false);
@@ -694,7 +752,7 @@ function handleAttack(action) {
   gameState.pendingPose = null;
 
   stopTimer();
-  elements.attacksDiv.classList.remove("show");
+  elements.defenseButtons.classList.remove("show");
 
   const correct = action === currentPose.correct;
   const poseId = currentPose.id;
@@ -737,7 +795,7 @@ function handleAttack(action) {
 
       // Deal damage
       gameState.enemyHP--;
-      updateEnemyHP();
+      updateEnemyHearts();
 
       if (gameState.enemyHP <= 0) {
         handleFightWon();
@@ -799,7 +857,7 @@ function handleAttack(action) {
 
 // Handle fight won
 function handleFightWon() {
-  elements.instruction.textContent = "Enemy defeated!";
+  // Enemy defeated
 
   // Show damaged pose
   setPose(damagedPose);
@@ -822,7 +880,6 @@ function handleFightWon() {
       const isNewHighScore = saveHighScore(totalGameTime);
 
       setPose(finalDestroyPose);
-      elements.instruction.textContent = "VICTORY!";
 
       // Play final death sound for level 4 victory
       audioManager.playSoundEffect("roboFinalDeath");
@@ -874,8 +931,7 @@ function formatTimeForDisplay(seconds) {
 // Show time warp transition
 function showTimeWarp() {
   setPose(timeWarpPose);
-  elements.instruction.textContent = "Time Warp Activated!";
-  elements.message.textContent = "Traveling to next fight...";
+  elements.message.textContent = "Time Warp!";
   elements.message.style.color = "#0ff";
 
   // Track that we're in a time warp
@@ -888,7 +944,7 @@ function showTimeWarp() {
   const currentConfig = GAME_CONFIG.FIGHT_CONFIGS[gameState.currentFight];
   if (currentConfig.showCrystal) {
     gameState.crystalCharges -= GAME_CONFIG.CRYSTAL_COST_ON_WARP;
-    updateCrystalEnergy();
+    updateCrystalDisplay();
 
     if (gameState.crystalCharges <= 0) {
       elements.message.textContent = "Crystal depleted!";
@@ -909,7 +965,6 @@ function showTimeWarp() {
 // Game over
 function gameOver() {
   stopTimer();
-  elements.instruction.textContent = "GAME OVER";
 
   if (gameState.isInfiniteMode) {
     // Save infinite mode high score
