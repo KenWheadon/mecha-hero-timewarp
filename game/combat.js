@@ -901,6 +901,33 @@ function handleAttack(action) {
         desc: "Blocked!",
         sprite: currentPose.hitSprite,
       });
+
+      // If using sprite animation, wait for it to complete
+      if (activeSpriteSheet && !activeSpriteSheet.loop) {
+        activeSpriteSheet.onComplete = () => {
+          elements.message.textContent = "Wrong move!";
+          elements.message.style.color = "#f00";
+          elements.message.style.fontSize = "32px";
+          elements.message.style.textShadow = "0 0 10px #f00, 3px 3px 0px #000";
+
+          // Lose a heart
+          gameState.hearts--;
+          audioManager.playSoundEffect("playerDamage");
+          updateHearts();
+
+          if (gameState.hearts <= 0) {
+            gameOver();
+          } else {
+            setTimeout(() => {
+              // Reset message styles
+              elements.message.style.fontSize = "";
+              elements.message.style.textShadow = "3px 3px 0px #000";
+              startNewPose();
+            }, GAME_CONFIG.FEEDBACK_DURATION);
+          }
+        };
+        return; // Exit early, the onComplete callback will handle the rest
+      }
     } else {
       setPose({ img: currentPose.hitImg, desc: "Blocked!" });
     }
@@ -1188,22 +1215,13 @@ function showTimeWarp() {
   spriteImg.src = timewarpSprite.imagePath;
   timewarpClipper.appendChild(spriteImg);
 
-  // Add click handler to sprite for spin trophy tracking
-  let spriteRotation = 0;
-  const spinSprite = () => {
+  // Track when the sprite completes a full yoyo cycle for trophy tracking
+  timewarpSprite.onCycleComplete = () => {
+    // Only track if game is paused during timewarp
     if (gameState.isPaused && isInTimewarp) {
-      spriteRotation += 360;
-      scaler.style.transform = `scale(${timewarpSprite.scale}) translate(${timewarpSprite.offsetX}px, ${timewarpSprite.offsetY}px) rotate(${spriteRotation}deg)`;
-      scaler.style.transition = "transform 0.5s ease-out";
       trackRobotSpinDuringTimewarpPause();
     }
   };
-  scaler.addEventListener("click", spinSprite);
-  scaler.addEventListener("touchend", (e) => {
-    e.preventDefault();
-    spinSprite();
-  });
-  scaler.style.cursor = "pointer";
 
   // Wait for sprite to load, then start animation and show popup
   timewarpLoadInterval = setInterval(() => {
@@ -1229,28 +1247,34 @@ function showTimeWarp() {
 
   // Function to complete the timewarp
   const completeTimewarp = () => {
-    // Stop and cleanup sprite
-    if (timewarpSprite) {
-      timewarpSprite.stop();
-      timewarpSprite.destroy();
-      timewarpSprite = null;
-    }
+    // Add closing animation
+    elements.timewarpOverlay.classList.add("closing");
 
-    // Stop particle animation
-    stopTimewarpParticles();
+    // Wait for exit animation to complete before cleanup
+    setTimeout(() => {
+      // Stop and cleanup sprite
+      if (timewarpSprite) {
+        timewarpSprite.stop();
+        timewarpSprite.destroy();
+        timewarpSprite = null;
+      }
 
-    // Hide popup
-    elements.timewarpOverlay.classList.remove("show");
+      // Stop particle animation
+      stopTimewarpParticles();
 
-    // Clear timeout reference
-    timewarpTimeoutId = null;
-    timewarpStartTime = null;
-    timewarpRemainingTime = null;
-    timewarpClipper = null;
+      // Hide popup and remove closing class
+      elements.timewarpOverlay.classList.remove("show", "closing");
 
-    isInTimewarp = false;
-    gameState.currentFight++;
-    setupFight();
+      // Clear timeout reference
+      timewarpTimeoutId = null;
+      timewarpStartTime = null;
+      timewarpRemainingTime = null;
+      timewarpClipper = null;
+
+      isInTimewarp = false;
+      gameState.currentFight++;
+      setupFight();
+    }, 500); // Match the CSS animation duration
   };
 
   // Hide popup and advance to next fight after duration
@@ -1373,28 +1397,34 @@ function togglePause() {
       // Restart the timeout with remaining time
       timewarpStartTime = Date.now();
       timewarpTimeoutId = setTimeout(() => {
-        // Stop and cleanup sprite
-        if (timewarpSprite) {
-          timewarpSprite.stop();
-          timewarpSprite.destroy();
-          timewarpSprite = null;
-        }
+        // Add closing animation
+        elements.timewarpOverlay.classList.add("closing");
 
-        // Stop particle animation
-        stopTimewarpParticles();
+        // Wait for exit animation to complete before cleanup
+        setTimeout(() => {
+          // Stop and cleanup sprite
+          if (timewarpSprite) {
+            timewarpSprite.stop();
+            timewarpSprite.destroy();
+            timewarpSprite = null;
+          }
 
-        // Hide popup
-        elements.timewarpOverlay.classList.remove("show");
+          // Stop particle animation
+          stopTimewarpParticles();
 
-        // Clear timeout reference
-        timewarpTimeoutId = null;
-        timewarpStartTime = null;
-        timewarpRemainingTime = null;
-        timewarpClipper = null;
+          // Hide popup and remove closing class
+          elements.timewarpOverlay.classList.remove("show", "closing");
 
-        isInTimewarp = false;
-        gameState.currentFight++;
-        setupFight();
+          // Clear timeout reference
+          timewarpTimeoutId = null;
+          timewarpStartTime = null;
+          timewarpRemainingTime = null;
+          timewarpClipper = null;
+
+          isInTimewarp = false;
+          gameState.currentFight++;
+          setupFight();
+        }, 500); // Match the CSS animation duration
       }, timewarpRemainingTime);
     }
   }
@@ -1426,6 +1456,11 @@ function restartGame() {
 function quitToMainMenu() {
   stopTimer();
   cleanupSpriteSheet();
+
+  // Hide game over screens (defeat/win popups)
+  if (gameOverScreen) {
+    gameOverScreen.hide();
+  }
 
   // Hide pause overlay and game elements
   elements.pauseOverlay.classList.remove("show");

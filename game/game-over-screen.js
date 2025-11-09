@@ -177,7 +177,7 @@ export class GameOverScreen {
         stars[i].classList.add("unlocked");
         // Play star award sound for each star
         audioManager.playSoundEffect("awardStar");
-      }, i * 200); // 200ms delay between each star
+      }, i * 500); // 500ms delay between each star
     }
   }
 

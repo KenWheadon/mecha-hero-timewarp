@@ -1,3 +1,5 @@
+import { audioManager } from "./audio-manager.js";
+
 export class LoadingScreen {
   constructor() {
     this.elements = {
@@ -350,6 +352,9 @@ export class LoadingScreen {
    * @returns {Promise} - Resolves when all assets are loaded
    */
   async preloadAllAssets() {
+    // Initialize audio manager first so we use its Audio objects
+    audioManager.init();
+
     const totalAssets = this.allImages.length + this.allAudio.length;
     let loadedAssets = 0;
 
@@ -376,28 +381,69 @@ export class LoadingScreen {
       });
     });
 
-    // Load audio with progress updates
-    const audioPromises = this.allAudio.map((url) => {
-      return new Promise((resolve) => {
-        const audio = new Audio();
-        const handleLoad = () => {
-          updateProgress();
-          audio.removeEventListener("canplaythrough", handleLoad);
-          audio.removeEventListener("error", handleError);
-          resolve();
-        };
-        const handleError = () => {
-          console.error(`Failed to load audio: ${url}`);
-          updateProgress();
-          audio.removeEventListener("canplaythrough", handleLoad);
-          audio.removeEventListener("error", handleError);
-          resolve();
-        };
-        audio.addEventListener("canplaythrough", handleLoad);
-        audio.addEventListener("error", handleError);
-        audio.src = url;
-        audio.load();
-      });
+    // Preload audio using AudioManager's actual Audio objects
+    const audioPromises = [];
+
+    // Preload music tracks
+    Object.values(audioManager.tracks).forEach((audio) => {
+      audioPromises.push(
+        new Promise((resolve) => {
+          const handleLoad = () => {
+            updateProgress();
+            audio.removeEventListener("canplaythrough", handleLoad);
+            audio.removeEventListener("error", handleError);
+            resolve();
+          };
+          const handleError = () => {
+            console.error(`Failed to load audio: ${audio.src}`);
+            updateProgress();
+            audio.removeEventListener("canplaythrough", handleLoad);
+            audio.removeEventListener("error", handleError);
+            resolve();
+          };
+
+          if (audio.readyState >= 4) {
+            // Already loaded
+            updateProgress();
+            resolve();
+          } else {
+            audio.addEventListener("canplaythrough", handleLoad);
+            audio.addEventListener("error", handleError);
+            audio.load();
+          }
+        })
+      );
+    });
+
+    // Preload sound effects
+    Object.values(audioManager.soundEffects).forEach((audio) => {
+      audioPromises.push(
+        new Promise((resolve) => {
+          const handleLoad = () => {
+            updateProgress();
+            audio.removeEventListener("canplaythrough", handleLoad);
+            audio.removeEventListener("error", handleError);
+            resolve();
+          };
+          const handleError = () => {
+            console.error(`Failed to load audio: ${audio.src}`);
+            updateProgress();
+            audio.removeEventListener("canplaythrough", handleLoad);
+            audio.removeEventListener("error", handleError);
+            resolve();
+          };
+
+          if (audio.readyState >= 4) {
+            // Already loaded
+            updateProgress();
+            resolve();
+          } else {
+            audio.addEventListener("canplaythrough", handleLoad);
+            audio.addEventListener("error", handleError);
+            audio.load();
+          }
+        })
+      );
     });
 
     return Promise.all([...imagePromises, ...audioPromises]);

@@ -47,17 +47,19 @@ class AudioManager {
       // Trophy
       trophyAward: null,
     };
+    // Track currently playing sound effects to prevent overlapping
+    this.playingSounds = {};
     // Volume settings for music tracks (0.0 to 1.0)
     this.trackVolumes = {
-      titleIntro: 0.3,
-      titleMain: 0.3,
-      combat: 0.3,
-      infinity: 0.3,
+      titleIntro: 0.2,
+      titleMain: 0.15,
+      combat: 0.15,
+      infinity: 0.15,
     };
     // Volume settings for each sound effect (0.0 to 1.0)
     this.volumes = {
       btnClick: 0.4,
-      btnHover: 0.4,
+      btnHover: 0.3,
       timewarp: 0.7,
       roboDeath: 0.6,
       roboFinalDeath: 0.8,
@@ -82,26 +84,24 @@ class AudioManager {
       titleTrans: 0.5,
       eyeballShow: 0.6,
       // Story & Popups
-      storyPage: 0.4,
-      popupAppear: 0.4,
-      accordionOpen: 0.4,
+      storyPage: 0.75,
+      popupAppear: 0.75,
+      accordionOpen: 0.75,
       // Combat
-      playerDamage: 0.6,
-      enemyDamage: 0.6,
-      timerRunningOut: 0.5,
+      playerDamage: 0.9,
+      enemyDamage: 0.8,
+      timerRunningOut: 0.8,
       shake: 0.5,
       // Victory Screen
-      awardStar: 0.5,
-      winScreen: 0.6,
-      newRecord: 0.6,
+      awardStar: 0.75,
+      winScreen: 0.75,
+      newRecord: 0.75,
       // Trophy
       trophyAward: 0.6,
     };
     this.currentTrack = null;
     this.isMuted = false;
     this.isInitialized = false;
-    this.isUnlocked = false;
-    this.pendingTrack = null; // Track to play once audio is unlocked
   }
 
   // Initialize audio files
@@ -184,24 +184,6 @@ class AudioManager {
     this.isInitialized = true;
   }
 
-  // Unlock audio context (must be called on user interaction)
-  unlock() {
-    if (this.isUnlocked) return;
-
-    this.init(); // Ensure audio is initialized
-    this.isUnlocked = true;
-
-    // If there's a pending track, play it now
-    if (this.pendingTrack && !this.isMuted) {
-      const track = this.tracks[this.pendingTrack];
-      if (track) {
-        this.currentTrack = track;
-        track.play().catch((err) => console.error("Error playing audio:", err));
-      }
-      this.pendingTrack = null;
-    }
-  }
-
   // Play a specific track
   play(trackName) {
     this.init(); // Ensure audio is initialized
@@ -221,11 +203,8 @@ class AudioManager {
 
     this.currentTrack = track;
 
-    // If audio not unlocked yet, save it as pending
-    if (!this.isUnlocked) {
-      this.pendingTrack = trackName;
-      return;
-    }
+    // Reset to beginning for immediate playback
+    track.currentTime = 0;
 
     // Only play if not muted
     if (!this.isMuted) {
@@ -272,11 +251,6 @@ class AudioManager {
   playSoundEffect(effectName) {
     this.init(); // Ensure audio is initialized
 
-    // Unlock audio on first sound effect attempt
-    if (!this.isUnlocked) {
-      this.unlock();
-    }
-
     // Only play if not muted
     if (this.isMuted) return;
 
@@ -286,6 +260,11 @@ class AudioManager {
       return;
     }
 
+    // Prevent btnHover from overlapping - only allow one instance at a time
+    if (effectName === "btnHover" && this.playingSounds.btnHover) {
+      return; // Already playing, don't play again
+    }
+
     // Clone the audio to allow overlapping plays
     const soundClone = effect.cloneNode();
     // Apply the volume setting to the clone
@@ -293,26 +272,38 @@ class AudioManager {
       soundClone.volume = this.volumes[effectName];
     }
 
+    // Track that btnHover is playing
+    if (effectName === "btnHover") {
+      this.playingSounds.btnHover = true;
+    }
+
     // Clean up the cloned audio after it finishes playing
-    soundClone.addEventListener('ended', () => {
-      soundClone.src = '';
+    soundClone.addEventListener("ended", () => {
+      if (effectName === "btnHover") {
+        this.playingSounds.btnHover = false;
+      }
+      soundClone.src = "";
       soundClone.remove();
     });
 
     // Also clean up if there's an error
-    soundClone.addEventListener('error', () => {
-      soundClone.src = '';
+    soundClone.addEventListener("error", () => {
+      if (effectName === "btnHover") {
+        this.playingSounds.btnHover = false;
+      }
+      soundClone.src = "";
       soundClone.remove();
     });
 
-    soundClone
-      .play()
-      .catch((err) => {
-        console.error("Error playing sound effect:", err);
-        // Clean up on playback error
-        soundClone.src = '';
-        soundClone.remove();
-      });
+    soundClone.play().catch((err) => {
+      console.error("Error playing sound effect:", err);
+      // Clean up on playback error
+      if (effectName === "btnHover") {
+        this.playingSounds.btnHover = false;
+      }
+      soundClone.src = "";
+      soundClone.remove();
+    });
   }
 }
 

@@ -14,7 +14,7 @@ function createHitSpriteConfig(imagePath, overrides = {}) {
     rows: 6,
     cols: 6,
     fps: 12,
-    loop: true,
+    loop: false, // Hit animations should play once
     scale: 1.5,
     offsetX: 0,
     offsetY: 0,

@@ -30,6 +30,7 @@ const elements = {
   game: document.getElementById("game"),
   startBtn: document.getElementById("start-btn"),
   infiniteBtn: document.getElementById("infinite-btn"),
+  infiniteBtnWrapper: document.querySelector(".infinite-btn-wrapper"),
   htpBtn: document.getElementById("htp-btn"),
   trophyBtn: document.getElementById("trophy-btn"),
   poseImg: document.getElementById("pose-img"),
@@ -78,22 +79,24 @@ export function initTitleScreen() {
   // Activate colorful background for title screen
   document.body.classList.add("title-active");
 
-  // Load and display high score
-  loadHighScore();
+  // Load high score to determine if infinite mode should be shown
+  const highScore = getHighScore();
+  loadHighScore(highScore);
 
-  // Load and display infinite mode high score
-  loadInfiniteHighScore();
+  // Show infinite mode only if the player has beaten the game once
+  if (highScore !== null) {
+    elements.infiniteBtnWrapper.style.display = "inline-block";
+    loadInfiniteHighScore();
+  }
 
-  // Play the intro audio immediately (audio already unlocked from loading screen)
-  audioManager.unlock();
+  // Play the intro audio immediately
   audioManager.play("titleIntro");
 
   startTitleGlitch();
 }
 
 // Load and display high score
-function loadHighScore() {
-  const highScore = getHighScore();
+function loadHighScore(highScore) {
   elements.highScoreValue.textContent = formatTime(highScore);
 
   // Update stars and progress message
@@ -197,7 +200,6 @@ function setupEventListeners() {
   addTouchAndClickListener(elements.trophyBtn, onTrophyClick);
   addTouchAndClickListener(elements.audioToggleTitle, () => {
     audioManager.playSoundEffect("btnClick");
-    ensureAudioUnlocked();
     toggleAudio();
   });
 
@@ -215,15 +217,9 @@ function setupEventListeners() {
   });
 }
 
-// Ensure audio is unlocked on first user interaction
-function ensureAudioUnlocked() {
-  audioManager.unlock();
-}
-
 // Handle start game button
 function onStartGame() {
   audioManager.playSoundEffect("btnClick");
-  ensureAudioUnlocked();
   elements.titleScreen.style.display = "none";
   elements.game.style.display = "block";
   // Remove colorful background when entering game
@@ -247,7 +243,6 @@ function onStartGame() {
 // Handle infinite mode button
 function onStartInfiniteMode() {
   audioManager.playSoundEffect("btnClick");
-  ensureAudioUnlocked();
   elements.titleScreen.style.display = "none";
   elements.game.style.display = "block";
   // Remove colorful background when entering game
@@ -271,7 +266,6 @@ function onStartInfiniteMode() {
 // Handle how to play button
 function onHowToPlay() {
   audioManager.playSoundEffect("btnHover");
-  ensureAudioUnlocked();
   howToPlayModal.open();
   trackHTPOpen();
 }
@@ -279,7 +273,6 @@ function onHowToPlay() {
 // Handle trophy button
 function onTrophyClick() {
   audioManager.playSoundEffect("btnClick");
-  ensureAudioUnlocked();
   openTrophyPopup();
 }
 
@@ -527,6 +520,7 @@ function setupTrophyPopup() {
   // Close trophy popup
   addTouchAndClickListener(closeTrophy, () => {
     audioManager.playSoundEffect("btnClick");
+    trophyDetailPopup.style.display = "none"; // Also close detail popup
     trophyPopup.style.display = "none";
     overlay.style.display = "none";
   });
@@ -541,6 +535,7 @@ function setupTrophyPopup() {
   addTouchAndClickListener(overlay, () => {
     if (trophyPopup.style.display === "block") {
       audioManager.playSoundEffect("btnClick");
+      trophyDetailPopup.style.display = "none"; // Also close detail popup
       trophyPopup.style.display = "none";
       overlay.style.display = "none";
     }

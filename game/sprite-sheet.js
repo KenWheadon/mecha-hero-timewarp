@@ -15,6 +15,8 @@ export class SpriteSheet {
     this.pingPong = config.pingPong || false; // Play forward, backward, forward
     this.direction = 1; // 1 for forward, -1 for backward
     this.cycleCount = 0; // Track how many times we've completed a cycle
+    this.onComplete = null; // Callback when animation completes (for non-looping animations)
+    this.onCycleComplete = null; // Callback when a full yoyo cycle completes (for pingPong animations)
 
     // Handle different config types:
     // 1. If frameContentWidth is defined, we assume a complex sprite with offsets and gaps.
@@ -40,6 +42,7 @@ export class SpriteSheet {
     this.isPlaying = false;
     this.animationInterval = null;
     this.frameDelay = 1000 / this.fps;
+    this.currentElement = null; // Store the element for resume functionality
 
     // Preload the image
     this.image = new Image();
@@ -68,6 +71,7 @@ export class SpriteSheet {
     }
     this.reset(); // Ensure state is clean before playing.
 
+    this.currentElement = element; // Store the element for pause/resume
     this.isPlaying = true;
     if (this.imagePath.includes("losing")) {
       console.log("Starting animation for:", this.imagePath);
@@ -105,8 +109,15 @@ export class SpriteSheet {
               this.cycleCount = 0;
               this.direction = 1;
               this.currentFrame = 0;
+              // Trigger cycle complete callback
+              if (this.onCycleComplete) {
+                this.onCycleComplete();
+              }
             } else {
               this.stop();
+              if (this.onComplete) {
+                this.onComplete();
+              }
               return;
             }
           }
@@ -121,6 +132,9 @@ export class SpriteSheet {
             this.currentFrame = 0;
           } else {
             this.stop();
+            if (this.onComplete) {
+              this.onComplete();
+            }
             return;
           }
         }
@@ -134,9 +148,10 @@ export class SpriteSheet {
    * Pause the animation
    */
   pause() {
-    if (this.isPlaying) {
-      this.stop();
-      this.isPlaying = true; // Keep the state as playing, but interval is stopped
+    if (this.isPlaying && this.animationInterval) {
+      clearInterval(this.animationInterval);
+      this.animationInterval = null;
+      // Keep isPlaying true to indicate it's paused, not stopped
     }
   }
 
@@ -145,8 +160,70 @@ export class SpriteSheet {
    */
   resume() {
     // Only resume if it was playing and there's no active interval
-    if (this.isPlaying && !this.animationInterval) {
-      this.play(this.currentElement); // Re-call play to restart the interval
+    if (this.isPlaying && !this.animationInterval && this.currentElement) {
+      // Don't call play() as it would reset the animation
+      // Instead, just restart the interval from the current frame
+      this.animationInterval = setInterval(() => {
+        // Safety check: if element no longer exists, stop animation
+        if (this.currentElement && !this.currentElement.isConnected) {
+          this.stop();
+          return;
+        }
+
+        if (this.pingPong) {
+          // Ping pong mode: forward, backward, forward
+          this.currentFrame += this.direction;
+
+          // Check bounds
+          if (this.currentFrame >= this.totalFrames - 1) {
+            // Reached the end, go backward
+            this.direction = -1;
+            this.cycleCount++;
+          } else if (this.currentFrame <= 0) {
+            // Reached the beginning
+            if (this.cycleCount < 2) {
+              // Not done yet, go forward again
+              this.direction = 1;
+              this.cycleCount++;
+            } else {
+              // Completed forward-backward-forward, stop or loop
+              if (this.loop) {
+                this.cycleCount = 0;
+                this.direction = 1;
+                this.currentFrame = 0;
+                // Trigger cycle complete callback
+                if (this.onCycleComplete) {
+                  this.onCycleComplete();
+                }
+              } else {
+                this.stop();
+                if (this.onComplete) {
+                  this.onComplete();
+                }
+                return;
+              }
+            }
+          }
+        } else {
+          // Standard mode
+          this.currentFrame++;
+
+          // Apply style updates for the new frame
+          if (this.currentFrame >= this.totalFrames) {
+            if (this.loop) {
+              this.currentFrame = 0;
+            } else {
+              this.stop();
+              if (this.onComplete) {
+                this.onComplete();
+              }
+              return;
+            }
+          }
+        }
+
+        if (this.currentElement && this.isPlaying) this.applyToElement(this.currentElement);
+      }, this.frameDelay);
     }
   }
 
