@@ -630,6 +630,12 @@ body.title-active::before {
   box-shadow: none;
 }
 
+.htp-button-icon {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+}
+
 /* GAME SCREEN */
 #game {
   text-align: center;
