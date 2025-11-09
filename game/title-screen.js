@@ -11,8 +11,6 @@ import {
   getStarRating,
   getInfiniteHighScore,
   getInfiniteStarRating,
-  hasSeenStory,
-  markStorySeen,
 } from "./storage-manager.js";
 import { HowToPlay } from "./how-to-play.js";
 import { storyPanel } from "./story-panel.js";
@@ -72,15 +70,6 @@ export function initTitleScreen() {
   audioManager.play("titleIntro");
 
   startTitleGlitch();
-
-  // Check if this is the first time loading the game
-  if (!hasSeenStory()) {
-    // Show story panel on first load
-    storyPanel.open(() => {
-      // Mark story as seen when it closes
-      markStorySeen();
-    });
-  }
 }
 
 // Load and display high score

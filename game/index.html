@@ -129,7 +129,7 @@
           </div>
           <div class="htp-fight-card fight-4">
             <div class="fight-number">Fight 4</div>
-            <div class="fight-detail">8 Poses</div>
+            <div class="fight-detail">4 Poses</div>
             <div class="fight-detail">8 Enemy HP</div>
             <div class="fight-detail">2s Timer</div>
           </div>
@@ -389,6 +389,8 @@
     <script type="module">
       import { initTitleScreen } from "./title-screen.js";
       import { loadingScreen } from "./loading-screen.js";
+      import { storyPanel } from "./story-panel.js";
+      import { hasSeenStory, markStorySeen } from "./storage-manager.js";
 
       // Show loading screen
       loadingScreen.show();
@@ -400,8 +402,21 @@
       window.addEventListener("load", async () => {
         // Complete loading and show start button
         await loadingScreen.complete(() => {
-          // Initialize title screen when user clicks start
-          initTitleScreen();
+          // Check if this is the first time loading the game
+          if (!hasSeenStory()) {
+            // Show story panel over the loading screen
+            storyPanel.open(() => {
+              // Mark story as seen and hide loading screen
+              markStorySeen();
+              loadingScreen.hide();
+              // Initialize title screen after story is complete
+              initTitleScreen();
+            });
+          } else {
+            // Hide loading screen and go straight to title screen
+            loadingScreen.hide();
+            initTitleScreen();
+          }
         });
       });
     </script>
