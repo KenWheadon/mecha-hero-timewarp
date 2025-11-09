@@ -73,6 +73,7 @@ export const timeWarpPose = {
   id: 8,
   desc: "Time Warp",
   img: "images/pose8.png",
+  sprite: "pose8-timewarp", // Use sprite sheet for time warp animation
   scale: 1.0,
   x: 0,
   y: 0,
@@ -91,7 +92,7 @@ export const finalDestroyPose = {
 export const GAME_CONFIG = {
   MAX_HEARTS: 3,
   MAX_FIGHTS: 4,
-  INITIAL_CRYSTAL_CHARGES: 2,
+  INITIAL_CRYSTAL_CHARGES: 3,
 
   // Fight configurations [fight level: { maxHP, availableAttacks, timerDuration, showCrystal }]
   FIGHT_CONFIGS: {

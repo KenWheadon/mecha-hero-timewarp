@@ -12,6 +12,9 @@ export class SpriteSheet {
     this.scale = config.scale || 1;
     this.offsetX = config.offsetX || 0;
     this.offsetY = config.offsetY || 0;
+    this.pingPong = config.pingPong || false; // Play forward, backward, forward
+    this.direction = 1; // 1 for forward, -1 for backward
+    this.cycleCount = 0; // Track how many times we've completed a cycle
 
     // Handle different config types:
     // 1. If frameContentWidth is defined, we assume a complex sprite with offsets and gaps.
@@ -71,15 +74,45 @@ export class SpriteSheet {
         return;
       }
 
-      this.currentFrame++;
+      if (this.pingPong) {
+        // Ping pong mode: forward, backward, forward
+        this.currentFrame += this.direction;
 
-      // Apply style updates for the new frame
-      if (this.currentFrame >= this.totalFrames) {
-        if (this.loop) {
-          this.currentFrame = 0;
-        } else {
-          this.stop();
-          return;
+        // Check bounds
+        if (this.currentFrame >= this.totalFrames - 1) {
+          // Reached the end, go backward
+          this.direction = -1;
+          this.cycleCount++;
+        } else if (this.currentFrame <= 0) {
+          // Reached the beginning
+          if (this.cycleCount < 2) {
+            // Not done yet, go forward again
+            this.direction = 1;
+            this.cycleCount++;
+          } else {
+            // Completed forward-backward-forward, stop or loop
+            if (this.loop) {
+              this.cycleCount = 0;
+              this.direction = 1;
+              this.currentFrame = 0;
+            } else {
+              this.stop();
+              return;
+            }
+          }
+        }
+      } else {
+        // Standard mode
+        this.currentFrame++;
+
+        // Apply style updates for the new frame
+        if (this.currentFrame >= this.totalFrames) {
+          if (this.loop) {
+            this.currentFrame = 0;
+          } else {
+            this.stop();
+            return;
+          }
         }
       }
 
@@ -104,6 +137,8 @@ export class SpriteSheet {
   reset() {
     this.stop();
     this.currentFrame = 0;
+    this.direction = 1;
+    this.cycleCount = 0;
   }
 
   /**

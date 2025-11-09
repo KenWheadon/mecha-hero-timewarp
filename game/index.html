@@ -253,6 +253,17 @@
       </div>
     </div>
 
+    <!-- Time Warp Overlay and Popup -->
+    <div id="timewarp-overlay">
+      <div id="timewarp-popup">
+        <div id="timewarp-animation-container">
+          <!-- Sprite animation will be injected here -->
+        </div>
+        <h1 id="timewarp-title">TIME WARP!</h1>
+        <div id="timewarp-message"></div>
+      </div>
+    </div>
+
     <div id="game">
       <!-- Audio Button (Top Left) -->
       <button id="audio-toggle-combat" class="audio-toggle-btn">
@@ -353,6 +364,7 @@
         <div class="game-over-subtitle">All Enemies Defeated</div>
 
         <div class="victory-content">
+          <img src="images/player-win.png" alt="Victory" class="game-over-player-img" onerror="console.error('Missing image: ' + this.src)" />
           <div id="victory-badge" class="high-score-badge">NEW RECORD!</div>
           <div class="time-display">
             <div class="time-label">Your Time</div>
@@ -383,9 +395,12 @@
         <div class="game-over-subtitle">Systems Overloaded</div>
 
         <div class="defeat-content">
-          <div class="fight-reached">
-            <div class="fight-label">Fight Reached</div>
-            <div id="defeat-fight" class="fight-value">1</div>
+          <div class="defeat-stats-row">
+            <img src="images/player-0hp.png" alt="Defeated" class="defeat-player-img" onerror="console.error('Missing image: ' + this.src)" />
+            <div class="fight-reached">
+              <div class="fight-label">Fight Reached</div>
+              <div id="defeat-fight" class="fight-value">1</div>
+            </div>
           </div>
           <div class="defeat-message">
             You have failed to avenge your lunch.<br />

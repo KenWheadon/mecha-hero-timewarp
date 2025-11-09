@@ -78,6 +78,16 @@ export const SPRITE_CONFIGS = {
   "pose5-hit": createHitSpriteConfig(
     "images/pose5-hit-spritesheet-2316-2454.png"
   ),
+  // Time warp animation
+  "pose8-timewarp": createHitSpriteConfig(
+    "images/pose8-spritesheet-2076-2814.png",
+    {
+      scale: 2.0, // Larger scale for dramatic effect
+      fps: 15, // Slightly faster animation
+      loop: true,
+      pingPong: true, // Play forward, backward, forward
+    }
+  ),
   // Use a direct configuration for the logo to handle custom offsets and gaps correctly.
   "logo-thin": {
     imagePath: "images/logo-thin-spritesheet-3072-3072.png",

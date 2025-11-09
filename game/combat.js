@@ -4,7 +4,6 @@ import {
   neutralPose,
   attackPoses,
   damagedPose,
-  timeWarpPose,
   finalDestroyPose,
   GAME_CONFIG,
   createInitialGameState,
@@ -43,6 +42,12 @@ let eventListenersInitialized = false;
 // Track if we're currently in a time warp
 let isInTimewarp = false;
 
+// Time warp particle effect
+let timewarpParticleCanvas = null;
+let timewarpParticleCtx = null;
+let timewarpParticles = [];
+let timewarpParticleAnimationId = null;
+
 // Helper function to add both click and touch event listeners
 function addTouchAndClickListener(element, handler) {
   // Remove any existing listeners to prevent duplicates
@@ -78,6 +83,9 @@ const elements = {
   pauseOverlay: document.getElementById("pause-overlay"),
   pauseResumeBtn: document.getElementById("pause-resume-btn"),
   pauseQuitBtn: document.getElementById("pause-quit-btn"),
+  timewarpOverlay: document.getElementById("timewarp-overlay"),
+  timewarpAnimationContainer: document.getElementById("timewarp-animation-container"),
+  timewarpMessage: document.getElementById("timewarp-message"),
 };
 
 // Initialize game
@@ -288,6 +296,16 @@ function updateEnemyHearts() {
 function updateCrystalDisplay() {
   elements.crystalDisplay.innerHTML = "";
 
+  // Add label
+  const label = document.createElement("div");
+  label.className = "crystal-label";
+  label.textContent = "Time Warps Left";
+  elements.crystalDisplay.appendChild(label);
+
+  // Create container for crystal items
+  const itemsContainer = document.createElement("div");
+  itemsContainer.className = "crystal-items-container";
+
   if (gameState.isInfiniteMode) {
     // Infinite mode: 1 crystal + infinity symbol
     const crystalItem = document.createElement("div");
@@ -299,12 +317,12 @@ function updateCrystalDisplay() {
       console.error("Missing image: images/timecrystal.png");
     };
     crystalItem.appendChild(crystalImg);
-    elements.crystalDisplay.appendChild(crystalItem);
+    itemsContainer.appendChild(crystalItem);
 
     const infiniteSymbol = document.createElement("div");
     infiniteSymbol.className = "infinite-symbol";
     infiniteSymbol.textContent = "∞";
-    elements.crystalDisplay.appendChild(infiniteSymbol);
+    itemsContainer.appendChild(infiniteSymbol);
   } else {
     // Normal mode: show 3 crystals total
     const maxCrystals = GAME_CONFIG.INITIAL_CRYSTAL_CHARGES;
@@ -324,9 +342,11 @@ function updateCrystalDisplay() {
         crystalItem.classList.add("depleted");
       }
 
-      elements.crystalDisplay.appendChild(crystalItem);
+      itemsContainer.appendChild(crystalItem);
     }
   }
+
+  elements.crystalDisplay.appendChild(itemsContainer);
 }
 
 // Clean up active sprite sheet
@@ -931,34 +951,199 @@ function formatTimeForDisplay(seconds) {
     .padStart(2, "0")}`;
 }
 
-// Show time warp transition
-function showTimeWarp() {
-  setPose(timeWarpPose);
-  elements.message.textContent = "Time Warp!";
-  elements.message.style.color = "#0ff";
+// Create time warp particle canvas
+function createTimewarpParticleCanvas() {
+  // Create canvas element
+  const canvas = document.createElement("canvas");
+  canvas.id = "timewarp-particle-canvas";
+  canvas.style.position = "absolute";
+  canvas.style.top = "0";
+  canvas.style.left = "0";
+  canvas.style.width = "100%";
+  canvas.style.height = "100%";
+  canvas.style.pointerEvents = "none";
+  canvas.style.zIndex = "1";
 
+  return canvas;
+}
+
+// Initialize time warp particles
+function initTimewarpParticles(canvasWidth, canvasHeight) {
+  timewarpParticles = [];
+  const particleCount = 60;
+
+  for (let i = 0; i < particleCount; i++) {
+    timewarpParticles.push({
+      x: Math.random() * canvasWidth,
+      y: Math.random() * canvasHeight,
+      vx: (Math.random() - 0.5) * 3,
+      vy: (Math.random() - 0.5) * 3,
+      size: Math.random() * 4 + 2,
+      alpha: Math.random() * 0.5 + 0.3,
+      color: Math.random() > 0.5 ? "#00ffff" : "#0099ff",
+      pulseSpeed: Math.random() * 0.05 + 0.02,
+      pulsePhase: Math.random() * Math.PI * 2,
+    });
+  }
+}
+
+// Animate time warp particles
+function animateTimewarpParticles() {
+  if (!timewarpParticleCanvas || !timewarpParticleCtx) return;
+
+  const width = timewarpParticleCanvas.width;
+  const height = timewarpParticleCanvas.height;
+
+  // Clear canvas with slight trail effect
+  timewarpParticleCtx.fillStyle = "rgba(0, 0, 0, 0.1)";
+  timewarpParticleCtx.fillRect(0, 0, width, height);
+
+  // Update and draw particles
+  timewarpParticles.forEach((particle) => {
+    // Update position
+    particle.x += particle.vx;
+    particle.y += particle.vy;
+
+    // Wrap around edges
+    if (particle.x < 0) particle.x = width;
+    if (particle.x > width) particle.x = 0;
+    if (particle.y < 0) particle.y = height;
+    if (particle.y > height) particle.y = 0;
+
+    // Update pulse
+    particle.pulsePhase += particle.pulseSpeed;
+    const pulse = Math.sin(particle.pulsePhase) * 0.3 + 0.7;
+
+    // Draw particle with glow
+    const glowSize = particle.size * 3;
+    const gradient = timewarpParticleCtx.createRadialGradient(
+      particle.x, particle.y, 0,
+      particle.x, particle.y, glowSize
+    );
+    gradient.addColorStop(0, particle.color + Math.floor(particle.alpha * pulse * 255).toString(16).padStart(2, "0"));
+    gradient.addColorStop(0.5, particle.color + "40");
+    gradient.addColorStop(1, particle.color + "00");
+
+    timewarpParticleCtx.fillStyle = gradient;
+    timewarpParticleCtx.beginPath();
+    timewarpParticleCtx.arc(particle.x, particle.y, glowSize, 0, Math.PI * 2);
+    timewarpParticleCtx.fill();
+
+    // Draw core
+    timewarpParticleCtx.fillStyle = particle.color;
+    timewarpParticleCtx.beginPath();
+    timewarpParticleCtx.arc(particle.x, particle.y, particle.size * pulse, 0, Math.PI * 2);
+    timewarpParticleCtx.fill();
+  });
+
+  timewarpParticleAnimationId = requestAnimationFrame(animateTimewarpParticles);
+}
+
+// Stop time warp particle animation
+function stopTimewarpParticles() {
+  if (timewarpParticleAnimationId) {
+    cancelAnimationFrame(timewarpParticleAnimationId);
+    timewarpParticleAnimationId = null;
+  }
+  timewarpParticles = [];
+}
+
+// Show time warp transition in popup
+function showTimeWarp() {
   // Track that we're in a time warp
   isInTimewarp = true;
 
   // Play timewarp sound effect
   audioManager.playSoundEffect("timewarp");
 
-  // Consume crystal charge if applicable
+  // Check if crystal is being consumed
   const currentConfig = GAME_CONFIG.FIGHT_CONFIGS[gameState.currentFight];
+  let crystalDepleted = false;
+
   if (currentConfig.showCrystal) {
     gameState.crystalCharges -= GAME_CONFIG.CRYSTAL_COST_ON_WARP;
     updateCrystalDisplay();
 
     if (gameState.crystalCharges <= 0) {
-      elements.message.textContent = "Crystal depleted!";
+      crystalDepleted = true;
       trackCrystalDepleted();
     }
   }
 
+  // Set the message
+  if (crystalDepleted) {
+    elements.timewarpMessage.textContent = "Crystal Energy Depleted!";
+  } else {
+    elements.timewarpMessage.textContent = "Warping Through Time...";
+  }
+
+  // Create sprite animation in the popup
+  const spriteConfig = getSpriteConfig("pose8-timewarp");
+  const timewarpSprite = new SpriteSheet(spriteConfig);
+
+  // Clear any existing content
+  elements.timewarpAnimationContainer.innerHTML = "";
+
+  // Create and add particle canvas
+  timewarpParticleCanvas = createTimewarpParticleCanvas();
+  elements.timewarpAnimationContainer.appendChild(timewarpParticleCanvas);
+
+  // Set canvas size to match container
+  const containerRect = elements.timewarpAnimationContainer.getBoundingClientRect();
+  timewarpParticleCanvas.width = containerRect.width || 450;
+  timewarpParticleCanvas.height = containerRect.height || 450;
+  timewarpParticleCtx = timewarpParticleCanvas.getContext("2d");
+
+  // Initialize particles
+  initTimewarpParticles(timewarpParticleCanvas.width, timewarpParticleCanvas.height);
+
+  // Create sprite structure: scaler -> clipper -> img
+  const scaler = document.createElement("div");
+  scaler.style.transform = `scale(${timewarpSprite.scale}) translate(${timewarpSprite.offsetX}px, ${timewarpSprite.offsetY}px)`;
+  scaler.style.transformOrigin = "center center";
+  scaler.style.position = "relative";
+  scaler.style.zIndex = "2";
+  elements.timewarpAnimationContainer.appendChild(scaler);
+
+  const clipper = document.createElement("div");
+  clipper.className = "sprite-clipper";
+  clipper.style.width = `${timewarpSprite.frameContentWidth}px`;
+  clipper.style.height = `${timewarpSprite.frameContentHeight}px`;
+  scaler.appendChild(clipper);
+
+  const spriteImg = document.createElement("img");
+  spriteImg.src = timewarpSprite.imagePath;
+  clipper.appendChild(spriteImg);
+
+  // Wait for sprite to load, then start animation and show popup
+  const loadInterval = setInterval(() => {
+    if (timewarpSprite.isLoaded) {
+      clearInterval(loadInterval);
+      timewarpSprite.play(clipper);
+
+      // Start particle animation
+      animateTimewarpParticles();
+
+      // Show the popup
+      elements.timewarpOverlay.classList.add("show");
+    }
+  }, 50);
+
   // Track time warp completion
   trackTimeWarpComplete();
 
+  // Hide popup and advance to next fight after duration
   setTimeout(() => {
+    // Stop and cleanup sprite
+    timewarpSprite.stop();
+    timewarpSprite.destroy();
+
+    // Stop particle animation
+    stopTimewarpParticles();
+
+    // Hide popup
+    elements.timewarpOverlay.classList.remove("show");
+
     isInTimewarp = false;
     gameState.currentFight++;
     setupFight();
