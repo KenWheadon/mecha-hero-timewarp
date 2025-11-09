@@ -37,13 +37,29 @@ let onCloseCallback = null;
 // Track if event listeners have been initialized
 let eventListenersInitialized = false;
 
+// Helper function to add both click and touch event listeners
+function addTouchAndClickListener(element, handler) {
+  // Remove any existing listeners to prevent duplicates
+  element.removeEventListener("click", handler);
+  element.removeEventListener("touchend", handler);
+
+  // Add click listener for mouse/desktop
+  element.addEventListener("click", handler);
+
+  // Add touchend listener for touch devices
+  element.addEventListener("touchend", (e) => {
+    e.preventDefault(); // Prevent ghost click
+    handler(e);
+  });
+}
+
 // Initialize onboarding system
 export function initOnboarding() {
   // Only add event listeners once to prevent duplicates
   if (eventListenersInitialized) return;
 
-  elements.closeBtn.addEventListener("click", closePopup);
-  elements.overlay.addEventListener("click", closePopup);
+  addTouchAndClickListener(elements.closeBtn, closePopup);
+  addTouchAndClickListener(elements.overlay, closePopup);
 
   eventListenersInitialized = true;
 }

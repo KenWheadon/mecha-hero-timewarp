@@ -14,6 +14,23 @@ export class LoadingScreen {
     this.onStartCallback = null;
   }
 
+  // Helper function to add both click and touch event listeners
+  addTouchAndClickListener(element, handler) {
+    // Remove any existing listeners to prevent duplicates
+    element.onclick = null;
+    element.removeEventListener("click", handler);
+    element.removeEventListener("touchend", handler);
+
+    // Add click listener for mouse/desktop
+    element.addEventListener("click", handler);
+
+    // Add touchend listener for touch devices
+    element.addEventListener("touchend", (e) => {
+      e.preventDefault(); // Prevent ghost click
+      handler(e);
+    });
+  }
+
   show() {
     this.elements.screen.style.display = "flex";
     this.elements.progressBar.style.display = "block";
@@ -67,12 +84,12 @@ export class LoadingScreen {
 
     // Show and setup start button
     this.elements.startButton.style.display = "block";
-    this.elements.startButton.onclick = () => {
+    this.addTouchAndClickListener(this.elements.startButton, () => {
       this.hide();
       if (this.onStartCallback) {
         this.onStartCallback();
       }
-    };
+    });
   }
 
   async animateToComplete(duration) {

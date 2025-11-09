@@ -15,10 +15,26 @@ export class GameOverScreen {
     this.initEventListeners();
   }
 
+  // Helper function to add both click and touch event listeners
+  addTouchAndClickListener(element, handler) {
+    // Remove any existing listeners to prevent duplicates
+    element.removeEventListener("click", handler);
+    element.removeEventListener("touchend", handler);
+
+    // Add click listener for mouse/desktop
+    element.addEventListener("click", handler);
+
+    // Add touchend listener for touch devices
+    element.addEventListener("touchend", (e) => {
+      e.preventDefault(); // Prevent ghost click
+      handler(e);
+    });
+  }
+
   initEventListeners() {
-    // Add click handlers to all restart buttons
+    // Add click and touch handlers to all restart buttons
     this.restartButtons.forEach((btn) => {
-      btn.addEventListener("click", () => {
+      this.addTouchAndClickListener(btn, () => {
         audioManager.playSoundEffect("btnClick");
         this.hide();
         if (this.onRestartCallback) {
@@ -32,9 +48,9 @@ export class GameOverScreen {
       });
     });
 
-    // Add click handlers to all main menu buttons
+    // Add click and touch handlers to all main menu buttons
     this.mainMenuButtons.forEach((btn) => {
-      btn.addEventListener("click", () => {
+      this.addTouchAndClickListener(btn, () => {
         audioManager.playSoundEffect("btnClick");
         this.hide();
         if (this.onMainMenuCallback) {

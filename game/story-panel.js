@@ -64,33 +64,49 @@ export class StoryPanel {
     this.setupEventListeners();
   }
 
+  // Helper function to add both click and touch event listeners
+  addTouchAndClickListener(element, handler) {
+    // Remove any existing listeners to prevent duplicates
+    element.removeEventListener("click", handler);
+    element.removeEventListener("touchend", handler);
+
+    // Add click listener for mouse/desktop
+    element.addEventListener("click", handler);
+
+    // Add touchend listener for touch devices
+    element.addEventListener("touchend", (e) => {
+      e.preventDefault(); // Prevent ghost click
+      handler(e);
+    });
+  }
+
   setupEventListeners() {
     // Next button
-    this.elements.nextBtn.addEventListener("click", () => {
+    this.addTouchAndClickListener(this.elements.nextBtn, () => {
       audioManager.playSoundEffect("btnClick");
       this.next();
     });
 
     // Back button
-    this.elements.backBtn.addEventListener("click", () => {
+    this.addTouchAndClickListener(this.elements.backBtn, () => {
       audioManager.playSoundEffect("btnClick");
       this.back();
     });
 
     // Skip button
-    this.elements.skipBtn.addEventListener("click", () => {
+    this.addTouchAndClickListener(this.elements.skipBtn, () => {
       audioManager.playSoundEffect("btnClick");
       this.close();
     });
 
     // Click overlay to close
-    this.elements.overlay.addEventListener("click", () => {
+    this.addTouchAndClickListener(this.elements.overlay, () => {
       audioManager.playSoundEffect("btnClick");
       this.close();
     });
 
     // Prevent clicks on panel from closing overlay
-    this.elements.panel.addEventListener("click", (e) => {
+    this.addTouchAndClickListener(this.elements.panel, (e) => {
       e.stopPropagation();
     });
 

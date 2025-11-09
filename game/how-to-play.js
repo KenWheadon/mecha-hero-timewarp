@@ -22,6 +22,22 @@ export class HowToPlay {
     this.setupEventListeners();
   }
 
+  // Helper function to add both click and touch event listeners
+  addTouchAndClickListener(element, handler) {
+    // Remove any existing listeners to prevent duplicates
+    element.removeEventListener("click", handler);
+    element.removeEventListener("touchend", handler);
+
+    // Add click listener for mouse/desktop
+    element.addEventListener("click", handler);
+
+    // Add touchend listener for touch devices
+    element.addEventListener("touchend", (e) => {
+      e.preventDefault(); // Prevent ghost click
+      handler(e);
+    });
+  }
+
   handleOverlayClick(e) {
     // Only close if clicking the overlay itself, not the modal
     if (e.target === this.elements.overlay) {
@@ -52,13 +68,13 @@ export class HowToPlay {
 
   setupEventListeners() {
     // Close button
-    this.elements.closeBtn.addEventListener("click", this.handleClose);
+    this.addTouchAndClickListener(this.elements.closeBtn, this.handleClose);
 
     // View Story button
-    this.elements.viewStoryBtn.addEventListener("click", this.handleViewStory);
+    this.addTouchAndClickListener(this.elements.viewStoryBtn, this.handleViewStory);
 
     // Close on overlay click (only if clicking overlay, not modal content)
-    this.elements.overlay.addEventListener("click", this.handleOverlayClick);
+    this.addTouchAndClickListener(this.elements.overlay, this.handleOverlayClick);
 
     // Add hover sound effect to buttons
     this.elements.closeBtn.addEventListener("mouseenter", this.handleCloseHover);

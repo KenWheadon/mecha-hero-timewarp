@@ -43,6 +43,22 @@ let eventListenersInitialized = false;
 // Track if we're currently in a time warp
 let isInTimewarp = false;
 
+// Helper function to add both click and touch event listeners
+function addTouchAndClickListener(element, handler) {
+  // Remove any existing listeners to prevent duplicates
+  element.removeEventListener("click", handler);
+  element.removeEventListener("touchend", handler);
+
+  // Add click listener for mouse/desktop
+  element.addEventListener("click", handler);
+
+  // Add touchend listener for touch devices
+  element.addEventListener("touchend", (e) => {
+    e.preventDefault(); // Prevent ghost click
+    handler(e);
+  });
+}
+
 // Cache DOM elements
 const elements = {
   pause: document.getElementById("pause"),
@@ -85,32 +101,32 @@ export function initGame(isInfiniteMode = false) {
 
   // Only initialize event listeners once to prevent duplicates
   if (!eventListenersInitialized) {
-    elements.pause.addEventListener("click", () => {
+    addTouchAndClickListener(elements.pause, () => {
       audioManager.playSoundEffect("btnClick");
       togglePause();
     });
-    elements.restart.addEventListener("click", () => {
+    addTouchAndClickListener(elements.restart, () => {
       audioManager.playSoundEffect("btnClick");
       restartGame();
     });
-    elements.quitBtn.addEventListener("click", () => {
+    addTouchAndClickListener(elements.quitBtn, () => {
       audioManager.playSoundEffect("btnClick");
       quitToMainMenu();
     });
-    elements.audioToggleCombat.addEventListener("click", () => {
+    addTouchAndClickListener(elements.audioToggleCombat, () => {
       audioManager.playSoundEffect("btnClick");
       toggleAudio();
     });
     elements.attacks.forEach((btn) => {
-      btn.addEventListener("click", () => handleAttack(btn.dataset.action));
+      addTouchAndClickListener(btn, () => handleAttack(btn.dataset.action));
     });
 
     // Pause popup buttons
-    elements.pauseResumeBtn.addEventListener("click", () => {
+    addTouchAndClickListener(elements.pauseResumeBtn, () => {
       audioManager.playSoundEffect("btnClick");
       togglePause();
     });
-    elements.pauseQuitBtn.addEventListener("click", () => {
+    addTouchAndClickListener(elements.pauseQuitBtn, () => {
       audioManager.playSoundEffect("btnClick");
       quitToMainMenu();
     });

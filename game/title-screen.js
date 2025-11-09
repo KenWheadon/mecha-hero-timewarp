@@ -45,6 +45,22 @@ let howToPlayModal;
 let logoSpriteSheet = null;
 let logoAnimationInterval = null;
 
+// Helper function to add both click and touch event listeners
+function addTouchAndClickListener(element, handler) {
+  // Remove any existing listeners to prevent duplicates
+  element.removeEventListener("click", handler);
+  element.removeEventListener("touchend", handler);
+
+  // Add click listener for mouse/desktop
+  element.addEventListener("click", handler);
+
+  // Add touchend listener for touch devices
+  element.addEventListener("touchend", (e) => {
+    e.preventDefault(); // Prevent ghost click
+    handler(e);
+  });
+}
+
 // Initialize title screen
 export function initTitleScreen() {
   setPose(neutralPose);
@@ -171,12 +187,12 @@ function setPose(pose) {
 
 // Setup event listeners
 function setupEventListeners() {
-  // Add click listeners with sound effects
-  elements.startBtn.addEventListener("click", onStartGame);
-  elements.infiniteBtn.addEventListener("click", onStartInfiniteMode);
-  elements.htpBtn.addEventListener("click", onHowToPlay);
-  elements.trophyBtn.addEventListener("click", onTrophyClick);
-  elements.audioToggleTitle.addEventListener("click", () => {
+  // Add click and touch listeners with sound effects
+  addTouchAndClickListener(elements.startBtn, onStartGame);
+  addTouchAndClickListener(elements.infiniteBtn, onStartInfiniteMode);
+  addTouchAndClickListener(elements.htpBtn, onHowToPlay);
+  addTouchAndClickListener(elements.trophyBtn, onTrophyClick);
+  addTouchAndClickListener(elements.audioToggleTitle, () => {
     audioManager.playSoundEffect("btnClick");
     ensureAudioUnlocked();
     toggleAudio();
@@ -300,8 +316,8 @@ function startTitleGlitch() {
         logoSpriteSheet.play(clipper);
       };
 
-      // Add click event to the title container which now holds the sprite
-      elements.title.addEventListener("click", onLogoClick);
+      // Add click and touch event to the title container which now holds the sprite
+      addTouchAndClickListener(elements.title, onLogoClick);
     }, 300);
   }, 3000);
 }
@@ -407,8 +423,10 @@ function createEyeballShower(element) {
       const easeProgress = 1 - Math.pow(1 - progress, 3);
 
       // Calculate current position
-      const currentX = particle.x + (particle.targetX - particle.x) * easeProgress;
-      const currentY = particle.y + (particle.targetY - particle.y) * easeProgress;
+      const currentX =
+        particle.x + (particle.targetX - particle.x) * easeProgress;
+      const currentY =
+        particle.y + (particle.targetY - particle.y) * easeProgress;
       const currentRotation = particle.targetRotation * easeProgress;
       const currentScale = 1 - progress * 0.8; // Scale down to 0.2
       const currentOpacity = 1 - progress;
@@ -471,20 +489,20 @@ function setupTrophyPopup() {
   const closeTrophyDetail = document.getElementById("close-trophy-detail");
 
   // Close trophy popup
-  closeTrophy.addEventListener("click", () => {
+  addTouchAndClickListener(closeTrophy, () => {
     audioManager.playSoundEffect("btnClick");
     trophyPopup.style.display = "none";
     overlay.style.display = "none";
   });
 
   // Close trophy detail popup
-  closeTrophyDetail.addEventListener("click", () => {
+  addTouchAndClickListener(closeTrophyDetail, () => {
     audioManager.playSoundEffect("btnClick");
     trophyDetailPopup.style.display = "none";
   });
 
   // Close on overlay click
-  overlay.addEventListener("click", () => {
+  addTouchAndClickListener(overlay, () => {
     if (trophyPopup.style.display === "block") {
       audioManager.playSoundEffect("btnClick");
       trophyPopup.style.display = "none";
@@ -508,18 +526,17 @@ function openTrophyPopup() {
   // Create trophy items
   trophies.forEach((trophy) => {
     const trophyItem = document.createElement("div");
-    trophyItem.className = `trophy-item ${trophy.unlocked ? "unlocked" : "locked"}`;
+    trophyItem.className = `trophy-item ${
+      trophy.unlocked ? "unlocked" : "locked"
+    }`;
 
-    const icon = trophy.unlocked
-      ? trophy.icon
-      : "images/icon-questionmark.png";
+    const icon = trophy.unlocked ? trophy.icon : "images/icon-questionmark.png";
 
     trophyItem.innerHTML = `
       <img src="${icon}" alt="${trophy.unlocked ? trophy.name : "Locked"}" />
-      ${trophy.unlocked ? `<div class="trophy-item-name">${trophy.name}</div>` : ""}
     `;
 
-    trophyItem.addEventListener("click", () => {
+    addTouchAndClickListener(trophyItem, () => {
       audioManager.playSoundEffect("btnClick");
       showTrophyDetail(trophy);
     });
@@ -537,7 +554,9 @@ function showTrophyDetail(trophy) {
   const detailPopup = document.getElementById("trophy-detail-popup");
   const detailIcon = document.getElementById("trophy-detail-icon");
   const detailName = document.getElementById("trophy-detail-name");
-  const detailRequirement = document.getElementById("trophy-detail-requirement");
+  const detailRequirement = document.getElementById(
+    "trophy-detail-requirement"
+  );
   const detailFlavor = document.getElementById("trophy-detail-flavor");
 
   // Set content
