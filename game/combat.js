@@ -255,7 +255,7 @@ function setupFight() {
   if (gameState.isInfiniteMode) {
     // Infinite mode: all attacks available, HP scales with level
     config = {
-      maxHP: 1, // One hit per level
+      maxHP: 4, // 4 hits per level
       availableAttacks: ["shield", "rocket", "sword", "plasma"],
       timerDuration: calculateInfiniteTimerDuration(gameState.infiniteLevel),
       showCrystal: false,
