@@ -414,14 +414,26 @@ function setPose(pose, useSprite = null) {
     elements.poseImg.style.display = "none";
     const container = elements.poseImg.parentElement;
 
+    // Get container dimensions
+    const containerHeight = container.offsetHeight;
+
+    // Calculate what the scaled sprite height will be
+    const scaledSpriteHeight = activeSpriteSheet.frameContentHeight * activeSpriteSheet.scale;
+
+    // Calculate scale to match container height (allow clipping at top if needed)
+    const heightScale = containerHeight / scaledSpriteHeight;
+
+    // Combine with the sprite's configured scale
+    const finalScale = activeSpriteSheet.scale * heightScale;
+
     // Create the structure for scaling and clipping: scaler -> clipper -> img
     // 1. The SCALER container. This will be scaled.
     const scaler = document.createElement("div");
-    scaler.style.transform = `scale(${activeSpriteSheet.scale}) translate(${activeSpriteSheet.offsetX}px, ${activeSpriteSheet.offsetY}px)`;
+    scaler.style.transform = `scale(${finalScale}) translate(${activeSpriteSheet.offsetX}px, ${activeSpriteSheet.offsetY}px)`;
     scaler.style.transformOrigin = "center center";
     container.appendChild(scaler); // Add the scaler to the DOM
 
-    // 2. The CLIPPER container. Sized to one frame, clips overflow.
+    // 2. The CLIPPER container. Sized to one frame at original dimensions (scale will handle sizing)
     const clipper = document.createElement("div");
     clipper.className = "sprite-clipper";
     clipper.style.width = `${activeSpriteSheet.frameContentWidth}px`;

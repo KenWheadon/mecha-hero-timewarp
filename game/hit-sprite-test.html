@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hit Sprite Scale Tester</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 20px;
+      background: #66b2b2;
+      font-family: "Courier New", "Courier", monospace;
+      color: #fff;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      text-align: center;
+      text-shadow: 3px 3px 0px #000;
+      margin-bottom: 30px;
+    }
+
+    .controls {
+      background: #fff;
+      border: 5px solid #000;
+      box-shadow: 8px 8px 0px #000;
+      padding: 20px;
+      margin-bottom: 30px;
+    }
+
+    .control-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      color: #000;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    select, input[type="range"], input[type="number"] {
+      width: 100%;
+      padding: 10px;
+      font-family: "Courier New", "Courier", monospace;
+      font-size: 16px;
+      border: 3px solid #000;
+      background: #fff;
+    }
+
+    input[type="range"] {
+      padding: 0;
+    }
+
+    .scale-display {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .scale-display input[type="range"] {
+      flex: 1;
+    }
+
+    .scale-display input[type="number"] {
+      width: 100px;
+      flex: none;
+    }
+
+    button {
+      padding: 15px 30px;
+      font-size: 18px;
+      font-weight: bold;
+      font-family: "Courier New", "Courier", monospace;
+      background: #00ff00;
+      color: #000;
+      border: 5px solid #000;
+      box-shadow: 8px 8px 0px #000;
+      cursor: pointer;
+      margin-right: 10px;
+      margin-bottom: 10px;
+    }
+
+    button:hover {
+      transform: translate(4px, 4px);
+      box-shadow: 4px 4px 0px #000;
+    }
+
+    button:active {
+      transform: translate(8px, 8px);
+      box-shadow: none;
+    }
+
+    .scale-controls {
+      opacity: 0.5;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .scale-controls.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .viewer {
+      background: #7fffd4;
+      border: 5px solid #000;
+      box-shadow: 8px 8px 0px #000;
+      padding: 20px;
+      min-height: 600px;
+    }
+
+    /* Duplicate the combat area layout */
+    #combat-area {
+      position: relative;
+      width: 95%;
+      max-width: 1400px;
+      height: auto;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: row;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    #player-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+      opacity: 0.3;
+    }
+
+    #player-box {
+      width: 100%;
+      max-width: 250px;
+      aspect-ratio: 1;
+      border: 5px solid #000;
+      background: #fff;
+      box-shadow: 8px 8px 0px #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #player-img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    #defense-buttons {
+      flex: 0 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      justify-content: center;
+      align-items: center;
+      opacity: 0.3;
+    }
+
+    .attack-btn {
+      width: 80px;
+      height: 80px;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #fff;
+      border: 5px solid #000;
+      box-shadow: 8px 8px 0px #000;
+      cursor: not-allowed;
+    }
+
+    .attack-btn img {
+      width: 70%;
+      height: 70%;
+      object-fit: contain;
+    }
+
+    #enemy-section {
+      flex: 1.5;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+
+    #enemy-hearts {
+      display: flex;
+      gap: 10px;
+      opacity: 0.3;
+      min-height: 40px;
+    }
+
+    /* Duplicate the enemy container styling - let it size naturally */
+    #enemy-container {
+      position: relative;
+      display: inline-block;
+      width: 100%;
+      max-width: 532px;
+      aspect-ratio: 1.4;
+    }
+
+    #enemy-pose {
+      width: 100%;
+      height: 100%;
+      border: 5px solid #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      font-weight: 900;
+      background: #fff;
+      box-shadow: 8px 8px 0px #000;
+      overflow: hidden;
+      aspect-ratio: unset !important;
+    }
+
+    .sprite-clipper {
+      overflow: hidden;
+      position: relative;
+    }
+
+    .sprite-clipper img {
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+
+    .info-panel {
+      background: #fff;
+      border: 5px solid #000;
+      box-shadow: 8px 8px 0px #000;
+      padding: 20px;
+      margin-top: 20px;
+      color: #000;
+    }
+
+    .info-panel h3 {
+      margin-top: 0;
+    }
+
+    .info-panel pre {
+      background: #f0f0f0;
+      border: 3px solid #000;
+      padding: 10px;
+      overflow-x: auto;
+    }
+
+    .dimensions {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .dimension-item {
+      background: #f0f0f0;
+      border: 3px solid #000;
+      padding: 10px;
+    }
+
+    .dimension-label {
+      font-weight: bold;
+      color: #000;
+    }
+
+    .dimension-value {
+      color: #0066cc;
+      font-size: 18px;
+    }
+
+    @media (max-width: 900px) {
+      .dimensions {
+        grid-template-columns: 1fr;
+      }
+
+      #player-container,
+      #defense-buttons {
+        display: none;
+      }
+
+      #enemy-section {
+        flex: 1;
+      }
+
+      #enemy-container {
+        max-width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Hit Sprite Scale Tester</h1>
+
+    <div class="controls">
+      <div class="control-group">
+        <label for="pose-select">Select Pose:</label>
+        <select id="pose-select">
+          <option value="">-- Select a pose --</option>
+          <optgroup label="Static Poses (for reference)">
+            <option value="static-pose2">Pose 2 - Charge (static)</option>
+            <option value="static-pose2-hit">Pose 2 - Hit (static)</option>
+            <option value="static-pose2-dmg">Pose 2 - Damaged (static)</option>
+            <option value="static-pose3">Pose 3 - Charge (static)</option>
+            <option value="static-pose3-hit">Pose 3 - Hit (static)</option>
+            <option value="static-pose3-dmg">Pose 3 - Damaged (static)</option>
+            <option value="static-pose4">Pose 4 - Charge (static)</option>
+            <option value="static-pose4-hit">Pose 4 - Hit (static)</option>
+            <option value="static-pose4-dmg">Pose 4 - Damaged (static)</option>
+            <option value="static-pose5">Pose 5 - Charge (static)</option>
+            <option value="static-pose5-hit">Pose 5 - Hit (static)</option>
+            <option value="static-pose5-dmg">Pose 5 - Damaged (static)</option>
+          </optgroup>
+          <optgroup label="Animated Sprites (adjust scale)">
+            <option value="pose2-hit">Pose 2 - Hit Animation</option>
+            <option value="pose3-hit">Pose 3 - Hit Animation</option>
+            <option value="pose4-hit">Pose 4 - Hit Animation</option>
+            <option value="pose5-hit">Pose 5 - Hit Animation</option>
+          </optgroup>
+        </select>
+      </div>
+
+      <div class="control-group scale-controls" id="scale-controls">
+        <label for="scale-slider">Scale (0.1 - 5.0):</label>
+        <div class="scale-display">
+          <input type="range" id="scale-slider" min="0.1" max="5.0" step="0.05" value="1.5">
+          <input type="number" id="scale-number" min="0.1" max="5.0" step="0.05" value="1.5">
+        </div>
+      </div>
+
+      <div class="control-group scale-controls" id="crop-controls">
+        <label for="crop-top">Crop from top (pixels):</label>
+        <div class="scale-display">
+          <input type="range" id="crop-top-slider" min="0" max="200" step="1" value="0">
+          <input type="number" id="crop-top-number" min="0" max="500" step="1" value="0">
+        </div>
+      </div>
+
+      <div class="control-group scale-controls" id="crop-bottom-controls">
+        <label for="crop-bottom">Crop from bottom (pixels):</label>
+        <div class="scale-display">
+          <input type="range" id="crop-bottom-slider" min="0" max="200" step="1" value="0">
+          <input type="number" id="crop-bottom-number" min="0" max="500" step="1" value="0">
+        </div>
+      </div>
+
+      <div class="control-group">
+        <button id="play-btn">Play/Reload</button>
+        <button id="stop-btn">Stop Animation</button>
+        <button id="copy-config-btn">Copy Config to Clipboard</button>
+      </div>
+    </div>
+
+    <div class="viewer">
+      <div id="combat-area">
+        <!-- Player Container (placeholder) -->
+        <div id="player-container">
+          <div id="player-box">
+            <img id="player-img" src="images/player-default.png" alt="Player">
+          </div>
+        </div>
+
+        <!-- Defense Buttons (placeholder) -->
+        <div id="defense-buttons">
+          <button class="attack-btn">
+            <img src="images/shield.png" alt="Shield">
+          </button>
+          <button class="attack-btn">
+            <img src="images/rocket.png" alt="Rocket">
+          </button>
+          <button class="attack-btn">
+            <img src="images/sword.png" alt="Sword">
+          </button>
+          <button class="attack-btn">
+            <img src="images/plasma.png" alt="Plasma">
+          </button>
+        </div>
+
+        <!-- Enemy Section -->
+        <div id="enemy-section">
+          <div id="enemy-hearts">
+            <!-- Placeholder hearts -->
+          </div>
+          <div id="enemy-container">
+            <div id="enemy-pose">
+              Select a sprite to preview
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="info-panel">
+      <h3>Current Settings</h3>
+      <div class="dimensions">
+        <div class="dimension-item">
+          <div class="dimension-label">Sprite:</div>
+          <div class="dimension-value" id="current-sprite">None</div>
+        </div>
+        <div class="dimension-item">
+          <div class="dimension-label">Scale:</div>
+          <div class="dimension-value" id="current-scale">1.5</div>
+        </div>
+        <div class="dimension-item">
+          <div class="dimension-label">Frame Dimensions:</div>
+          <div class="dimension-value" id="frame-dims">-</div>
+        </div>
+        <div class="dimension-item">
+          <div class="dimension-label">Scaled Dimensions:</div>
+          <div class="dimension-value" id="scaled-dims">-</div>
+        </div>
+        <div class="dimension-item">
+          <div class="dimension-label">Final Scale (with fit):</div>
+          <div class="dimension-value" id="final-scale">-</div>
+        </div>
+        <div class="dimension-item">
+          <div class="dimension-label">Container:</div>
+          <div class="dimension-value" id="container-dims">-</div>
+        </div>
+      </div>
+
+      <h3>Copy this config:</h3>
+      <pre id="config-output">Select a sprite and adjust the scale</pre>
+    </div>
+  </div>
+
+  <script type="module">
+    import { SpriteSheet } from './sprite-sheet.js';
+    import { getSpriteConfig } from './sprites-config.js';
+
+    let activeSpriteSheet = null;
+    let currentSpriteName = '';
+    let isStaticPose = false;
+
+    const staticPoses = {
+      'static-pose2': 'images/pose2.png',
+      'static-pose2-hit': 'images/pose2-hit.png',
+      'static-pose2-dmg': 'images/pose2-dmg.png',
+      'static-pose3': 'images/pose3.png',
+      'static-pose3-hit': 'images/pose3-hit.png',
+      'static-pose3-dmg': 'images/pose3-dmg.png',
+      'static-pose4': 'images/pose4.png',
+      'static-pose4-hit': 'images/pose4-hit.png',
+      'static-pose4-dmg': 'images/pose4-dmg.png',
+      'static-pose5': 'images/pose5.png',
+      'static-pose5-hit': 'images/pose5-hit.png',
+      'static-pose5-dmg': 'images/pose5-dmg.png',
+    };
+
+    const elements = {
+      poseSelect: document.getElementById('pose-select'),
+      scaleSlider: document.getElementById('scale-slider'),
+      scaleNumber: document.getElementById('scale-number'),
+      scaleControls: document.getElementById('scale-controls'),
+      cropTopSlider: document.getElementById('crop-top-slider'),
+      cropTopNumber: document.getElementById('crop-top-number'),
+      cropBottomSlider: document.getElementById('crop-bottom-slider'),
+      cropBottomNumber: document.getElementById('crop-bottom-number'),
+      cropControls: document.getElementById('crop-controls'),
+      cropBottomControls: document.getElementById('crop-bottom-controls'),
+      playBtn: document.getElementById('play-btn'),
+      stopBtn: document.getElementById('stop-btn'),
+      copyConfigBtn: document.getElementById('copy-config-btn'),
+      enemyPose: document.getElementById('enemy-pose'),
+      enemyContainer: document.getElementById('enemy-container'),
+      currentSprite: document.getElementById('current-sprite'),
+      currentScale: document.getElementById('current-scale'),
+      frameDims: document.getElementById('frame-dims'),
+      scaledDims: document.getElementById('scaled-dims'),
+      finalScale: document.getElementById('final-scale'),
+      containerDims: document.getElementById('container-dims'),
+      configOutput: document.getElementById('config-output'),
+    };
+
+    // Update container dimensions display
+    function updateContainerDims() {
+      const width = elements.enemyContainer.offsetWidth;
+      const height = elements.enemyContainer.offsetHeight;
+      elements.containerDims.textContent = `${width}px × ${height}px`;
+    }
+
+    // Sync slider and number input
+    elements.scaleSlider.addEventListener('input', (e) => {
+      elements.scaleNumber.value = e.target.value;
+      updateSprite();
+    });
+
+    elements.scaleNumber.addEventListener('input', (e) => {
+      elements.scaleSlider.value = e.target.value;
+      updateSprite();
+    });
+
+    elements.cropTopSlider.addEventListener('input', (e) => {
+      elements.cropTopNumber.value = e.target.value;
+      updateSprite();
+    });
+
+    elements.cropTopNumber.addEventListener('input', (e) => {
+      elements.cropTopSlider.value = e.target.value;
+      updateSprite();
+    });
+
+    elements.cropBottomSlider.addEventListener('input', (e) => {
+      elements.cropBottomNumber.value = e.target.value;
+      updateSprite();
+    });
+
+    elements.cropBottomNumber.addEventListener('input', (e) => {
+      elements.cropBottomSlider.value = e.target.value;
+      updateSprite();
+    });
+
+    // Clean up existing sprite
+    function cleanupSprite() {
+      if (activeSpriteSheet) {
+        activeSpriteSheet.stop();
+        activeSpriteSheet.destroy();
+        activeSpriteSheet = null;
+      }
+
+      // Clear container
+      elements.enemyPose.innerHTML = '';
+    }
+
+    // Show static pose image
+    function showStaticPose(poseKey) {
+      cleanupSprite();
+      isStaticPose = true;
+      currentSpriteName = poseKey;
+
+      const img = document.createElement('img');
+      img.id = 'pose-img';
+      img.src = staticPoses[poseKey];
+      img.style.width = '100%';
+      img.style.height = '100%';
+      img.style.objectFit = 'contain';
+
+      elements.enemyPose.appendChild(img);
+
+      // Update info
+      img.onload = () => {
+        elements.currentSprite.textContent = poseKey + ' (static)';
+        elements.currentScale.textContent = 'N/A (static image)';
+        elements.frameDims.textContent = `${img.naturalWidth}px × ${img.naturalHeight}px`;
+        elements.scaledDims.textContent = 'Uses object-fit: contain';
+        elements.finalScale.textContent = 'N/A';
+        elements.configOutput.textContent = 'Static pose - no config needed';
+      };
+
+      // Disable scale controls
+      elements.scaleControls.classList.remove('active');
+      elements.cropControls.classList.remove('active');
+      elements.cropBottomControls.classList.remove('active');
+    }
+
+    // Create and display sprite
+    function createSprite(spriteName, scale, cropTop, cropBottom) {
+      cleanupSprite();
+      isStaticPose = false;
+
+      const spriteConfig = getSpriteConfig(spriteName);
+
+      // Enable scale controls
+      elements.scaleControls.classList.add('active');
+      elements.cropControls.classList.add('active');
+      elements.cropBottomControls.classList.add('active');
+
+      // Calculate frame dimensions from the sprite sheet file
+      const dims = parseDimensions(spriteConfig.imagePath);
+      const cols = spriteConfig.cols || 6;
+      const rows = spriteConfig.rows || 6;
+      const fullFrameWidth = dims.width / cols;
+      const fullFrameHeight = dims.height / rows;
+
+      // Apply cropping (crops are from the full frame, not from already-cropped config)
+      const frameContentWidth = fullFrameWidth;
+      const frameContentHeight = fullFrameHeight - cropTop - cropBottom;
+      const frameHeight = cropTop;
+
+      // Override the config with custom values
+      const customConfig = {
+        ...spriteConfig,
+        scale: parseFloat(scale),
+        frameContentWidth: frameContentWidth,
+        frameContentHeight: frameContentHeight,
+        frameWidth: 0,
+        frameHeight: frameHeight,
+        gapX: 0,
+        gapY: cropBottom,
+      };
+
+      activeSpriteSheet = new SpriteSheet(customConfig);
+      currentSpriteName = spriteName;
+
+      // Clear container
+      elements.enemyPose.innerHTML = '';
+
+      const container = elements.enemyPose;
+      const containerHeight = container.offsetHeight;
+
+      // Calculate what the scaled sprite height will be
+      const scaledSpriteHeight = activeSpriteSheet.frameContentHeight * activeSpriteSheet.scale;
+
+      // Calculate scale to match container height (allow clipping at top if needed)
+      const heightScale = containerHeight / scaledSpriteHeight;
+
+      // Combine with the sprite's configured scale
+      const finalScale = activeSpriteSheet.scale * heightScale;
+
+      // Create structure
+      const scaler = document.createElement('div');
+      scaler.style.transform = `scale(${finalScale}) translate(${activeSpriteSheet.offsetX}px, ${activeSpriteSheet.offsetY}px)`;
+      scaler.style.transformOrigin = 'center center';
+      container.appendChild(scaler);
+
+      const clipper = document.createElement('div');
+      clipper.className = 'sprite-clipper';
+      clipper.style.width = `${activeSpriteSheet.frameContentWidth}px`;
+      clipper.style.height = `${activeSpriteSheet.frameContentHeight}px`;
+      scaler.appendChild(clipper);
+
+      const spriteImg = document.createElement('img');
+      spriteImg.src = activeSpriteSheet.imagePath;
+      clipper.appendChild(spriteImg);
+
+      // Wait for load and play
+      const loadInterval = setInterval(() => {
+        if (activeSpriteSheet && activeSpriteSheet.isLoaded) {
+          clearInterval(loadInterval);
+          activeSpriteSheet.play(clipper);
+          updateInfo(finalScale);
+        }
+      }, 50);
+    }
+
+    // Helper function to parse dimensions from filename
+    function parseDimensions(filename) {
+      const match = filename.match(/-(\d+)-(\d+)\.png$/);
+      if (match) {
+        return {
+          width: parseInt(match[1], 10),
+          height: parseInt(match[2], 10),
+        };
+      }
+      return { width: 0, height: 0 };
+    }
+
+    // Update info panel
+    function updateInfo(finalScale) {
+      elements.currentSprite.textContent = currentSpriteName;
+      elements.currentScale.textContent = elements.scaleNumber.value;
+      elements.frameDims.textContent = `${activeSpriteSheet.frameContentWidth}px × ${activeSpriteSheet.frameContentHeight}px`;
+
+      const scaledW = Math.round(activeSpriteSheet.frameContentWidth * activeSpriteSheet.scale);
+      const scaledH = Math.round(activeSpriteSheet.frameContentHeight * activeSpriteSheet.scale);
+      elements.scaledDims.textContent = `${scaledW}px × ${scaledH}px`;
+
+      elements.finalScale.textContent = finalScale.toFixed(3);
+
+      // Generate config code
+      const cropTop = parseInt(elements.cropTopNumber.value) || 0;
+      const cropBottom = parseInt(elements.cropBottomNumber.value) || 0;
+
+      let configCode;
+      if (cropTop === 0 && cropBottom === 0) {
+        // Simple config using helper
+        configCode = `"${currentSpriteName}": createHitSpriteConfig(
+  "images/${activeSpriteSheet.imagePath.replace('images/', '')}",
+  { scale: ${elements.scaleNumber.value} }
+),`;
+      } else {
+        // Manual config with cropping
+        const dims = parseDimensions(activeSpriteSheet.imagePath);
+        const cols = activeSpriteSheet.cols || 6;
+        const rows = activeSpriteSheet.rows || 6;
+        const fullFrameWidth = dims.width / cols;
+        const fullFrameHeight = dims.height / rows;
+
+        configCode = `"${currentSpriteName}": {
+  imagePath: "images/${activeSpriteSheet.imagePath.replace('images/', '')}",
+  rows: ${rows},
+  cols: ${cols},
+  fps: ${activeSpriteSheet.fps || 12},
+  loop: true,
+  scale: ${elements.scaleNumber.value},
+  offsetX: 0,
+  offsetY: 0,
+  frameContentWidth: ${fullFrameWidth},  // ${dims.width} / ${cols}
+  frameContentHeight: ${fullFrameHeight - cropTop - cropBottom}, // ${dims.height} / ${rows} = ${fullFrameHeight}, cropped
+  frameWidth: 0,
+  frameHeight: ${cropTop}, // Crop ${cropTop}px from top
+  gapX: 0,
+  gapY: ${cropBottom}, // Crop ${cropBottom}px from bottom
+},`;
+      }
+      elements.configOutput.textContent = configCode;
+    }
+
+    // Update sprite with current settings
+    function updateSprite() {
+      if (!currentSpriteName || isStaticPose) return;
+      const cropTop = parseInt(elements.cropTopNumber.value) || 0;
+      const cropBottom = parseInt(elements.cropBottomNumber.value) || 0;
+      createSprite(currentSpriteName, elements.scaleNumber.value, cropTop, cropBottom);
+    }
+
+    // Event listeners
+    elements.poseSelect.addEventListener('change', (e) => {
+      const value = e.target.value;
+      if (!value) {
+        cleanupSprite();
+        elements.enemyPose.innerHTML = 'Select a pose to preview';
+        elements.scaleControls.classList.remove('active');
+        return;
+      }
+
+      if (value.startsWith('static-')) {
+        showStaticPose(value);
+      } else {
+        // Reset crop values when changing sprite
+        elements.cropTopNumber.value = 0;
+        elements.cropTopSlider.value = 0;
+        elements.cropBottomNumber.value = 0;
+        elements.cropBottomSlider.value = 0;
+        createSprite(value, elements.scaleNumber.value, 0, 0);
+      }
+    });
+
+    elements.playBtn.addEventListener('click', () => {
+      if (!currentSpriteName) return;
+
+      if (isStaticPose) {
+        showStaticPose(currentSpriteName);
+      } else {
+        const cropTop = parseInt(elements.cropTopNumber.value) || 0;
+        const cropBottom = parseInt(elements.cropBottomNumber.value) || 0;
+        createSprite(currentSpriteName, elements.scaleNumber.value, cropTop, cropBottom);
+      }
+    });
+
+    elements.stopBtn.addEventListener('click', () => {
+      if (activeSpriteSheet) {
+        activeSpriteSheet.stop();
+      }
+    });
+
+    elements.copyConfigBtn.addEventListener('click', () => {
+      if (!currentSpriteName) {
+        alert('Select a pose first!');
+        return;
+      }
+
+      if (isStaticPose) {
+        alert('Static poses don\'t need config - they use object-fit: contain automatically!');
+        return;
+      }
+
+      const configText = elements.configOutput.textContent;
+      navigator.clipboard.writeText(configText).then(() => {
+        const originalText = elements.copyConfigBtn.textContent;
+        elements.copyConfigBtn.textContent = 'Copied!';
+        setTimeout(() => {
+          elements.copyConfigBtn.textContent = originalText;
+        }, 2000);
+      });
+    });
+
+    // Initialize
+    updateContainerDims();
+    window.addEventListener('resize', updateContainerDims);
+  </script>
+</body>
+</html>
