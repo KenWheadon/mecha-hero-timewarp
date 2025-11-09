@@ -129,5 +129,35 @@ export function createInitialGameState() {
     gameStartTime: null,
     totalPausedTime: 0,
     lastPauseTime: null,
+    // Randomized defense mappings for this game session
+    defenseMapping: null,
+  };
+}
+
+// Helper function to shuffle an array
+function shuffleArray(array) {
+  const shuffled = [...array];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+}
+
+// Generate random defense mapping for the game
+// Level 1: shuffle shield/rocket between poses 2 and 3
+// Level 2+: shuffle sword/plasma between poses 4 and 5
+export function generateDefenseMapping() {
+  // Shuffle the first two defenses for level 1 (shield and rocket)
+  const level1Defenses = shuffleArray(["shield", "rocket"]);
+
+  // Shuffle the last two defenses for level 2+ (sword and plasma)
+  const level2Defenses = shuffleArray(["sword", "plasma"]);
+
+  return {
+    2: level1Defenses[0],  // Pose 2 (Laser Beam)
+    3: level1Defenses[1],  // Pose 3 (Launcher)
+    4: level2Defenses[0],  // Pose 4 (Short Blade)
+    5: level2Defenses[1],  // Pose 5 (Heavy Blade)
   };
 }

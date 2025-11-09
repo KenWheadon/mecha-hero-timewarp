@@ -1,10 +1,10 @@
 // Storage Manager - handles local storage for high scores and first-time flags
 
 const STORAGE_KEYS = {
-  HIGH_SCORE: 'mecha-hero-high-score',
-  FIRST_TIME_FLAGS: 'mecha-hero-first-time',
-  INFINITE_HIGH_SCORE: 'mecha-hero-infinite-high-score',
-  STORY_SEEN: 'mecha-hero-story-seen',
+  HIGH_SCORE: "mecha-hero-high-score",
+  FIRST_TIME_FLAGS: "mecha-hero-first-time",
+  INFINITE_HIGH_SCORE: "mecha-hero-infinite-high-score",
+  STORY_SEEN: "mecha-hero-story-seen",
 };
 
 // Get high score (best time in seconds, lower is better)
@@ -35,7 +35,9 @@ export function formatTime(seconds) {
   const secs = Math.floor(seconds % 60);
   const ms = Math.floor((seconds % 1) * 100);
 
-  return `${minutes}:${secs.toString().padStart(2, '0')}.${ms.toString().padStart(2, '0')}`;
+  return `${minutes}:${secs.toString().padStart(2, "0")}.${ms
+    .toString()
+    .padStart(2, "0")}`;
 }
 
 // Check if it's the first time for a specific fight
@@ -58,11 +60,11 @@ function getFirstTimeFlags() {
 }
 
 // Get star rating based on completion time
-// Under 1 minute: 3 stars
+// Under 1.5 minutes: 3 stars
 // Under 2 minutes: 2 stars
 // Anything else: 1 star
 export function getStarRating(timeInSeconds) {
-  if (timeInSeconds < 60) {
+  if (timeInSeconds < 90) {
     return 3;
   } else if (timeInSeconds < 120) {
     return 2;
@@ -109,12 +111,12 @@ export function getInfiniteStarRating(level) {
 
 // Check if story has been seen
 export function hasSeenStory() {
-  return localStorage.getItem(STORAGE_KEYS.STORY_SEEN) === 'true';
+  return localStorage.getItem(STORAGE_KEYS.STORY_SEEN) === "true";
 }
 
 // Mark story as seen
 export function markStorySeen() {
-  localStorage.setItem(STORAGE_KEYS.STORY_SEEN, 'true');
+  localStorage.setItem(STORAGE_KEYS.STORY_SEEN, "true");
 }
 
 // Reset all progress (for testing or user request)

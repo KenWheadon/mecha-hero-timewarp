@@ -7,6 +7,7 @@ import {
   finalDestroyPose,
   GAME_CONFIG,
   createInitialGameState,
+  generateDefenseMapping,
 } from "./config.js";
 import { audioManager } from "./audio-manager.js";
 import { saveHighScore, saveInfiniteHighScore } from "./storage-manager.js";
@@ -106,6 +107,10 @@ export function initGame(isInfiniteMode = false) {
   gameState = createInitialGameState();
   gameState.isInfiniteMode = isInfiniteMode;
   gameState.infiniteLevel = isInfiniteMode ? 1 : 0;
+
+  // Generate random defense mapping for this game session
+  gameState.defenseMapping = generateDefenseMapping();
+
   initHearts();
   initOnboarding();
 
@@ -425,7 +430,8 @@ function setPose(pose, useSprite = null) {
     const containerHeight = container.offsetHeight;
 
     // Calculate what the scaled sprite height will be
-    const scaledSpriteHeight = activeSpriteSheet.frameContentHeight * activeSpriteSheet.scale;
+    const scaledSpriteHeight =
+      activeSpriteSheet.frameContentHeight * activeSpriteSheet.scale;
 
     // Calculate scale to match container height (allow clipping at top if needed)
     const heightScale = containerHeight / scaledSpriteHeight;
@@ -514,11 +520,11 @@ function showAttackPose() {
 
 // Select random pose based on fight level
 function selectRandomPose() {
-  // Fight 1: 2 unique poses
+  // Fight 1: 2 unique poses (only poses 2 and 3, which map to the available attacks)
   if (gameState.currentFight === 1) {
     const availablePoses = attackPoses.filter(
       (p) =>
-        gameState.availableAttacks.includes(p.correct) &&
+        gameState.availableAttacks.includes(gameState.defenseMapping[p.id]) &&
         !gameState.counteredPoses.has(p.id)
     );
     if (availablePoses.length === 0) {
@@ -827,7 +833,9 @@ function handleAttack(action) {
   stopTimer();
   elements.defenseButtons.classList.remove("show");
 
-  const correct = action === currentPose.correct;
+  // Use the defense mapping to determine the correct answer
+  const correctDefense = gameState.defenseMapping[currentPose.id];
+  const correct = action === correctDefense;
   const poseId = currentPose.id;
 
   // Add button press feedback with correct/incorrect indication
@@ -987,7 +995,7 @@ function handleFightWon() {
       audioManager.playSoundEffect("roboFinalDeath");
 
       // Track story mode completion
-      const noHits = gameState.lives === 3;
+      const noHits = gameState.hearts === 3;
       trackStoryModeComplete(noHits);
 
       // Show victory screen after a brief delay
@@ -1001,7 +1009,7 @@ function handleFightWon() {
         trackFight1Complete();
 
         // Check if level 1 was completed without hits
-        if (gameState.lives === 3) {
+        if (gameState.hearts === 3) {
           trackLevel1NoHits();
         }
       }
@@ -1320,14 +1328,20 @@ function togglePause() {
     elements.pauseOverlay.classList.add("show");
 
     // Check if paused on win screen for trophy
-    if (gameOverScreen && gameOverScreen.victoryScreen &&
-        gameOverScreen.victoryScreen.style.display === "flex") {
+    if (
+      gameOverScreen &&
+      gameOverScreen.victoryScreen &&
+      gameOverScreen.victoryScreen.style.display === "flex"
+    ) {
       trackPauseOnWinScreen();
     }
 
     // Check if paused on lose screen for trophy
-    if (gameOverScreen && gameOverScreen.defeatScreen &&
-        gameOverScreen.defeatScreen.style.display === "flex") {
+    if (
+      gameOverScreen &&
+      gameOverScreen.defeatScreen &&
+      gameOverScreen.defeatScreen.style.display === "flex"
+    ) {
       trackPauseOnLoseScreen();
     }
 
@@ -1351,10 +1365,8 @@ function togglePause() {
         timewarpLoadInterval = null;
       }
 
-      // Pause the sprite animation
-      if (timewarpSprite) {
-        timewarpSprite.pause();
-      }
+      // Don't pause the sprite animation - let it continue to yoyo
+      // The sprite animation should continue even when paused
 
       // Pause particle animation
       if (timewarpParticleAnimationId) {
@@ -1387,9 +1399,8 @@ function togglePause() {
             animateTimewarpParticles();
           }
         }, 50);
-      } else if (timewarpSprite && timewarpSprite.isLoaded) {
-        // Resume the sprite animation if it was already playing
-        timewarpSprite.resume();
+      } else {
+        // Sprite animation continues running even when paused, so just resume particles
         // Resume particle animation
         animateTimewarpParticles();
       }
@@ -1448,6 +1459,10 @@ function restartGame() {
 
   gameState = createInitialGameState();
   gameState.isInfiniteMode = wasInfiniteMode;
+
+  // Generate new random defense mapping for the new game
+  gameState.defenseMapping = generateDefenseMapping();
+
   initHearts();
   setupFight();
 }
@@ -1477,6 +1492,8 @@ function quitToMainMenu() {
 
   // Re-import and re-initialize the title screen to reset its state
   import("./title-screen.js").then((titleScreenModule) => {
+    // Reset the title screen first to clean up any previous state
+    titleScreenModule.resetTitleScreen();
     titleScreenModule.initTitleScreen();
   });
 

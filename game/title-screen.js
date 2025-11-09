@@ -64,6 +64,31 @@ function addTouchAndClickListener(element, handler) {
   });
 }
 
+// Reset title screen to initial state - call before initTitleScreen when returning from game
+export function resetTitleScreen() {
+  // Clean up any running logo animations
+  if (logoAnimationInterval) {
+    clearInterval(logoAnimationInterval);
+    logoAnimationInterval = null;
+  }
+  if (logoVisibilityKey) {
+    visibilityManager.stopMonitoring(logoVisibilityKey);
+    logoVisibilityKey = null;
+  }
+  logoSpriteSheet = null;
+
+  // Reset the title element to its original state
+  elements.title.innerHTML = "MECHA HERO: TIMEWARP";
+  elements.title.style.animation = "none";
+  elements.title.style.marginBottom = "";
+  elements.title.style.cursor = "";
+
+  // Remove any existing event listeners from title
+  elements.title.replaceWith(elements.title.cloneNode(true));
+  // Update the cached reference after cloning
+  elements.title = document.getElementById("title");
+}
+
 // Initialize title screen
 export function initTitleScreen() {
   setPose(neutralPose);
@@ -130,7 +155,7 @@ function updateHighScoreStars(timeInSeconds) {
   if (rating === 3) {
     progressMessage.textContent = "Perfect! 3 stars!";
   } else if (rating === 2) {
-    progressMessage.textContent = "Under 1 minute for 3 stars";
+    progressMessage.textContent = "Under 1.5 minutes for 3 stars";
   } else {
     progressMessage.textContent = "Under 2 minutes for 2 stars";
   }

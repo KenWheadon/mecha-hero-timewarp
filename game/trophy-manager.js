@@ -131,7 +131,8 @@ const TROPHIES = [
     id: "spin-to-win",
     name: "Spin to Win",
     icon: "images/icon-record.png",
-    requirement: "Make the robot spin 10 times while paused during a Time Warp animation.",
+    requirement:
+      "Make the robot spin 10 times while paused during a Time Warp animation.",
     flavorText: "DJ Hero over here scratching records in the time stream.",
     unlocked: false,
   },
@@ -414,7 +415,7 @@ export function trackRobotSpinDuringTimewarpPause() {
   trophyStats.robotSpinsDuringTimewarpPause++;
   saveTrophyStats();
 
-  if (trophyStats.robotSpinsDuringTimewarpPause >= 10) {
+  if (trophyStats.robotSpinsDuringTimewarpPause >= 5) {
     unlockTrophy("spin-to-win");
   }
 }
