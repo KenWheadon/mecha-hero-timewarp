@@ -11,7 +11,6 @@ export const attackPoses = [
     id: 2,
     desc: "Laser Beam Charge",
     img: "images/pose2.png",
-    hitImg: "images/pose2-hit.png",
     hitSprite: "pose2-hit", // Use sprite sheet for hit animation
     dmgImg: "images/pose2-dmg.png",
     correct: "shield",
@@ -20,7 +19,6 @@ export const attackPoses = [
     id: 3,
     desc: "Launcher Warm Up",
     img: "images/pose3.png",
-    hitImg: "images/pose3-hit.png",
     hitSprite: "pose3-hit", // Use sprite sheet for hit animation
     dmgImg: "images/pose3-dmg.png",
     correct: "rocket",
@@ -29,7 +27,6 @@ export const attackPoses = [
     id: 4,
     desc: "Short Blade Ready",
     img: "images/pose4.png",
-    hitImg: "images/pose4-hit.png",
     hitSprite: "pose4-hit", // Use sprite sheet for hit animation
     dmgImg: "images/pose4-dmg.png",
     correct: "sword",
@@ -38,7 +35,6 @@ export const attackPoses = [
     id: 5,
     desc: "Heavy Blade Ready",
     img: "images/pose5.png",
-    hitImg: "images/pose5-hit.png",
     hitSprite: "pose5-hit", // Use sprite sheet for hit animation
     dmgImg: "images/pose5-dmg.png",
     correct: "plasma",
