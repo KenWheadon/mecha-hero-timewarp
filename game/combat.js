@@ -48,6 +48,14 @@ let timewarpParticleCtx = null;
 let timewarpParticles = [];
 let timewarpParticleAnimationId = null;
 
+// Time warp timing and sprite
+let timewarpTimeoutId = null;
+let timewarpSprite = null;
+let timewarpStartTime = null;
+let timewarpRemainingTime = null;
+let timewarpLoadInterval = null;
+let timewarpClipper = null;
+
 // Helper function to add both click and touch event listeners
 function addTouchAndClickListener(element, handler) {
   // Remove any existing listeners to prevent duplicates
@@ -963,6 +971,7 @@ function createTimewarpParticleCanvas() {
   canvas.style.height = "100%";
   canvas.style.pointerEvents = "none";
   canvas.style.zIndex = "1";
+  canvas.style.borderRadius = "50%";
 
   return canvas;
 }
@@ -1079,7 +1088,7 @@ function showTimeWarp() {
 
   // Create sprite animation in the popup
   const spriteConfig = getSpriteConfig("pose8-timewarp");
-  const timewarpSprite = new SpriteSheet(spriteConfig);
+  timewarpSprite = new SpriteSheet(spriteConfig);
 
   // Clear any existing content
   elements.timewarpAnimationContainer.innerHTML = "";
@@ -1105,21 +1114,22 @@ function showTimeWarp() {
   scaler.style.zIndex = "2";
   elements.timewarpAnimationContainer.appendChild(scaler);
 
-  const clipper = document.createElement("div");
-  clipper.className = "sprite-clipper";
-  clipper.style.width = `${timewarpSprite.frameContentWidth}px`;
-  clipper.style.height = `${timewarpSprite.frameContentHeight}px`;
-  scaler.appendChild(clipper);
+  timewarpClipper = document.createElement("div");
+  timewarpClipper.className = "sprite-clipper";
+  timewarpClipper.style.width = `${timewarpSprite.frameContentWidth}px`;
+  timewarpClipper.style.height = `${timewarpSprite.frameContentHeight}px`;
+  scaler.appendChild(timewarpClipper);
 
   const spriteImg = document.createElement("img");
   spriteImg.src = timewarpSprite.imagePath;
-  clipper.appendChild(spriteImg);
+  timewarpClipper.appendChild(spriteImg);
 
   // Wait for sprite to load, then start animation and show popup
-  const loadInterval = setInterval(() => {
+  timewarpLoadInterval = setInterval(() => {
     if (timewarpSprite.isLoaded) {
-      clearInterval(loadInterval);
-      timewarpSprite.play(clipper);
+      clearInterval(timewarpLoadInterval);
+      timewarpLoadInterval = null;
+      timewarpSprite.play(timewarpClipper);
 
       // Start particle animation
       animateTimewarpParticles();
@@ -1132,11 +1142,18 @@ function showTimeWarp() {
   // Track time warp completion
   trackTimeWarpComplete();
 
-  // Hide popup and advance to next fight after duration
-  setTimeout(() => {
+  // Start tracking time for pause/resume
+  timewarpStartTime = Date.now();
+  timewarpRemainingTime = GAME_CONFIG.TIME_WARP_DURATION;
+
+  // Function to complete the timewarp
+  const completeTimewarp = () => {
     // Stop and cleanup sprite
-    timewarpSprite.stop();
-    timewarpSprite.destroy();
+    if (timewarpSprite) {
+      timewarpSprite.stop();
+      timewarpSprite.destroy();
+      timewarpSprite = null;
+    }
 
     // Stop particle animation
     stopTimewarpParticles();
@@ -1144,10 +1161,19 @@ function showTimeWarp() {
     // Hide popup
     elements.timewarpOverlay.classList.remove("show");
 
+    // Clear timeout reference
+    timewarpTimeoutId = null;
+    timewarpStartTime = null;
+    timewarpRemainingTime = null;
+    timewarpClipper = null;
+
     isInTimewarp = false;
     gameState.currentFight++;
     setupFight();
-  }, GAME_CONFIG.TIME_WARP_DURATION);
+  };
+
+  // Hide popup and advance to next fight after duration
+  timewarpTimeoutId = setTimeout(completeTimewarp, GAME_CONFIG.TIME_WARP_DURATION);
 }
 
 // Game over
@@ -1188,6 +1214,33 @@ function togglePause() {
     // Check if paused during time warp for trophy
     if (isInTimewarp) {
       trackPauseDuringTimewarp();
+
+      // Pause the timewarp timeout
+      if (timewarpTimeoutId !== null) {
+        clearTimeout(timewarpTimeoutId);
+        timewarpTimeoutId = null;
+
+        // Calculate remaining time
+        const elapsed = Date.now() - timewarpStartTime;
+        timewarpRemainingTime -= elapsed;
+      }
+
+      // Stop the sprite loading interval if still loading
+      if (timewarpLoadInterval !== null) {
+        clearInterval(timewarpLoadInterval);
+        timewarpLoadInterval = null;
+      }
+
+      // Pause the sprite animation
+      if (timewarpSprite) {
+        timewarpSprite.pause();
+      }
+
+      // Pause particle animation
+      if (timewarpParticleAnimationId) {
+        cancelAnimationFrame(timewarpParticleAnimationId);
+        timewarpParticleAnimationId = null;
+      }
     }
   } else {
     // Add paused time to total when resuming
@@ -1196,6 +1249,54 @@ function togglePause() {
       gameState.lastPauseTime = null;
     }
     elements.pauseOverlay.classList.remove("show");
+
+    // Resume timewarp if it was paused during timewarp
+    if (isInTimewarp && timewarpTimeoutId === null && timewarpRemainingTime !== null) {
+      // Check if sprite was still loading when paused
+      if (timewarpSprite && !timewarpSprite.isLoaded && timewarpClipper) {
+        // Resume the loading interval
+        timewarpLoadInterval = setInterval(() => {
+          if (timewarpSprite.isLoaded) {
+            clearInterval(timewarpLoadInterval);
+            timewarpLoadInterval = null;
+            timewarpSprite.play(timewarpClipper);
+            animateTimewarpParticles();
+          }
+        }, 50);
+      } else if (timewarpSprite && timewarpSprite.isLoaded) {
+        // Resume the sprite animation if it was already playing
+        timewarpSprite.resume();
+        // Resume particle animation
+        animateTimewarpParticles();
+      }
+
+      // Restart the timeout with remaining time
+      timewarpStartTime = Date.now();
+      timewarpTimeoutId = setTimeout(() => {
+        // Stop and cleanup sprite
+        if (timewarpSprite) {
+          timewarpSprite.stop();
+          timewarpSprite.destroy();
+          timewarpSprite = null;
+        }
+
+        // Stop particle animation
+        stopTimewarpParticles();
+
+        // Hide popup
+        elements.timewarpOverlay.classList.remove("show");
+
+        // Clear timeout reference
+        timewarpTimeoutId = null;
+        timewarpStartTime = null;
+        timewarpRemainingTime = null;
+        timewarpClipper = null;
+
+        isInTimewarp = false;
+        gameState.currentFight++;
+        setupFight();
+      }, timewarpRemainingTime);
+    }
   }
 }
 
@@ -1230,6 +1331,7 @@ function quitToMainMenu() {
   gameState.isPaused = false;
   // Also reset the UI elements related to pausing
   elements.pause.textContent = "Pause";
+  elements.pause.style.display = "none";
   elements.quitBtn.style.display = "none";
 
   // Hide game elements and show title screen

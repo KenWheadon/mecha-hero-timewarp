@@ -226,7 +226,8 @@ function onStartGame() {
   // Remove colorful background when entering game
   document.body.classList.remove("title-active");
   initGame(false);
-  // Ensure quit button is hidden on game start
+  // Show pause button and hide quit button on game start
+  document.getElementById("pause").style.display = "block";
   document.getElementById("quit-btn").style.display = "none";
 
   // Clean up logo animation if it's running
@@ -245,7 +246,8 @@ function onStartInfiniteMode() {
   // Remove colorful background when entering game
   document.body.classList.remove("title-active");
   initGame(true); // Pass true for infinite mode
-  // Ensure quit button is hidden on game start
+  // Show pause button and hide quit button on game start
+  document.getElementById("pause").style.display = "block";
   document.getElementById("quit-btn").style.display = "none";
 
   // Clean up logo animation if it's running
