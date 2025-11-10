@@ -66,17 +66,31 @@ export class StoryPanel {
 
   // Helper function to add both click and touch event listeners
   addTouchAndClickListener(element, handler) {
-    // Remove any existing listeners to prevent duplicates
-    element.removeEventListener("click", handler);
-    element.removeEventListener("touchend", handler);
+    let touchHandled = false;
 
-    // Add click listener for mouse/desktop
-    element.addEventListener("click", handler);
+    // Add touchstart listener to track touch events
+    element.addEventListener("touchstart", () => {
+      touchHandled = true;
+    });
 
     // Add touchend listener for touch devices
     element.addEventListener("touchend", (e) => {
-      e.preventDefault(); // Prevent ghost click
-      handler(e);
+      if (touchHandled) {
+        e.preventDefault(); // Prevent ghost click
+        handler(e);
+        // Reset flag after a short delay
+        setTimeout(() => {
+          touchHandled = false;
+        }, 500);
+      }
+    });
+
+    // Add click listener for mouse/desktop
+    element.addEventListener("click", (e) => {
+      // Only handle click if it wasn't preceded by a touch
+      if (!touchHandled) {
+        handler(e);
+      }
     });
   }
 
