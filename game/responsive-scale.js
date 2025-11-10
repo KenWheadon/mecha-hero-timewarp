@@ -20,6 +20,9 @@ export function initResponsiveScaling() {
     const viewportWidth = window.innerWidth;
     const viewportHeight = window.innerHeight;
 
+    // Target aspect ratio for the game (16:9 landscape optimal for this game)
+    const targetAspectRatio = 16 / 9;
+
     // Determine which screen/modal is visible
     let visibleScreen = null;
     let isModal = false;
@@ -94,8 +97,27 @@ export function initResponsiveScaling() {
       // For modals, use more aggressive scaling (98% of viewport) to fill space better
       // For game screens, use 95% to leave some breathing room
       const margin = (isModal || isStoryPanel) ? 0.98 : 0.95;
-      const scaleX = (viewportWidth * margin) / contentWidth;
-      const scaleY = (viewportHeight * margin) / contentHeight;
+
+      // Calculate viewport aspect ratio
+      const viewportAspectRatio = viewportWidth / viewportHeight;
+      const contentAspectRatio = contentWidth / contentHeight;
+
+      let scaleX = (viewportWidth * margin) / contentWidth;
+      let scaleY = (viewportHeight * margin) / contentHeight;
+
+      // For main game screens (not modals), maintain aspect ratio more strictly
+      // This ensures the game scales uniformly and maintains proper proportions
+      if (!isModal && !isStoryPanel) {
+        // If viewport is wider than content, scale based on height
+        // If viewport is taller than content, scale based on width
+        if (viewportAspectRatio > contentAspectRatio) {
+          // Viewport is wider - use height as constraint
+          scaleX = scaleY = (viewportHeight * margin) / contentHeight;
+        } else {
+          // Viewport is taller - use width as constraint
+          scaleX = scaleY = (viewportWidth * margin) / contentWidth;
+        }
+      }
 
       // Use the smaller scale to ensure everything fits, cap at 1 to prevent upscaling
       const scale = Math.min(scaleX, scaleY, 1);

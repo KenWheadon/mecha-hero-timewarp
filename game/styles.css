@@ -14,6 +14,58 @@
   --shadow-brutal-active: 4px 4px 0px #000000;
 }
 
+/* ========================================
+   RESPONSIVE & ORIENTATION LOCK
+   ======================================== */
+
+/* Prevent zooming and maintain responsive behavior */
+* {
+  -webkit-text-size-adjust: none;
+  -moz-text-size-adjust: none;
+  -ms-text-size-adjust: none;
+  text-size-adjust: none;
+}
+
+/* Landscape orientation enforcement for mobile */
+@media screen and (max-width: 1024px) and (orientation: portrait) {
+  body::after {
+    content: "Please rotate your device to landscape mode";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--color-bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    font-weight: bold;
+    text-align: center;
+    padding: 40px;
+    z-index: 99999;
+    color: var(--color-text);
+    text-shadow: 4px 4px 0px #000000;
+    letter-spacing: 2px;
+    box-sizing: border-box;
+  }
+
+  /* Hide all content in portrait mode on mobile */
+  body > *:not(::after) {
+    display: none !important;
+  }
+}
+
+/* Ensure game containers scale proportionally */
+#title-screen,
+#game,
+#victory-screen,
+#defeat-screen {
+  transform-origin: center center;
+  width: 100%;
+  max-width: 100%;
+}
+
 /* PARTICLE CANVAS */
 #particle-canvas {
   position: fixed;
@@ -67,7 +119,7 @@
 /* Container for the logo, whether static or sprite */
 #loading-logo-container {
   width: 200px;
-  height: 200px; /* Adjust height to match width for a square container */
+  height: 200px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -1287,14 +1339,8 @@ body.combat-active::before {
   border-right: 3px solid #000;
 }
 
-/* ENEMY POSE */
-#enemy-container {
-  position: relative;
-  display: inline-block;
-  /* Increase container width by 50%, keep original height */
-  width: 798px; /* 532px * 1.5 = 798px */
-  height: 380px; /* Original height maintained */
-}
+/* ENEMY POSE - These old fixed dimensions are now handled by the combat layout below */
+/* Removed hardcoded 798px x 380px to allow responsive scaling */
 
 #enemy-pose {
   width: 100%;
@@ -3111,8 +3157,8 @@ body.combat-active::before {
   }
 
   #enemy-container {
-    width: 630px; /* 420px * 1.5 = 630px */
-    height: 300px; /* Original height maintained */
+    /* Removed fixed width - let flexbox handle sizing */
+    max-width: 100%;
   }
 
   #enemy-pose {
@@ -3196,8 +3242,8 @@ body.combat-active::before {
   }
 
   #enemy-container {
-    width: 546px; /* 364px * 1.5 = 546px */
-    height: 260px; /* Original height maintained */
+    /* Removed fixed width - let flexbox handle sizing */
+    max-width: 100%;
   }
 
   #enemy-pose {
@@ -3848,5 +3894,442 @@ body.combat-active::before {
   .pause-btn {
     font-size: 20px;
     padding: 15px 40px;
+  }
+}
+
+/* ========================================
+   MOBILE RESPONSIVE OVERRIDES
+   ======================================== */
+
+/* Mobile devices - scale everything down proportionally */
+@media screen and (max-width: 896px) and (orientation: landscape),
+       screen and (max-height: 600px) and (orientation: landscape) {
+
+  /* Loading Screen */
+  #loading-logo-container,
+  #loading-logo {
+    width: min(150px, 25vw);
+    height: min(150px, 25vw);
+  }
+
+  #producer-text {
+    font-size: min(18px, 3vw);
+    margin-bottom: min(15px, 2vh);
+  }
+
+  #loading-content {
+    gap: min(30px, 4vh);
+  }
+
+  #loading-progress-bar {
+    height: min(35px, 6vh);
+  }
+
+  #loading-progress-text {
+    font-size: min(20px, 3.5vw);
+  }
+
+  #loading-start-btn {
+    padding: min(15px, 2vh) min(30px, 5vw);
+    font-size: min(24px, 4vw);
+  }
+
+  /* Combat Screen */
+  #game {
+    padding: 0; /* Remove padding to allow absolute positioning from edges */
+  }
+
+  #combat-area {
+    width: 98%;
+    height: 60vh;
+    gap: min(12px, 2vw);
+  }
+
+  /* Time warp popup */
+  #timewarp-popup {
+    padding: min(30px, 5vh) min(40px, 6vw);
+    max-width: 85vw;
+  }
+
+  #timewarp-title {
+    font-size: min(48px, 8vw);
+  }
+
+  #timewarp-message {
+    font-size: min(20px, 3.5vw);
+  }
+
+  #audio-toggle-combat {
+    width: min(41px, 6vw);
+    height: min(41px, 6vh);
+    top: min(12px, 2vh);
+    left: min(12px, 2vw);
+  }
+
+  #audio-toggle-combat .audio-icon {
+    width: min(32px, 5vw);
+    height: min(32px, 5vh);
+  }
+
+  #pause {
+    top: min(12px, 2vh);
+    right: min(12px, 2vw);
+    padding: min(8px, 1.5vh) min(18px, 3vw);
+    font-size: min(16px, 2.5vw);
+  }
+
+  #crystal-display {
+    top: min(12px, 2vh);
+    padding: min(10px, 2vh) min(18px, 3vw);
+    gap: min(8px, 1.5vh);
+  }
+
+  .crystal-item {
+    width: min(55px, 8vw);
+    height: min(55px, 8vh);
+  }
+
+  .crystal-label {
+    font-size: min(14px, 2.2vh);
+    letter-spacing: 1px;
+  }
+
+  .crystal-items-container {
+    gap: min(12px, 2vw);
+  }
+
+  .infinite-symbol,
+  .infinite-level-display {
+    font-size: min(40px, 6vh);
+  }
+
+  #defense-buttons {
+    gap: min(10px, 2vh);
+    min-width: min(75px, 12vw);
+  }
+
+  #defense-buttons .attack-btn {
+    height: min(75px, 12vh);
+    padding: min(8px, 1.5vh);
+  }
+
+  #player-container {
+    width: 22.5%;
+    gap: min(10px, 2vh);
+  }
+
+  #enemy-section {
+    width: 48%;
+    gap: min(10px, 2vh);
+  }
+
+  #player-hearts {
+    min-height: min(42px, 7vh);
+    gap: min(8px, 1.5vw);
+  }
+
+  .heart {
+    width: min(42px, 6vh);
+    height: min(42px, 6vh);
+  }
+
+  #enemy-hearts {
+    min-height: min(35px, 6vh);
+    gap: min(6px, 1vw);
+  }
+
+  #enemy-hearts .heart {
+    width: min(32px, 5vh);
+    height: min(32px, 5vh);
+  }
+
+  #timer-bar-container {
+    height: min(42px, 7vh);
+  }
+
+  #timer-text {
+    font-size: min(24px, 4vh);
+  }
+
+  #message {
+    top: min(120px, 18vh);
+    font-size: min(20px, 3vh);
+    max-width: 85vw;
+  }
+
+  #restart {
+    bottom: min(15px, 2vh);
+    padding: min(12px, 2vh) min(30px, 5vw);
+    font-size: min(20px, 3vh);
+  }
+}
+
+/* Extra small devices */
+@media screen and (max-width: 667px) and (orientation: landscape) {
+  /* Fix game container to allow proper absolute positioning */
+  #game {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    padding: 0; /* Remove padding to allow absolute positioning from edges */
+  }
+
+  #combat-area {
+    height: 70vh;
+    gap: 6px;
+  }
+
+  /* Time warp popup */
+  #timewarp-popup {
+    padding: 20px 30px;
+    max-width: 90vw;
+  }
+
+  #timewarp-title {
+    font-size: 36px;
+  }
+
+  #timewarp-message {
+    font-size: 16px;
+  }
+
+  #audio-toggle-combat {
+    width: 30px;
+    height: 30px;
+    top: 5px;
+    left: 5px;
+    position: absolute;
+  }
+
+  #audio-toggle-combat .audio-icon {
+    width: 24px;
+    height: 24px;
+  }
+
+  #pause {
+    top: 5px;
+    right: 5px;
+    padding: 5px 12px;
+    font-size: 12px;
+    position: fixed;
+  }
+
+  #crystal-display {
+    top: 5px;
+    padding: 6px 12px;
+    gap: 5px;
+    border-radius: 8px;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .crystal-item {
+    width: 40px;
+    height: 40px;
+  }
+
+  .crystal-label {
+    font-size: 10px;
+    letter-spacing: 0.5px;
+  }
+
+  .crystal-items-container {
+    gap: 8px;
+  }
+
+  .infinite-symbol,
+  .infinite-level-display {
+    font-size: 30px;
+  }
+
+  #defense-buttons {
+    gap: 6px;
+    min-width: 50px;
+    width: 15%;
+  }
+
+  #defense-buttons .attack-btn {
+    height: 56px;
+    padding: 4px;
+  }
+
+  .heart {
+    width: 32px;
+    height: 32px;
+  }
+
+  #enemy-hearts {
+    gap: 5px;
+  }
+
+  #enemy-hearts .heart {
+    width: 24px;
+    height: 24px;
+  }
+
+  #timer-bar-container {
+    height: 32px;
+  }
+
+  #timer-text {
+    font-size: 16px;
+  }
+
+  #player-container {
+    width: 23.4%;
+    gap: 8px;
+  }
+
+  #player-hearts {
+    gap: 6px;
+    min-height: 34px;
+  }
+
+  #enemy-section {
+    width: 48%;
+    gap: 8px;
+  }
+
+  #message {
+    top: 80px;
+    font-size: 16px;
+  }
+
+  #restart {
+    bottom: 8px;
+    padding: 8px 20px;
+    font-size: 16px;
+  }
+}
+
+/* Ultra small screens - very aggressive scaling */
+@media screen and (max-height: 400px) and (orientation: landscape) {
+  /* Fix game container */
+  #game {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    padding: 0; /* Remove padding to allow absolute positioning from edges */
+  }
+
+  #combat-area {
+    height: 75vh;
+    gap: 4px;
+  }
+
+  /* Time warp popup */
+  #timewarp-popup {
+    padding: 15px 25px;
+    max-width: 92vw;
+  }
+
+  #timewarp-title {
+    font-size: 32px;
+  }
+
+  #timewarp-message {
+    font-size: 14px;
+  }
+
+  #audio-toggle-combat {
+    width: 26px;
+    height: 26px;
+    top: 3px;
+    left: 3px;
+    position: absolute;
+  }
+
+  #audio-toggle-combat .audio-icon {
+    width: 20px;
+    height: 20px;
+  }
+
+  #pause {
+    top: 3px;
+    right: 3px;
+    padding: 4px 10px;
+    font-size: 11px;
+    position: fixed;
+  }
+
+  #crystal-display {
+    top: 3px;
+    padding: 5px 10px;
+    gap: 4px;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .crystal-item {
+    width: 35px;
+    height: 35px;
+  }
+
+  .crystal-label {
+    font-size: 9px;
+  }
+
+  .infinite-symbol,
+  .infinite-level-display {
+    font-size: 26px;
+  }
+
+  #defense-buttons {
+    gap: 5px;
+    min-width: 45px;
+    width: 15%;
+  }
+
+  #defense-buttons .attack-btn {
+    height: 50px;
+    padding: 3px;
+  }
+
+  .heart {
+    width: 28px;
+    height: 28px;
+  }
+
+  #enemy-hearts .heart {
+    width: 22px;
+    height: 22px;
+  }
+
+  #timer-bar-container {
+    height: 28px;
+  }
+
+  #timer-text {
+    font-size: 14px;
+  }
+
+  #player-container {
+    width: 22.5%;
+    gap: 6px;
+  }
+
+  #enemy-section {
+    width: 48%;
+    gap: 6px;
+  }
+
+  #player-hearts {
+    gap: 5px;
+    min-height: 30px;
+  }
+
+  #message {
+    top: 70px;
+    font-size: 14px;
+  }
+
+  #restart {
+    bottom: 5px;
+    padding: 6px 16px;
+    font-size: 14px;
   }
 }
